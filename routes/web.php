@@ -34,6 +34,8 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/user/{id}', 'UserController@show');
     Route::post('/user/seek', ['as'=>'user.seek', 'uses'=>'UserController@seek']);
     Route::get('/user/seek/reset', 'UserController@seekReset');
+    Route::get('/user/lock/{id}', 'UserController@lock');
+    Route::get('/user/unlock/{id}', 'UserController@unlock');
 
     // 业务
     Route::get('/customer/biz/{id}', 'BizController@create');

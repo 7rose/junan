@@ -16,4 +16,9 @@ class Error
     {
        return view('note')->with('custom', ['color'=>'warning', 'icon'=>'warning-sign', 'content'=>'您的账号被锁定, 请联系管理员!']);
     }
+
+    public function forbidden()
+    {
+        return view('note')->with('custom', ['color'=>'warning', 'icon'=>'warning-sign', 'content'=>'无权继续操作!']);
+    }
 }

@@ -15,6 +15,7 @@ use App\Forms\UserSeekForm;
 use App\Helpers\Validator;
 use App\Helpers\Error;
 use App\Helpers\Unique;
+use App\Helpers\Auth;
 
 class UserController extends Controller
 {
@@ -111,6 +112,31 @@ class UserController extends Controller
         return redirect('/');
     }
 
+    // 锁定
+    public function lock($id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin() || !$auth->master($id))  return $auth_error->forbidden();
+
+        $target = User::find($id)->update(['locked' => true]);
+        return redirect('/user/'.$id);
+    }
+
+    // 解锁
+    public function unlock($id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin() || !$auth->master($id))  return $auth_error->forbidden();
+        
+        $target = User::find($id)->update(['locked' => false]);
+        return redirect('/user/'.$id);
+    }
+
+
     // 锁定提示
     public function lockInfo()
     {
@@ -175,18 +201,25 @@ class UserController extends Controller
     public function show($id=0)
     {
         if($id===0) return redirect('/user');
-        $record = Customer::find($id);
+        $record = User::leftJoin('config as g', 'users.gender', '=', 'g.id')
+                    ->leftJoin('config as ut', 'users.user_type', '=', 'ut.id')
+                    ->leftJoin('config as at', 'users.auth_type', '=', 'at.id')
+                    ->leftJoin('branches', 'users.branch', '=', 'branches.id')
+                    ->leftJoin('users as c', 'users.created_by', '=', 'c.id')
+                    ->select('users.*', 'g.text as gender_text', 'ut.text as user_type_text', 'at.text as auth_type_text', 'branches.text as branch_text', 'c.name as created_by_text')
+                    ->find($id);
 
         if(!$record){
             $error = new Error;
             return $error->notFound();
         }
 
-        return view('users.show');
+        return view('users.show')->with('record', $record);
     }
 
     // end
 }
+
 
 
 
