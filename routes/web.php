@@ -11,31 +11,33 @@
 |
 */
 
-Route::get('/', function () {
-    $a = new App\Helpers\Date;
-    $b =  $a->ageFromId('320823197912187037');
-    // $b =  $a->birthdayFromId('320823197912187037');
-    $c =  $a->availableId('320823196912187037', '20-50');
-    echo $b;
-    // echo carbon->today();
+Route::get('/', 'UserController@welcome');
+Route::get('/login', 'UserController@login');
+Route::get('/logout', 'UserController@logout');
+Route::post('/user/check', ['as'=>'user.check', 'uses'=>'UserController@check']);
+Route::get('/locked', 'UserController@lockInfo');
+
+Route::group(['middleware' => ['login', 'state_check']], function () {
+
+    // 学员
+    Route::get('/customer', 'CustomerController@index');
+    Route::get('/customer/create', 'CustomerController@create');
+    Route::get('/customer/{id}', 'CustomerController@show');
+    Route::post('/customer/store', ['as'=>'customer.store', 'uses'=>'CustomerController@store']);
+    Route::post('/customer/seek', ['as'=>'customer.seek', 'uses'=>'CustomerController@seek']);
+    Route::get('/customer/seek/reset', 'CustomerController@seekReset');
+
+    // 员工
+    Route::get('/user', 'UserController@index');
+    Route::get('/user/create', 'UserController@create');
+    Route::post('/user/store', ['as'=>'user.store', 'uses'=>'UserController@store']);
+    Route::get('/user/{id}', 'UserController@show');
+    Route::post('/user/seek', ['as'=>'user.seek', 'uses'=>'UserController@seek']);
+    Route::get('/user/seek/reset', 'UserController@seekReset');
+
+    // 业务
+    Route::get('/customer/biz/{id}', 'BizController@create');
+    Route::post('/customer/biz/store', ['as'=>'biz.store', 'uses'=>'BizController@store']);
+
 });
 
-Route::get('/insert', function () {
-    return view('users/insert');
-});
-
-Route::get('/customer/create', 'CustomerController@create');
-Route::get('/customer/{id}', 'CustomerController@show');
-Route::post('/customer/store', ['as'=>'customer.store', 'uses'=>'CustomerController@store']);
-
-    // Route::get('/staff/auto_login', 'StaffController@autoLogin');
-    // Route::get('/staffing', 'StaffController@index');
-    // Route::get('/staff/create', 'StaffController@create');
-    // Route::post('/staff/store', ['as'=>'staff.store', 'uses'=>'StaffController@store']);
-    // Route::get('/staff/show/{id?}', 'StaffController@show');
-    // Route::get('/staff/edit/{id?}', 'StaffController@edit');
-    // Route::post('/staff/update/{id?}', 'StaffController@update');
-    // Route::get('/staff/lock/{id?}', 'StaffController@lock');
-    // Route::get('/staff/unlock/{id?}', 'StaffController@unlock');
-    // Route::get('/staff/delete/{id?}', 'StaffController@delete');
-    // Route::post('/staff/image/{id?}', 'StaffController@setImage');

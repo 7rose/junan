@@ -1,3 +1,25 @@
+<?php
+    $seek = new App\Helpers\Seek;
+    $me = '<li><a href="/login">请登录</a></li>';
+    if(Session::has('id')) {
+        $id = Session::get('id');
+        $record = DB::table('users')
+                        ->leftJoin('branches', 'users.branch', '=', 'branches.id')
+                        ->select('users.name', 'branches.text as branch_text')
+                        ->where('users.id', $id)
+                        ->first();
+        $me = '<li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        '.$record->name.'-'.$record->branch_text.' <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><span class="glyphicon glyphicon-cog"></span>&nbsp&nbsp系统配置</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/logout"><span class="glyphicon glyphicon-off"></span>&nbsp&nbsp安全退出</a></li>
+                    </ul>
+                </li>';
+     }
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,6 +28,7 @@
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ URL::asset('junan/css/style.css') }}" >
 </head>
 <body>
     <!-- 导航 -->
@@ -19,24 +42,14 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">军安</a>
+            <a href="/"><img class="logo" src="{{ URL::asset('junan/images/logo.svg') }}"></a>
         </div>
         <div class="collapse navbar-collapse" id="example-navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="#">学员</a></li>
-                <li><a href="#">员工</a></li>
-                <li><a href="#">财务</a></li>
-                <li><a href="#">分支机构</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        钟艳 <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#"><span class="glyphicon glyphicon-cog"></span>&nbsp&nbsp系统配置</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#"><span class="glyphicon glyphicon-off"></span>&nbsp&nbsp安全退出</a></li>
-                    </ul>
-                </li>
+                <li class="{{ $seek->navClick('customer') ? 'active' : '' }}"><a href="/customer">学员</a></li>
+                <li class="{{ $seek->navClick('user') ? 'active' : '' }}"><a href="/user">员工</a></li>
+                <li class="{{ $seek->navClick('finance') ? 'active' : '' }}"><a href="/finance">财务</a></li>
+                {!! $me !!}
             </ul>
         </div>
         </div>

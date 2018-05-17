@@ -29,6 +29,7 @@ class CreateCustomersTable extends Migration
             $table->string('content')->nullable(); // 备注
             $table->boolean('locked')->default(false); // 锁定
             $table->boolean('show')->default(true); // 锁定
+            $table->integer('created_by')->nullable(); // 性别
             $table->timestamps();
         });
     }

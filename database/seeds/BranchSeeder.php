@@ -14,43 +14,43 @@ class BranchSeeder extends Seeder
         DB::table('branches')->insert([
             [
                 'parent_id'=> 0,
-                'name'=>"军安集团",
+                'text'=>"军安集团",
              ],[
                 'parent_id'=> 1,
-                'name'=>"军安(马厂)",
+                'text'=>"军安(马厂)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"恒通(沭城)",
+                'text'=>"恒通(沭城)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"军越(汤涧)",
+                'text'=>"军越(汤涧)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"鸿远(沭城)",
+                'text'=>"鸿远(沭城)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"军兴(周集)",
+                'text'=>"军兴(周集)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"军顺(沭城)",
+                'text'=>"军顺(沭城)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"军畅(耿圩)",
+                'text'=>"军畅(耿圩)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"永安(沭城)",
+                'text'=>"永安(沭城)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"军盛(沂涛)",
+                'text'=>"军盛(沂涛)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"元顺(塘沟)",
+                'text'=>"元顺(塘沟)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"元安(章集)",
+                'text'=>"元安(章集)",
              ],[
                 'parent_id'=> 1,
-                'name'=>"杰达(北丁集)",
+                'text'=>"杰达(北丁集)",
              ],
         ]);
     }

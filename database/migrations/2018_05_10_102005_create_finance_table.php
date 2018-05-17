@@ -21,6 +21,7 @@ class CreateFinanceTable extends Migration
             $table->decimal('price',8,2)->nullable();
             $table->decimal('real_price',8,2);
             $table->integer('item');
+            $table->integer('created_by')->nullable(); // 创建人
             $table->string('content')->nullable();
             $table->timestamps();
         });

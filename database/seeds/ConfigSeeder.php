@@ -25,6 +25,22 @@ class ConfigSeeder extends Seeder
                 'text'    => '其他',
                 'extra'   => NULL,
             ],[
+                'type'    => 'auth_type',
+                'text'    => '超级管理员',
+                'extra'   => NULL,
+            ],[
+                'type'    => 'auth_type',
+                'text'    => '管理员',
+                'extra'   => NULL,
+            ],[
+                'type'    => 'auth_type',
+                'text'    => '用户',
+                'extra'   => NULL,
+            ],[
+                'type'    => 'auth_type',
+                'text'    => '员工',
+                'extra'   => NULL,
+            ],[
                 'type'    => 'customer_state',
                 'text'    => '报名成功',
                 'extra'   => NULL,
@@ -170,6 +186,26 @@ class ConfigSeeder extends Seeder
                 'extra'   => NULL,
             ],[
                 'type'    => 'lesson_state',
+                'text'    => '其他',
+                'extra'   => NULL,
+            ],[
+                'type'    => 'user_type',
+                'text'    => '决策',
+                'extra'   => NULL,
+            ],[
+                'type'    => 'user_type',
+                'text'    => '管理',
+                'extra'   => NULL,
+            ],[
+                'type'    => 'user_type',
+                'text'    => '教练',
+                'extra'   => NULL,
+            ],[
+                'type'    => 'user_type',
+                'text'    => '业务',
+                'extra'   => NULL,
+            ],[
+                'type'    => 'user_type',
                 'text'    => '其他',
                 'extra'   => NULL,
             ],

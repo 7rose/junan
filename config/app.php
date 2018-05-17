@@ -214,6 +214,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         
         // 手动
+        'Input' => Illuminate\Support\Facades\Input::class,
         'FormBuilder' => Kris\LaravelFormBuilder\Facades\FormBuilder::class,
 
     ],

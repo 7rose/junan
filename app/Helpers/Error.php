@@ -10,4 +10,10 @@ class Error
     {
        return view('note')->with('custom', ['color'=>'danger', 'icon'=>'warning-sign', 'content'=>'无记录!']);
     }
+
+    // 账号锁定
+    public function locked()
+    {
+       return view('note')->with('custom', ['color'=>'warning', 'icon'=>'warning-sign', 'content'=>'您的账号被锁定, 请联系管理员!']);
+    }
 }
