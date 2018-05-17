@@ -38,7 +38,7 @@
         </thead>
         <tbody>
             @foreach($records as $record)
-            <tr>
+            <tr class="{{ $record->locked ? 'warning' : 'default' }}">
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->work_id) !!}</td>
                 <td>{!! '<a class="btn btn-sm btn-'.$auth->authColor($record->auth_type).'" href="/user/'.$record->id.'">'. $seek->seekLabel('user_seek_array', 'key', $record->name).'</a>' !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->mobile) !!}</td>
