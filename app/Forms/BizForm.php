@@ -37,6 +37,12 @@ class BizForm extends Form
                 'attr' =>['step' => 0.01],
                 'rules' => 'required'
         ])
+        ->add('branch', 'choice', [
+            'label' => '所属驾校', 
+            'empty_value' => '-- 选择 --',
+            'choices'=> $list->branchList(),
+            'rules' => 'required'
+        ])
         ->add('user_id', 'text', [
             'label' => '推荐人工号或手机号',
             'rules' => 'min:2|max:16'

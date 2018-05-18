@@ -60,7 +60,7 @@ class BizController extends Controller
             }
         }
 
-        $finance = array_except($all, ['licence_type', 'class_type', 'date']);
+        $finance = array_except($all, ['licence_type', 'class_type']);
         $finance['item'] =  27;
         Finance::create($finance);
         return redirect('/customer/'.$all['customer_id']);

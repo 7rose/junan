@@ -13,7 +13,7 @@
                         '.$record->name.'-'.$record->branch_text.' <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="#"><span class="glyphicon glyphicon-cog"></span>&nbsp&nbsp系统配置</a></li>
+                        <li><a href="/user/reset_password"><span class="glyphicon glyphicon-cog"></span>&nbsp&nbsp重设密码</a></li>
                         <li class="divider"></li>
                         <li><a href="/logout"><span class="glyphicon glyphicon-off"></span>&nbsp&nbsp安全退出</a></li>
                     </ul>

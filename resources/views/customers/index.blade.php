@@ -30,6 +30,7 @@
                 <th>手机</th>
                 <th>出生日期</th>
                 <th>身份证</th>
+                <th>创建人</th>
                 <th>业务</th>
                 <th>财务</th>
             </tr>
@@ -41,6 +42,7 @@
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->mobile) !!}</td>
                 <td>{{ $date->birthdayFromId($record->id_number)}}&nbsp&nbsp<span class="label label-{{ $record->gender == 2 ? 'danger' : 'default' }}">{{ $date->ageFromId($record->id_number) }}</span></td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->id_number) !!}</td>
+                <td>{{ $record->created_by_text }}</td>
                 <td>0</td>
                 <td>0</td>
             </tr>

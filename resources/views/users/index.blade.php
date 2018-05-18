@@ -32,18 +32,24 @@
                 <th>手机</th>
                 <th>机构</th>
                 <th>类型</th>
+                <th>创建人</th>
                 <th>业务</th>
                 <th>财务</th>
             </tr>
         </thead>
         <tbody>
             @foreach($records as $record)
+        @if($auth->self($record->id))
+            <tr class="info">
+        @else
             <tr class="{{ $record->locked ? 'warning' : 'default' }}">
+        @endif
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->work_id) !!}</td>
                 <td>{!! '<a class="btn btn-sm btn-'.$auth->authColor($record->auth_type).'" href="/user/'.$record->id.'">'. $seek->seekLabel('user_seek_array', 'key', $record->name).'</a>' !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->mobile) !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->branch_text) !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->user_type_text) !!}</td>
+                <td>{{ $record->created_by_text }}</td>
                 <td>1</td>
                 <td>1</td>
             </tr>

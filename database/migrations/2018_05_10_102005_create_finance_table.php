@@ -17,10 +17,12 @@ class CreateFinanceTable extends Migration
             $table->increments('id');
             $table->integer('customer_id');
             $table->integer('user_id')->nullable();
+            $table->integer('branch')->nullable();
             $table->integer('in')->default(true);
             $table->decimal('price',8,2)->nullable();
             $table->decimal('real_price',8,2);
             $table->integer('item');
+            $table->integer('date')->nullable();
             $table->integer('created_by')->nullable(); // 创建人
             $table->string('content')->nullable();
             $table->timestamps();

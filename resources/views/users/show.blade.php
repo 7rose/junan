@@ -12,21 +12,29 @@
         @if(isset($record))
         <li><h4>{{ $record->name }}</h4></li>
         <li><strong>状态:  </strong><span class="label label-{{ $record->locked ? 'warning' : 'success' }}">{{ $record->locked ? '锁定' : '正常' }}</span></li>
+        <li><strong>工号:  </strong>{{ $record->work_id }}</li>
         <li><strong>性别:  </strong>{{ $record->gender_text }}</li>
         <li><strong>电话:  </strong>{{ $record->mobile }}</li>
         <li><strong>驾校:  </strong>{{ $record->branch_text }}</li>
         <li><strong>职位:  </strong>{{ $record->user_type_text }}</li>
         <li><strong>类型:  </strong>{{ $record->auth_type_text }}</li>
+        <li><strong>创建人:  </strong>{{ $record->created_by_text }}</li>
+        <li><strong>创建时间:  </strong>{{ $record->created_at }}</li>
+        <li><strong>最近更新:  </strong>{{ $record->updated_at }}</li>
         <li><strong>备注:  </strong>{{ $record->content }}</li>
         </ul>
         @endif
 
         @if($auth->master($record->id) && !$auth->self($record->id) && $auth->admin())
             @if($record->locked)
-                <a href="/user/unlock/{{ $record->id }}" class="btn btn-success btn-block btn-sm">解锁</a>
+                <a href="/user/unlock/{{ $record->id }}" class="btn btn-success  btn-sm"> 解锁 </a>
             @else
-                <a href="/user/lock/{{ $record->id }}" class="btn btn-warning btn-block btn-sm">锁定</a>
+                <a href="/user/lock/{{ $record->id }}" class="btn btn-warning  btn-sm"> 锁定 </a>
             @endif
+            <a href="/user/password_help/{{ $record->id }}" class="btn btn-danger  btn-sm">重置密码</a>
+        @endif
+        @if($auth->self($record->id) || ($auth->master($record->id) && $auth->admin()))
+            <a href="/user/edit/{{ $record->id }}" class="btn btn-danger  btn-sm">信息修改</a>
         @endif
 
     </div>

@@ -1,5 +1,6 @@
 <?php
     $date = new App\Helpers\Date;
+    $auth = new App\Helpers\Auth;
 ?>
 @extends('../nav')
 
@@ -16,6 +17,9 @@
         <li><strong>地址:  </strong>{{ $record->address }}</li>
         <li><strong>电话:  </strong>{{ $record->mobile }}</li>
         <li><strong>居住地:  </strong>{{ $record->location }}</li>
+        <li><strong>创建人:  </strong>{{ $record->created_by_text }}</li>
+        <li><strong>创建时间:  </strong>{{ $record->created_at }}</li>
+        <li><strong>最近更新:  </strong>{{ $record->updated_at }}</li>
         <li><strong>备注:  </strong>{{ $record->content }}</li>
         </ul>
         {{-- 年龄限制 --}}
@@ -28,7 +32,10 @@
         </div>
         @endif
          <a href="/customer/biz/{{ $record->id }}" class="btn btn-success btn-sm">+ 新业务</a>&nbsp
-        <a href="/customer/finance/{{ $record->id }}" class="btn btn-warning btn-sm">$ 收付款</a>
+        <a href="/finance/create/{{ $record->id }}" class="btn btn-warning btn-sm">$ 收付款</a>
+        @if($auth->admin())
+            <a href="/customer/edit/{{ $record->id }}" class="btn btn-danger btn-sm">修改</a>&nbsp
+        @endif
     </div>
 </div>
 </div>
@@ -53,7 +60,8 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>收/付</th>
+                    <th>收付</th>
+                    <th>驾校</th>
                     <th>项目</th>
                     <th>经手人</th>
                     <th>推荐人</th>
@@ -64,14 +72,15 @@
             </thead>
             
                 @foreach($finance as $f)
-                    <tr>
-                        <td class="{{ $f->in ? 'default' : 'danger' }}">{{ $f->in ? '收 +' : '付 -' }}</td>
+                    <tr class="{{ $f->in ? 'default' : 'danger' }}">
+                        <td>{{ $f->in ? '+' : '-' }}</td>
+                        <td>{{ $f->branch_text }}</td>
                         <td>{{ $f->item_text }}</td>
                         <td>{{ $f->created_by_text }}</td>
                         <td>{{ $f->user_id_text }}</td>
                         <td>{{ $f->price }}</td>
                         <td>{{ $f->real_price }}</td>
-                        <td>{{ $f->created_at }}</td>
+                        <td>{{ date('Y-m-d', $f->date) }}</td>
                     </tr>
                 @endforeach
             </table>

@@ -11,6 +11,7 @@ use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\UserForm;
 use App\Forms\UserLoginForm;
 use App\Forms\UserSeekForm;
+use App\Forms\UserPasswordForm;
 
 use App\Helpers\Validator;
 use App\Helpers\Error;
@@ -32,7 +33,8 @@ class UserController extends Controller
         $records = User::leftJoin('config as g', 'users.gender', '=', 'g.id')
                     ->leftJoin('config as t', 'users.user_type', '=', 't.id')
                     ->leftJoin('branches', 'users.branch', '=', 'branches.id')
-                    ->select('users.*', 'g.text as gender_text', 't.text as user_type_text', 'branches.text as branch_text')
+                    ->leftJoin('users as c', 'users.created_by', '=', 'c.id')
+                    ->select('users.*', 'g.text as gender_text', 't.text as user_type_text', 'branches.text as branch_text', 'c.name as created_by_text')
                     ->where(function ($query) { 
                             // // admin
                             // if(!$this->tap->realRoot()) $query->where('staff.id', '>', 1);
@@ -53,6 +55,9 @@ class UserController extends Controller
                                 $query->orWhere('users.content', 'LIKE', '%'.Session::get('user_seek_array')['key'].'%');
                             }
                         })
+                    ->orderBy('users.auth_type')
+                    ->orderBy('users.user_type')
+                    ->orderBy('users.created_at', 'desc')
                     ->paginate(30);
 
         return view('users.index', compact('form'))->with('records', $records);
@@ -89,6 +94,7 @@ class UserController extends Controller
         return view('form', compact('form'))->with('custom',['title'=>$title, 'icon'=>$icon]);
     }
 
+    // 退出
     public function logout()
     {
         Session::flush();
@@ -150,6 +156,46 @@ class UserController extends Controller
         return view('users.welcome');
     }
 
+    // 重设密码
+    public function resetPassword()
+    {
+        $form = $this->form(UserPasswordForm::class, [
+            'method' => 'POST',
+            'url' => route('password.store')
+        ]);
+
+        $title = '重设密码';
+        $icon = 'cog';
+
+        return view('form', compact('form'))->with('custom',['title'=>$title, 'icon'=>$icon]);
+    }
+
+    // 处理重设密码
+    public function updatePassword(Request $request)
+    {
+        $form = $this->form(UserPasswordForm::class);
+        if($request->password != $request->password_confirmed) return redirect()->back()->withErrors(['password_confirmed'=>'2次输入不一致!'])->withInput();
+        User::find(Session::get('id'))->update(['password'=>bcrypt($request->password), 'new'=>false]);
+        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'您的密码修改成功!']);
+    }
+
+    // 管理员设置用户密码
+    public function passwordHelp($id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin() || !$auth->master($id))  return $auth_error->forbidden();
+
+        $record = User::find($id);
+        if(!$record) return $auth_error->notFound();
+
+        $password = $record->work_id.date("md");
+        $record->update(['password'=>bcrypt($password), 'new'=>true]);
+
+        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>$record->name.'的密码修改成功!  格式为['.$record->name.'工号+本月+本日]']);
+    }
+
 
     // 新员工
     public function create()
@@ -191,7 +237,8 @@ class UserController extends Controller
         }
 
         $all['work_id'] = $validate->getWorkId();
-        $all['password'] = bcrypt($all['work_id'].$all['mobile']);
+        $all['created_by'] = Session::get('id');
+        $all['password'] = bcrypt($all['work_id'].$all['work_id']);
 
         $id = User::create($all);
         return redirect('/user/'.$id->id);
@@ -215,6 +262,66 @@ class UserController extends Controller
         }
 
         return view('users.show')->with('record', $record);
+    }
+
+    // 修改信息
+    public function edit($id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+
+        $record = User::find($id);
+
+        $form = $this->form(UserForm::class, [
+            'method' => 'POST',
+            'model' => $record,
+            //'url' => route('fashion.update')
+            'url' => '/user/update/'.$id
+        ]);
+
+
+        if(($auth->admin() && $auth->master($id)) || $auth->self($id)){
+            return view('form', compact('form'))->with('custom',['title'=>'信息修改 - '.$record->name, 'icon'=>'cog']);
+        }else{
+           return $auth_error->forbidden(); 
+        }         
+    }
+
+    // 执行修改
+    public function update(Request $request, $id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(($auth->admin() && $auth->master($id)) || $auth->self($id)){
+        
+            $all = $request->all();
+            $form = $this->form(UserForm::class);
+
+            $validate = new Validator;
+            // // 身份证格式检查
+            // if(!$validate->checkIdNumber($all['id_number'])) return redirect()->back()->withErrors(['id_number'=>'身份证错误!'])->withInput();
+            // 身份证唯一性检查
+            $exists = new Unique;
+            if(!$validate->checkMobile($all['mobile'])) return redirect()->back()->withErrors(['mobile'=>'手机号错误!'])->withInput();
+            // 手机号重复性检查
+            $target = User::find($id);
+
+            $resault = $exists->exists($all['mobile'], 'mobile', 'users');
+            if($resault && $target->mobile != $all['mobile']) {
+                $message = "此手机号已存在! <a href=\"/user/".$resault."\">若确认输入无误, 可转到已有记录</a>";
+                return redirect()->back()->withErrors(['mobile'=>$message])->withInput();
+            }
+            // 手机号格式检查
+            if(!$validate->checkMobile($all['mobile'])) return redirect()->back()->withErrors(['mobile'=>'手机号错误!'])->withInput();
+
+            $target->update($all);
+
+            return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'用户信息修改成功!']);
+        }else{
+            return $auth_error->forbidden(); 
+        }
     }
 
     // end

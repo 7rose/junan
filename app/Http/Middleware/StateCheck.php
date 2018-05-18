@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Session;
+use Request;
 use App\User;
 use App\Helpers\Auth;
 
@@ -18,13 +19,17 @@ class StateCheck
      */
     public function handle($request, Closure $next)
     {
-        $locked = User::find(Session::get('id'))->locked;
+        $record = User::find(Session::get('id'));
         $auth = new Auth;
 
-        if($locked || !$auth->user()){
+        if($record->locked || !$auth->user()){
             return redirect('/locked');
         }else{
-            return $next($request);
+            if($record->new && Request::path() != 'user/reset_password' && Request::path() != 'user/update_password'){
+                return redirect('/user/reset_password');
+            }else{
+                return $next($request);
+            }
         }
     }
 }

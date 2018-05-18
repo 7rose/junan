@@ -17,7 +17,7 @@ class CreateCustomersTable extends Migration
             $table->increments('id');
             // $table->integer('licence_type'); // 驾照类型
             // $table->integer('class_type'); // 班类型
-            $table->string('id_number')->unique(); // 身份证号
+            $table->string('id_number'); // 身份证号
             $table->string('mobile'); // 电话
             $table->string('name'); // 姓名
             $table->integer('gender'); // 性别

@@ -5,7 +5,10 @@ namespace App\Helpers;
 use App\Config;
 use App\Branch;
 use App\Customer;
+use App\User;
+
 use Request;
+use Session;
 
 use App\Helpers\Date;
 
@@ -61,6 +64,18 @@ class ConfigList
         $path = Request::path();
         $path_array = explode('/', $path);
         return end($path_array);
+    }
+
+    // 有效授权
+    public function authList()
+    {
+        $records = Config::where('type', 'auth_type')->get();
+        $me = User::find(Session::get('id'))->auth_type;
+        $out = [];
+        foreach ($records as $record) {
+            if($me < $record->id) $out = array_add($out, $record->id, $record->text);
+        }
+        return $out;
     }
 
     // end
