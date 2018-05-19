@@ -26,6 +26,8 @@ class CreateCustomersTable extends Migration
             // $table->integer('date'); // 报名日期
             // $table->integer('file_id')->nullable(); // 交管局开班档案号
             // $table->integer('state')->nullable(); // 状态
+            $table->decimal('finance_info',8,2)->nullable();
+            $table->string('biz_info')->nullable(); // 业务信息
             $table->string('content')->nullable(); // 备注
             $table->boolean('locked')->default(false); // 锁定
             $table->boolean('show')->default(true); // 锁定

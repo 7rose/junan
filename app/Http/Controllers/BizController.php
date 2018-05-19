@@ -44,10 +44,6 @@ class BizController extends Controller
         $all['date'] =  strtotime($all['date']);
         $all['created_by'] = Session::get('id');
 
-        // 存储业务表
-        $biz = array_except($all, ['price', 'real_price', 'user_id']);
-        Biz::create($biz);
-
         // 财务表
         // 推荐人
         if($all['user_id'] != '' || $all['user_id'] != null){
@@ -63,6 +59,10 @@ class BizController extends Controller
         $finance = array_except($all, ['licence_type', 'class_type']);
         $finance['item'] =  27;
         Finance::create($finance);
+         // 存储业务表
+        $biz = array_except($all, ['price', 'real_price', 'user_id']);
+        Biz::create($biz);
+
         return redirect('/customer/'.$all['customer_id']);
     }
 }

@@ -25,11 +25,11 @@ class FinanceSeekForm extends Form
             'choices'=> $config_list->branchList(),
         ])
         ->add('date_begin', 'date', [
-            'label' => '时间段: 起点',
+            'label' => '时间: 起点, 包含当日',
             'value' => Session::has('finance_seek_array') && Session::get('finance_seek_array')['date_begin']!='' ? Session::get('finance_seek_array')['date_begin'] : '',
         ])
         ->add('date_end', 'date', [
-            'label' => '时间段: 终点',
+            'label' => '时间: 终点, 包含当日',
             'value' => Session::has('finance_seek_array') && Session::get('finance_seek_array')['date_end']!='' ? Session::get('finance_seek_array')['date_end'] : '',
         ])
         ->add('submit','submit',[

@@ -19,7 +19,7 @@
         <table class="table table-hover">
         <caption>
             <a href="/customer/create" class="btn btn-sm btn-default">+ 新学员</a>&nbsp&nbsp
-            <a href="#" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-th-list"></span>&nbsp&nbsp导出excel</a>&nbsp&nbsp
+            <a href="/customer/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-th-list"></span>&nbsp&nbsp导出excel</a>&nbsp&nbsp
             @if($seek->seeking('seek_array', 'key'))
                 <a href="/customer/seek/reset" class="btn btn-sm btn-warning">重置查询条件</a>&nbsp&nbsp
             @endif
@@ -30,20 +30,18 @@
                 <th>手机</th>
                 <th>出生日期</th>
                 <th>身份证</th>
-                <th>创建人</th>
-                <th>业务</th>
                 <th>财务</th>
+                <th>业务</th>
             </tr>
         </thead>
         <tbody>
             @foreach($records as $record)
-            <tr>
+            <tr class="{{ $record->finance_info > 0 ? 'warning' : 'default' }}">
                 <td><a class="btn btn-sm btn-{{ $record->gender == 2 ? 'danger' : 'default'}}"  href="/customer/{{ $record->id }}" >{!! $seek->seekLabel('seek_array', 'key', $record->name) !!}</a></td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->mobile) !!}</td>
                 <td>{{ $date->birthdayFromId($record->id_number)}}&nbsp&nbsp<span class="label label-{{ $record->gender == 2 ? 'danger' : 'default' }}">{{ $date->ageFromId($record->id_number) }}</span></td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->id_number) !!}</td>
-                <td>{{ $record->created_by_text }}</td>
-                <td>0</td>
+                <td>{!! $seek->seekLabel('seek_array', 'key', $record->finance_info) !!}</td>
                 <td>0</td>
             </tr>
             @endforeach

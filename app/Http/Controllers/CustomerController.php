@@ -8,6 +8,7 @@ use App\Customer;
 use App\Biz;
 use App\Finance;
 use DB;
+use Excel;
 
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\CustomerForm;
@@ -17,43 +18,62 @@ use App\Helpers\Validator;
 use App\Helpers\Error;
 use App\Helpers\Unique;
 use App\Helpers\Auth;
+use App\Helpers\Pre;
 
 class CustomerController extends Controller
 {
     use FormBuilderTrait;
 
+    private function prepare() 
+    {
+        // 更新预处理财务结果数据
+        $pre = new Pre;
+        $pre->updateFinance();
+
+        $records = DB::table('customers')
+            ->leftJoin('config', 'customers.gender', '=', 'config.id')
+            ->leftJoin('users', 'customers.created_by', '=', 'users.id')
+            ->select('customers.*','config.text as gender_text', 'users.name as created_by_text')
+            // ->leftJoin('finance', 'customers.id', '=', 'finance.customer_id')
+            // ->select('customers.*',
+            //          'config.text as gender_text', 
+            //          'users.name as created_by_text', 
+            //          DB::raw('
+            //             group_concat(finance.customer_id) as num, 
+            //             group_concat(finance.price) as all_price, 
+            //             group_concat(finance.real_price) as all_real_price, 
+            //             group_concat(finance.in) as all_in
+            //             '))
+            ->where(function ($query) { 
+                    // 关键词
+                    if(Session::has('seek_array') && array_has(Session::get('seek_array'), 'key') && Session::get('seek_array')['key'] != '') {
+                        $query->Where('customers.name', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                        $query->orWhere('customers.mobile', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                        $query->orWhere('customers.id_number', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                        $query->orWhere('customers.finance_info', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                        $query->orWhere('customers.address', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                        $query->orWhere('customers.location', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                        $query->orWhere('customers.content', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                    }
+                });
+        return $records;
+    }
+
     // index 
     public function index()
     {
+
         $form = $this->form(CustomerSeekForm::class, [
             'method' => 'POST',
             'url' => route('customer.seek')
         ]);
 
-        $records = DB::table('customers')
-                    ->leftJoin('config', 'customers.gender', '=', 'config.id')
-                    ->leftJoin('users', 'customers.created_by', '=', 'users.id')
-                    ->select('customers.*', 'config.text', 'users.name as created_by_text')
-                    ->where(function ($query) { 
-                            // 关键词
-                            if(Session::has('seek_array') && array_has(Session::get('seek_array'), 'key') && Session::get('seek_array')['key'] != '') {
-                                $query->Where('customers.name', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                                $query->orWhere('customers.mobile', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                                $query->orWhere('customers.id_number', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                                $query->orWhere('customers.address', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                                $query->orWhere('customers.location', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                                $query->orWhere('customers.content', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                            }
-                        })
-                    // ->leftJoin('biz', 'customers.id', '=', 'biz.customer_id')
-                    // ->select(DB::raw('group_concat(staff.name) as staff_name, group_concat(staff.id) as staff_id, group_concat(staff.img) as staff_img,  group_concat(staff.gender) as staff_gender'), 'departments.name', 'departments.id')
-                    // ->groupBy('customers.id')
-                    // ->groupBy('customers.id')
-                    ->orderBy('customers.created_at', 'desc')
-                    ->paginate(30);
+        $records = $this->prepare()
+                        ->orderBy('customers.finance_info', 'desc')
+                        ->orderBy('customers.created_at', 'desc')
+                        ->paginate(30);
 
         return view('customers.index', compact('form'))->with('records', $records);
-        // return view('customers.index')->with('records', $records);
     }
 
     // 查询条件
@@ -216,6 +236,41 @@ class CustomerController extends Controller
         $target->update($all);
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'学员信息修改成功!']);
+    }
+
+        // 输出Execl
+    public function seekToExcel()
+    {
+        $cellData = [
+            ['姓名', '电话', '学身份证', '财务统计', '业务统计', '身份证地址', '现居地'],
+        ];
+
+        $records = $this->prepare()
+                        // ->orderBy('finance.date')
+                        ->get();
+
+        if(count($records)) {
+            foreach ($records as $record) {
+                array_push($cellData, [
+                                        $record->name,
+                                        $record->mobile, 
+                                        '#'.$record->id_number, 
+                                        $record->finance_info, 
+                                        $record->biz_info,
+                                        $record->address,
+                                        $record->location
+                                    ]);
+            }
+        }
+        $file_name = '学员'.date('Y-m-d', time());
+
+        Excel::create($file_name,function($excel) use ($cellData){
+            $excel->sheet('列表', function($sheet) use ($cellData){
+                $sheet->rows($cellData);
+                $sheet->setAutoSize(true);
+                $sheet->freezeFirstRow();
+            });
+        })->export('xlsx');
     }
 
     // end

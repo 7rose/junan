@@ -163,6 +163,7 @@ return [
 
         // 手动
         Kris\LaravelFormBuilder\FormBuilderServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
     ],
 
@@ -216,6 +217,7 @@ return [
         // 手动
         'Input' => Illuminate\Support\Facades\Input::class,
         'FormBuilder' => Kris\LaravelFormBuilder\Facades\FormBuilder::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
     ],
 

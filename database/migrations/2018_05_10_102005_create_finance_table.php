@@ -15,7 +15,7 @@ class CreateFinanceTable extends Migration
     {
         Schema::create('finance', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('customer_id');
+            $table->integer('customer_id')->index();
             $table->integer('user_id')->nullable();
             $table->integer('branch')->nullable();
             $table->integer('in')->default(true);

@@ -24,6 +24,8 @@ class CreateUsersTable extends Migration
             $table->string('password'); // 密码
             $table->integer('user_type'); // 员工类型
             $table->integer('auth_type'); // 系统授权
+            $table->decimal('finance_info',8,2)->nullable();
+            $table->string('biz_info')->nullable(); // 业务信息
             $table->integer('created_by')->nullable(); // 创建人
             $table->boolean('locked')->default(false); // 锁定
             $table->boolean('new')->default(true); // 新用户

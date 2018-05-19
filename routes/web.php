@@ -28,6 +28,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/customer/seek/reset', 'CustomerController@seekReset');
     Route::get('/customer/edit/{id}', 'CustomerController@edit');
     Route::post('/customer/update/{id}', ['as'=>'customer.update', 'uses'=>'CustomerController@update']);
+    Route::get('/customer/download/excel', 'CustomerController@seekToExcel');
 
     // 员工
     Route::get('/user', 'UserController@index');
@@ -54,12 +55,14 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/finance/seek/reset', 'FinanceController@seekReset');
     Route::get('/finance/create/{id}', 'FinanceController@create');
     Route::post('/finance/store', ['as'=>'finance.store', 'uses'=>'FinanceController@store']);
+    Route::get('/finance/download/excel', 'FinanceController@seekToExcel');
 
 });
 
 
 Route::get('/test', function() {
-    echo  Request::path();
+    $a = new App\Helpers\Pre;
+    print_r($a->updateFinance());
 });
 
 
