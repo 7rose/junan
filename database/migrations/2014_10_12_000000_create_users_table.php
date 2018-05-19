@@ -15,8 +15,8 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('work_id')// 工号
-            $table->string('mobile')// 手机
+            $table->string('work_id');// 工号
+            $table->string('mobile');// 手机
             // $table->string('id_number')->unique(); // 身份证
             $table->integer('branch'); // 驾校
             $table->integer('gender'); // 性别
