@@ -26,8 +26,8 @@
     <meta charset="utf-8">
     <title>军安集团</title>
     <link rel="stylesheet" href="{{ URL::asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
-    <script src="{{ URL::asset('node_modules/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script src="{{ URL::asset('node_modules/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ URL::asset('node_modules/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <link rel="stylesheet" type="text/css" href="{{ URL::asset('junan/css/style.css') }}" >
 </head>
 <body>
