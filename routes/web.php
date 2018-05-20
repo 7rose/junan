@@ -61,8 +61,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 
 Route::get('/test', function() {
-    $a = new App\Helpers\Pre;
-    print_r($a->updateFinance());
+     echo str_random(16);
 });
 
 
