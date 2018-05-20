@@ -61,7 +61,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 
 Route::get('/test', function() {
-     return phpinfo();
+     phpinfo();
 });
 
 
