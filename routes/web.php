@@ -61,7 +61,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 
 Route::get('/test', function() {
-     echo str_random(16);
+     // echo str_random(16);
 });
 
 
