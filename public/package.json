@@ -1,14 +1,19 @@
 {
-  "name": "junan",
+  "name": "junan.viirose.com",
   "version": "1.0.0",
-  "description": "junan",
+  "description": "laravel",
   "main": "index.js",
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bootstrap": "3.*"
-  }
+  "repository": {
+    "type": "git",
+    "url": "https://viirose.com"
+  },
+  "author": "kris",
+  "license": "ISC"
 }
