@@ -1,23 +1,21 @@
 <?php
 
-// GitHub Webhook Secret.
-// Keep it the same with the 'Secret' field on your Webhooks / Manage webhook page of your respostory.
-$secret = "vlQUTCw7EguCqY5F";
-
-// Path to your respostory on your server.
-// e.g. "/var/www/respostory"
 $path = "/mnt/www/junan.viirose.com";
+$key = 'vlQUTCw7EguCqY5F';
 
-// Headers deliveried from GitHub
-$signature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
+$github_signature = @$_SERVER['HTTP_X_HUB_SIGNATURE'];
+$payload = file_get_contents('php://input');
 
-if ($signature) {
-  $hash = "sha1=".hash_hmac('sha1', file_get_contents("php://input"), $secret);
-  if (strcmp($signature, $hash) == 0) {
-    echo shell_exec("cd {$path} && /usr/bin/git reset --hard origin/master && /usr/bin/git clean -f && /usr/bin/git pull 2>&1");
-    exit();
-  }
-}
+$arr = explode('=', $github_signature);
+$algo = $arr[0];
+$signature = $arr[1];
 
-http_response_code(404);
+$payload_hash = hash_hmac($algo, $payload, $key);
+if($payload_hash == $signature){
+    shell_exec('cd '.$path);
+    shell_exec('/usr/bin/git pull');
+    return 200;
+}else{
+   return 'invalid key!'; 
+} 
 ?>
