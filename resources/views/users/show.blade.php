@@ -48,23 +48,17 @@
     <div class="panel-body">
         @if(isset($finance) && count($finance))
         <caption>
-            <div class="alert alert-{{ $finance_info['rest'] > 0 || $finance_info['rest'] < 0 ? 'warning' : 'success' }}">
-                <ul class="list-inline">
-                    <li>应付: {{ $finance_info['to_out'] }}</li>
-                    <li>实付: {{ $finance_info['out'] }}</li>
-                    <li>应收: {{ $finance_info['to_in'] }}</li>
-                    <li>实收: {{ $finance_info['in'] }}</li>
-                    <li>结果: {{ $finance_info['rest'] }}</li>
-                </ul>
+            <div class="alert alert-info">
+                统计信息
             </div>
         </caption>
         <table class="table table-hover">
             <thead>
                 <tr>
                     <th>收/付</th>
+                    <th>学员</th>
                     <th>项目</th>
                     <th>经手人</th>
-                    <th>推荐人</th>
                     <th>应收(付)</th>
                     <th>实收(付)</th>
                     <th>日期</th>
@@ -74,12 +68,12 @@
                 @foreach($finance as $f)
                     <tr>
                         <td class="{{ $f->in ? 'default' : 'danger' }}">{{ $f->in ? '收 +' : '付 -' }}</td>
+                        <td>{{ $f->customer_id_text }}</td>
                         <td>{{ $f->item_text }}</td>
                         <td>{{ $f->created_by_text }}</td>
-                        <td>{{ $f->user_id_text }}</td>
                         <td>{{ $f->price }}</td>
                         <td>{{ $f->real_price }}</td>
-                        <td>{{ $f->created_at }}</td>
+                        <td>{{ date('Y-m-d', $f->date) }}</td>
                     </tr>
                 @endforeach
             </table>

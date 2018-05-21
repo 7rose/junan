@@ -6,6 +6,7 @@ use Session;
 use Hash;
 use Illuminate\Http\Request;
 use App\User;
+use App\Finance;
 
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\UserForm;
@@ -244,26 +245,6 @@ class UserController extends Controller
         return redirect('/user/'.$id->id);
     }
 
-    // 个人
-    public function show($id=0)
-    {
-        if($id===0) return redirect('/user');
-        $record = User::leftJoin('config as g', 'users.gender', '=', 'g.id')
-                    ->leftJoin('config as ut', 'users.user_type', '=', 'ut.id')
-                    ->leftJoin('config as at', 'users.auth_type', '=', 'at.id')
-                    ->leftJoin('branches', 'users.branch', '=', 'branches.id')
-                    ->leftJoin('users as c', 'users.created_by', '=', 'c.id')
-                    ->select('users.*', 'g.text as gender_text', 'ut.text as user_type_text', 'at.text as auth_type_text', 'branches.text as branch_text', 'c.name as created_by_text')
-                    ->find($id);
-
-        if(!$record){
-            $error = new Error;
-            return $error->notFound();
-        }
-
-        return view('users.show')->with('record', $record);
-    }
-
     // 修改信息
     public function edit($id)
     {
@@ -322,6 +303,38 @@ class UserController extends Controller
         }else{
             return $auth_error->forbidden(); 
         }
+    }
+
+    // 个人
+    public function show($id=0)
+    {
+        if($id===0) return redirect('/user');
+        $record = User::leftJoin('config as g', 'users.gender', '=', 'g.id')
+                    ->leftJoin('config as ut', 'users.user_type', '=', 'ut.id')
+                    ->leftJoin('config as at', 'users.auth_type', '=', 'at.id')
+                    ->leftJoin('branches', 'users.branch', '=', 'branches.id')
+                    ->leftJoin('users as c', 'users.created_by', '=', 'c.id')
+                    ->select('users.*', 'g.text as gender_text', 'ut.text as user_type_text', 'at.text as auth_type_text', 'branches.text as branch_text', 'c.name as created_by_text')
+                    ->find($id);
+
+        if(!$record){
+            $error = new Error;
+            return $error->notFound();
+        }
+
+
+        $finance = Finance::where('finance.user_id', $id)
+                            ->leftJoin('config', 'finance.item', '=', 'config.id')
+                            ->leftJoin('customers', 'finance.customer_id', '=', 'customers.id')
+                            ->leftJoin('users as c', 'finance.created_by', '=', 'c.id')
+                            ->leftJoin('users as a', 'finance.user_id', '=', 'a.id')
+                            ->leftJoin('branches', 'finance.branch', '=', 'branches.id')
+                            ->select('finance.*', 'customers.name as customer_id_text', 'config.text as item_text', 'c.name as created_by_text', 'a.name as user_id_text', 'branches.text as branch_text')
+                            ->get();
+
+        return view('users.show')
+                        ->with('record', $record)
+                        ->with('finance', $finance);
     }
 
     // end
