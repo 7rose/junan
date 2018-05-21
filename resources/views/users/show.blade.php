@@ -66,8 +66,8 @@
             </thead>
             
                 @foreach($finance as $f)
-                    <tr>
-                        <td class="{{ $f->in ? 'default' : 'danger' }}">{{ $f->in ? '收 +' : '付 -' }}</td>
+                    <tr class="{{ $f->in ? 'default' : 'danger' }}">{{ $f->in ? '收 +' : '付 -' }}>
+                        <td </td>
                         <td>{{ $f->customer_id_text }}</td>
                         <td>{{ $f->item_text }}</td>
                         <td>{{ $f->created_by_text }}</td>
