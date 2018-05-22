@@ -72,8 +72,8 @@ class FinanceController extends Controller
 
         // 输出排序
         $records = $this->records_prepare
-                        ->orderBy('finance.created_by', 'desc')
                         ->orderBy('finance.date', 'desc')
+                        ->orderBy('finance.created_by', 'desc')
                         ->paginate(30);
 
         return view('finance.index', compact('form'))->with('records', $records);
