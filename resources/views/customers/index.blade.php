@@ -37,7 +37,7 @@
         <tbody>
             @foreach($records as $record)
             <tr class="{{ $record->finance_info > 0 ? 'warning' : 'default' }}">
-                <td><a class="btn btn-sm btn-{{ $record->gender == 2 ? 'danger' : 'default'}}"  href="/customer/{{ $record->id }}" >{!! $seek->seekLabel('seek_array', 'key', $record->name) !!}</a></td>
+                <td><a class="btn btn-sm btn-{{ $record->finance_info > 0 ? 'warning' : 'default' }}"  href="/customer/{{ $record->id }}" >{!! $seek->seekLabel('seek_array', 'key', $record->name) !!}</a></td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->mobile) !!}</td>
                 <td>{{ $date->birthdayFromId($record->id_number)}}&nbsp&nbsp<span class="label label-{{ $record->gender == 2 ? 'danger' : 'default' }}">{{ $date->ageFromId($record->id_number) }}</span></td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->id_number) !!}</td>

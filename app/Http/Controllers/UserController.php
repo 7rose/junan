@@ -337,6 +337,12 @@ class UserController extends Controller
                         ->with('finance', $finance);
     }
 
+    // docs
+    public function doc()
+    {
+        return view('users.doc');
+    }
+
     // end
 }
 

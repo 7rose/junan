@@ -31,6 +31,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/customer/download/excel', 'CustomerController@seekToExcel');
 
     // 员工
+    Route::get('/user/doc', 'UserController@doc');
     Route::get('/user', 'UserController@index');
     Route::get('/user/create', 'UserController@create');
     Route::post('/user/store', ['as'=>'user.store', 'uses'=>'UserController@store']);
