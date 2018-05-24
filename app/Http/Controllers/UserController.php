@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Session;
 use Hash;
+use Excel;
 use Illuminate\Http\Request;
 use App\User;
 use App\Finance;
@@ -23,14 +24,8 @@ class UserController extends Controller
 {
     use FormBuilderTrait;
 
-    // index 
-    public function index()
+    private function prepare() 
     {
-        $form = $this->form(UserSeekForm::class, [
-            'method' => 'POST',
-            'url' => route('user.seek')
-        ]);
-
         $records = User::leftJoin('config as g', 'users.gender', '=', 'g.id')
                     ->leftJoin('config as t', 'users.user_type', '=', 't.id')
                     ->leftJoin('branches', 'users.branch', '=', 'branches.id')
@@ -55,10 +50,23 @@ class UserController extends Controller
                                 $query->orWhere('t.text', 'LIKE', '%'.Session::get('user_seek_array')['key'].'%');
                                 $query->orWhere('users.content', 'LIKE', '%'.Session::get('user_seek_array')['key'].'%');
                             }
-                        })
-                    ->orderBy('users.auth_type')
+                        });
+        return $records;
+    }
+
+    // index 
+    public function index()
+    {
+        $form = $this->form(UserSeekForm::class, [
+            'method' => 'POST',
+            'url' => route('user.seek')
+        ]);
+
+        $records = $this->prepare()
                     ->orderBy('users.user_type')
-                    ->orderBy('users.created_at', 'desc')
+                    ->orderBy('users.work_id')
+                    // ->orderBy('users.auth_type')
+                    // ->orderBy('users.created_at', 'desc')
                     ->paginate(30);
 
         return view('users.index', compact('form'))->with('records', $records);
@@ -335,6 +343,40 @@ class UserController extends Controller
         return view('users.show')
                         ->with('record', $record)
                         ->with('finance', $finance);
+    }
+
+    // 输出Execl
+    public function seekToExcel()
+    {
+        $cellData = [
+            ['工号', '姓名', '手机', '备注'],
+        ];
+
+        $records = $this->prepare()
+                        ->orderBy('users.branch')
+                        ->orderBy('users.user_type')
+                        ->orderBy('users.work_id')
+                        ->get();
+
+        if(count($records)) {
+            foreach ($records as $record) {
+                array_push($cellData, [
+                                        $record->branch_text, 
+                                        $record->name, 
+                                        $record->mobile, 
+                                        $record->content
+                                    ]);
+            }
+        }
+        $file_name = '成员'.date('Y-m-d', time());
+
+        Excel::create($file_name,function($excel) use ($cellData){
+            $excel->sheet('列表', function($sheet) use ($cellData){
+                $sheet->rows($cellData);
+                $sheet->setAutoSize(true);
+                $sheet->freezeFirstRow();
+            });
+        })->export('xlsx');
     }
 
     // docs

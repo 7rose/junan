@@ -25,6 +25,10 @@ class CreateFinanceTable extends Migration
             $table->integer('date')->nullable();
             $table->integer('created_by')->nullable(); // 创建人
             $table->string('content')->nullable();
+
+            $table->boolean('checked')->default(false);
+            $table->integer('checked_by')->nullable();
+            $table->integer('checked_by_time')->nullable();
             $table->timestamps();
         });
     }

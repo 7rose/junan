@@ -13,7 +13,7 @@ class UserLoginForm extends Form
         $this
             ->add('id', 'text', [
                 'label' => '工号/手机号',
-                'rules' => 'required|min:4|max:16'
+                'rules' => 'required|min:3|max:11'
             ])
             ->add('password', 'password', [
                 'label' => '密码',

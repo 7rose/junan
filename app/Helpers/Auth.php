@@ -80,11 +80,11 @@ class Auth
     {
         switch ($auth_id) {
             case 4:
-                return 'primary';
+                return 'info';
                 break;
 
             case 5:
-                return 'info';
+                return 'primary';
                 break;
 
             case 6:

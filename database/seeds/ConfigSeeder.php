@@ -198,6 +198,10 @@ class ConfigSeeder extends Seeder
                 'extra'   => NULL,
             ],[
                 'type'    => 'user_type',
+                'text'    => '财务',
+                'extra'   => NULL,
+            ],[
+                'type'    => 'user_type',
                 'text'    => '教练',
                 'extra'   => NULL,
             ],[

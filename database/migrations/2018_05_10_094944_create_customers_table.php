@@ -23,6 +23,7 @@ class CreateCustomersTable extends Migration
             $table->integer('gender'); // 性别
             $table->string('address'); // 身份证地址
             $table->string('location')->nullable(); // 居住地
+            $table->integer('import_id')->nullable(); // 导入批号
             // $table->integer('date'); // 报名日期
             // $table->integer('file_id')->nullable(); // 交管局开班档案号
             // $table->integer('state')->nullable(); // 状态

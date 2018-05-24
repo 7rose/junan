@@ -21,6 +21,7 @@ class CreateLessonsTable extends Migration
             $table->integer('lesson_action');
             $table->integer('score');
             $table->integer('date');
+            $table->integer('import_id')->nullable(); // 导入批号
             $table->string('location')->nullable();
             $table->string('content')->nullable();
             $table->timestamps();

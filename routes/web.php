@@ -31,6 +31,10 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/customer/download/excel', 'CustomerController@seekToExcel');
 
     // 员工
+    Route::get('/user/import', 'ImportController@userImport');
+    Route::post('/user/import/store', ['as'=>'import.user_store', 'uses'=>'ImportController@userStore']);
+    Route::get('/user/import/save', 'ImportController@userSave');
+
     Route::get('/user/doc', 'UserController@doc');
     Route::get('/user', 'UserController@index');
     Route::get('/user/create', 'UserController@create');
@@ -45,6 +49,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/user/unlock/{id}', 'UserController@unlock');
     Route::get('/user/edit/{id}', 'UserController@edit');
     Route::post('/user/update/{id}', ['as'=>'user.update', 'uses'=>'UserController@update']);
+    Route::get('/user/download/excel', 'UserController@seekToExcel');
 
     // 业务
     Route::get('/customer/biz/{id}', 'BizController@create');
@@ -58,11 +63,17 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/finance/store', ['as'=>'finance.store', 'uses'=>'FinanceController@store']);
     Route::get('/finance/download/excel', 'FinanceController@seekToExcel');
 
+    // excel
+    // Route::get('/import', 'ImportController@index');
+    // Route::get('/user/import', 'ImportController@userImport');
+    // Route::post('/user/import/store', ['as'=>'import.user_store', 'uses'=>'ImportController@userStore']);
+    // Route::get('/user/import/save', 'ImportController@userSave');
+
 });
 
 
 Route::get('/test', function() {
-     phpinfo();
+// 
 });
 
 

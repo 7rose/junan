@@ -13,6 +13,28 @@ class UserSeeder extends Seeder
     {
         DB::table('users')->insert([
             [
+                'work_id'=>888,
+                'mobile'=>"13305241588",
+                // 'id_number'=>"13815708136",
+                'branch'=>1,
+                'gender'=>1,
+                'name'=>"岳士军",
+                'password'=>bcrypt('000000'),
+                'user_type'=>45,
+                'auth_type'=>6,
+                'created_by'=>3,
+            ],[
+                'work_id'=>999,
+                'mobile'=>"18118088880",
+                // 'id_number'=>"13815708136",
+                'branch'=>1,
+                'gender'=>1,
+                'name'=>"岳卫超",
+                'password'=>bcrypt('000000'),
+                'user_type'=>45,
+                'auth_type'=>6,
+                'created_by'=>3,
+            ],[
                 'work_id'=>1000,
                 'mobile'=>"13815708136",
                 // 'id_number'=>"13815708136",
@@ -22,18 +44,7 @@ class UserSeeder extends Seeder
                 'password'=>bcrypt('000000'),
                 'user_type'=>45,
                 'auth_type'=>4,
-                'created_by'=>1,
-            ],[
-                'work_id'=>1001,
-                'mobile'=>"13811231226",
-                // 'id_number'=>"13815708136",
-                'branch'=>3,
-                'gender'=>1,
-                'name'=>"蓝凤凰",
-                'password'=>bcrypt('000000'),
-                'user_type'=>46,
-                'auth_type'=>6,
-                'created_by'=>1,
+                'created_by'=>3,
             ],
         ]);
     }

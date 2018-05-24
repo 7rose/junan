@@ -21,4 +21,9 @@ class Error
     {
         return view('note')->with('custom', ['color'=>'warning', 'icon'=>'warning-sign', 'content'=>'无权继续操作!']);
     }
+
+    public function paramLost()
+    {
+        return view('note')->with('custom', ['color'=>'danger', 'icon'=>'warning-sign', 'content'=>'缺少参数,可能是操作错误或者超时!']);
+    }
 }
