@@ -1,7 +1,7 @@
 <?php
     $date = new App\Helpers\Date;
     $seek = new App\Helpers\Seek;
-    // $auth = new App\Helpers\Auth;
+    $auth = new App\Helpers\Auth;
 ?>
 @extends('../nav')
 
@@ -36,6 +36,7 @@
                 <th>经手人</th>
                 <th>推荐人</th>
                 <th>时间</th>
+                <th>审核</th>
             </tr>
         </thead>
         <tbody>
@@ -52,6 +53,27 @@
                 <td>{{ $record->created_by_text }}</td>
                 <td>{{ $record->user_id_text }}</td>
                 <td>{{ date('Y-m-d', $record->date) }}</td>
+                <td>
+                    @if($record->checked)
+                        <span class="btn btn-success btn-xs">
+                            {{ $record->ticket_no.' - '.$record->checked_by_text.', '.date('Y-m-d h:m:s', $record->checked_by_time) }}
+                        </span>
+                    @else
+                        @if($auth->finance())
+                            <div id="checking" class="input-group input-group-sm">
+                                <input type="hidden" id="id" value="{{ $record->id }}">
+                                <input id="no" type="text" class="form-control" placeholder="请输入票号...">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-warning" type="button" onClick="javascript:check()">
+                                        完成
+                                    </button>
+                                </span>
+                            </div>
+                        @else
+                            <span class="label label-warning">未审核</span>
+                        @endif
+                    @endif
+                </td>
             </tr>
             @endforeach
         </tbody>
@@ -77,5 +99,26 @@
             </div>
         </div>
     </div>
+
+{{-- 审核 --}}
+<script>
+    function check() {
+        var no = $("#no").val();
+        var id = $("#id").val();
+        if(no == '') {
+            alert('票号必须输入!');
+            return false;
+        }
+
+        $.post("/finance/checking",
+            {
+              no:no,
+              id:id
+            },
+            function(message){
+               $("#checking").html("<span class=\"label label-success\">"+message+"</span>");
+            });
+    }
+</script>
 
 @endsection

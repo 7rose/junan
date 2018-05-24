@@ -22,10 +22,6 @@
             <a href="/user/create" class="btn btn-sm btn-default">+ 新成员</a>&nbsp&nbsp
             <a href="/user/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-th-list"></span>&nbsp&nbsp导出excel</a>&nbsp&nbsp
 
-            @if($auth->admin())
-            <a href="/user/import" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-import"></span>&nbsp&nbspExcel导入成员!</a>&nbsp&nbsp
-            @endif
-
             @if($seek->seeking('user_seek_array', 'key') || $seek->seeking('user_seek_array', 'branch'))
                 <a href="/user/seek/reset" class="btn btn-sm btn-warning">重置查询条件</a>&nbsp&nbsp
             @endif

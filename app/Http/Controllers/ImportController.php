@@ -8,12 +8,17 @@ use Excel;
 
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\UserImportForm;
+use App\Forms\ClassImportForm;
 use App\Helpers\Validator;
 use App\Helpers\Unique;
 use App\Helpers\Error;
+use App\Helpers\Auth;
 
 use App\User;
+use App\Customer;
 use App\Config;
+use App\Classes;
+use App\Biz;
 
 class ImportController extends Controller
 {
@@ -27,6 +32,11 @@ class ImportController extends Controller
     // 新学员表单
     public function userImport()
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
         $form = $this->form(UserImportForm::class, [
             'method' => 'POST',
             'url' => route('import.user_store')
@@ -41,6 +51,11 @@ class ImportController extends Controller
     // 存储校验
     public function userStore(Request $request)
     {
+         // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
         $resaults = Excel::load($request->file, function($reader) {
             // 
         })->get();
@@ -59,6 +74,8 @@ class ImportController extends Controller
 
         for ($i=0; $i < count($resaults); $i++) { 
             $item = $resaults[$i];
+            if($item['mobile'] == '') break;
+
             if(!$validate->checkMobile($item['mobile'])) {
                 $error = '第'.($i+2).'行: '.$resaults[$i]['name'].'-'.$item['mobile']."手机号错误!";
                 return redirect()->back()->withErrors(['file'=>$error])->withInput();
@@ -111,6 +128,11 @@ class ImportController extends Controller
     // 存入数据库
     public function userSave()
     {
+         // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+        
         $error = new Error;
         $validate = new Validator;
         if(!Session::has('ok_list') || !count(Session::get('ok_list'))) return $error->paramLost();
@@ -127,6 +149,145 @@ class ImportController extends Controller
 
         User::insert($ok_list);
         if(Session::has('ok_list')) Session::forget('ok_list');
+        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'Excel导入已成功!']);
+    }
+
+    // 开班花名册
+    public function classImport()
+    {
+        // 授权
+        // $auth = new Auth;
+        // $auth_error = new Error;
+        // if(!$auth->admin())  return $auth_error->forbidden();
+
+        $form = $this->form(ClassImportForm::class, [
+            'method' => 'POST',
+            'url' => route('import.class_store')
+        ]);
+        $title = 'Excel导入: 开班花名册';
+        $icon = 'import';
+        return view('form', compact('form'))->with('custom',['title'=>$title, 'icon'=>$icon]);
+    }
+
+    // 校验
+    public function classStore(Request $request)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        $resaults = Excel::load($request->file, function($reader) {
+            // 
+        })->get();
+
+        $form = $this->form(ClassImportForm::class);
+        $validate = new Validator;
+        $unique = new Unique;
+
+        // print_r($array);
+        $all_id_number_list = [];
+        $new_customer_list = [];
+
+        for ($i=0; $i < count($resaults); $i++) { 
+
+            $item = $resaults[$i];
+            if($item['id_number'] == '') break;
+
+            if(!$validate->checkMobile($item['mobile'])) {
+                $error = '第'.($i+2).'行: '.$resaults[$i]['name'].'-'.$item['mobile']."手机号错误!";
+                return redirect()->back()->withErrors(['file'=>$error])->withInput();
+            }
+            if(!$validate->checkIdNumber($item['id_number'])) {
+                $error = '第'.($i+2).'行: '.$resaults[$i]['name'].'-'.$item['id_number']."身份证号错误!";
+                return redirect()->back()->withErrors(['file'=>$error])->withInput();
+            }
+
+
+            $item_to_import = [
+                'name'=>preg_replace('# #', '', $item['name']), 
+                'mobile'=>$item['mobile'], 
+                'id_number'=>strtoupper($item['id_number']),
+                'address'=>$item['address'],
+                'gender'=>$item['gender'] == '女' ? 2 : 1,
+                'created_by'=>Session::get('id'),
+            ];
+
+            // 如果数据库中无记录, 则新建
+            if(!$unique->exists_id_number($item['id_number'], 'id_number', 'customers')){
+                array_push($new_customer_list, $item_to_import);
+            }
+
+            // 所有开班人员
+            // array_push($all_id_number_list, $item['id_number']);
+            $all_id_number_list = array_add($all_id_number_list, $item['id_number'], $item['licence_type']);
+        }
+
+        $unique_all_id_number_list = array_unique($all_id_number_list);
+        $diff = array_diff_assoc($unique_all_id_number_list, $all_id_number_list);
+
+        // 提交文件中身份证重复
+        if(count($diff)){
+            $error = '文件中身份证号: '.implode(',', $diff)."重复出现!";
+            return redirect()->back()->withErrors(['file'=>$error])->withInput();
+        }
+
+        $class_info = ['branch'=>$request->branch, 'date'=>$request->date, 'class_no'=>$request->class_no];
+        Session::put('new_customer_list', $new_customer_list);
+        Session::put('all_id_number_list', $all_id_number_list);
+        Session::put('class_info', $class_info);
+
+
+
+        return view('class.import_info')
+                    ->with('all', count($all_id_number_list))
+                    ->with('new', count($new_customer_list));
+ 
+    }
+
+    // 写入开班信息
+    public function classSave()
+    {
+        $error = new Error;
+        $validate = new Validator;
+        if(!Session::has('new_customer_list')|| !Session::has('all_id_number_list') || !count(Session::get('all_id_number_list'))) return $error->paramLost();
+
+        $new_customer_list = Session::get('new_customer_list');
+        $all_id_number_list = Session::get('all_id_number_list');
+        $class_info = Session::get('class_info');
+
+        if(Session::has('new_customer_list')) Session::forget('new_customer_list');
+        if(Session::has('all_id_number_list')) Session::forget('all_id_number_list');
+        if(Session::has('class_info')) Session::forget('class_info');
+
+        if(count($new_customer_list)) Customer::insert($new_customer_list);
+        // print_r($class_info);
+
+        $has = Classes::where('branch', $class_info['branch'])->where('class_no', $class_info['class_no'])->first();
+        $class_id = 0;
+
+        if($has){
+            $class_id = $has->id;
+        }else{
+            $class_id = Classes::create($class_info)->id;
+        }
+
+        foreach ($all_id_number_list as $id_number => $licence_type) {
+            $customer_id = Customer::where('id_number', $id_number)->first()->id;
+            $licence_type_id = Config::where('text', 'LIKE', $licence_type.":%")->first()->id;
+
+            $default_class_type_id = 23;
+            $has = Biz::where('customer_id', $customer_id)
+                        ->where('licence_type', $licence_type_id)
+                        ->where('finished', false)
+                        ->first();
+            if(!$has){
+                Biz::insert(['customer_id'=>$customer_id, 'licence_type'=>$licence_type_id, 'created_by'=>Session::get('id'), 'class_id'=>$class_id, 'class_type'=>$default_class_type_id]);
+            }else{
+                $has->update(['class_id'=>$class_id]);
+            }
+        }
+
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'Excel导入已成功!']);
     }
 

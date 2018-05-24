@@ -71,7 +71,7 @@ class CustomerController extends Controller
         $records = $this->prepare()
                         ->orderBy('customers.finance_info', 'desc')
                         ->orderBy('customers.created_at', 'desc')
-                        ->paginate(30);
+                        ->paginate(50);
 
         return view('customers.index', compact('form'))->with('records', $records);
     }
@@ -127,6 +127,7 @@ class CustomerController extends Controller
         if(!$validate->checkMobile($all['mobile'])) return redirect()->back()->withErrors(['mobile'=>'手机号错误!'])->withInput();
 
         $all['created_by'] = Session::get('id');
+        $all['id_number'] = strtoupper($all['id_number']);
 
         $id = Customer::create($all);
         return redirect('/customer/'.$id->id);
@@ -152,7 +153,9 @@ class CustomerController extends Controller
                     ->leftJoin('config as ct', 'biz.class_type', '=', 'ct.id')
                     ->leftJoin('users', 'biz.created_by', '=', 'users.id')
                     ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
-                    ->select('biz.*', 'customers.name as customer_name', 'lt.text as licence_type_text', 'ct.text as class_type_text', 'users.name as created_by_text', 'branches.text as branch_text')
+                    ->leftJoin('classes', 'biz.class_id', '=', 'classes.id')
+                    ->leftJoin('branches as bb', 'classes.branch', '=', 'bb.id')
+                    ->select('biz.*', 'customers.name as customer_name', 'lt.text as licence_type_text', 'ct.text as class_type_text', 'users.name as created_by_text', 'branches.text as branch_text', 'classes.class_no as class_no', 'bb.text as class_branch_text')
                     ->orderBy('biz.created_at', 'desc')
                     ->orderBy('biz.updated_at', 'desc')
                     ->get();
@@ -238,7 +241,13 @@ class CustomerController extends Controller
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'学员信息修改成功!']);
     }
 
-        // 输出Execl
+    // 导入开班花名册
+    public function importClass()
+    {
+        # code...
+    }
+
+    // 输出Execl
     public function seekToExcel()
     {
         $cellData = [

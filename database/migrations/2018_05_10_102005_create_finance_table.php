@@ -29,6 +29,7 @@ class CreateFinanceTable extends Migration
             $table->boolean('checked')->default(false);
             $table->integer('checked_by')->nullable();
             $table->integer('checked_by_time')->nullable();
+            $table->string('ticket_no')->nullable();
             $table->timestamps();
         });
     }

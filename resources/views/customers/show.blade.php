@@ -96,7 +96,7 @@
         @foreach($biz as $b)
             <div class="panel panel-success">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{{ $b->licence_type_text.' - '.$b->class_type_text }}</h3>
+                    <h3 class="panel-title">{{ $b->licence_type_text.' - '.$b->class_type_text.' ['.explode('(', $b->class_branch_text)[0].$b->class_no.'期]' }}</h3>
                 </div>
                 <div class="panel-body">
                     <ul class="list-inline">

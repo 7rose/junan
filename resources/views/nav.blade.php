@@ -2,6 +2,8 @@
     $seek = new App\Helpers\Seek;
     $me = '<li><a href="/login">请登录</a></li>';
     if(Session::has('id')) {
+        $auth = new App\Helpers\Auth;
+
         $id = Session::get('id');
         $record = DB::table('users')
                         ->leftJoin('branches', 'users.branch', '=', 'branches.id')
@@ -50,6 +52,17 @@
                 <li class="{{ $seek->navClick('user') ? 'active' : '' }}"><a href="/user">成员</a></li>
                 <li class="{{ $seek->navClick('finance') ? 'active' : '' }}"><a href="/finance">财务</a></li>
                 <li class="{{ $seek->navClick('count') ? 'active' : '' }}"><a href="/count">统计</a></li>
+                @if(isset($auth) && $auth->admin())
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            导入Excel <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/import/user"><span class="glyphicon glyphicon-user"></span> 成员</a></li>
+                            <li><a href="/import/class"><span class="glyphicon glyphicon-list-alt"></span> 开班花名册</a></li>
+                        </ul>
+                    </li>
+                @endif
                 {!! $me !!}
             </ul>
         </div>

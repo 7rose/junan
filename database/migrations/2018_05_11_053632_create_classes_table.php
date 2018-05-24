@@ -15,9 +15,10 @@ class CreateClassesTable extends Migration
     {
         Schema::create('classes', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('branch_id'); // 驾校
-            $table->integer('class_id'); // 开班号
-            $table->integer('date'); // 开班日期
+            $table->integer('branch'); // 驾校
+            $table->integer('class_no'); // 开班号
+            $table->integer('date')->nullable(); // 开班日期
+            $table->integer('created_by')->nullable(); // 操作人
             $table->string('content')->nullable(); // 开班号
             $table->timestamps();
         });

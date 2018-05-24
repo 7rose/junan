@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Session;
 use Excel;
+use Input;
 
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\FinanceSeekForm;
@@ -15,21 +16,21 @@ use App\User;
 
 use App\Helpers\Error;
 use App\Helpers\ConfigList;
+use App\Helpers\Auth;
 
 class FinanceController extends Controller
 {
     use FormBuilderTrait;
 
-    private $records_prepare;
-
     private function prepare() 
     {
-        $this->records_prepare = Finance::leftJoin('config as i', 'finance.item', '=', 'i.id')
+        $records = Finance::leftJoin('config as i', 'finance.item', '=', 'i.id')
                           ->leftJoin('customers', 'finance.customer_id', '=', 'customers.id')
                           ->leftJoin('users as c', 'finance.created_by', '=', 'c.id')
+                          ->leftJoin('users as ck', 'finance.checked_by', '=', 'ck.id')
                           ->leftJoin('users as u', 'finance.user_id', '=', 'u.id')
                           ->leftJoin('branches', 'finance.branch', '=', 'branches.id')
-                          ->select('finance.*', 'i.text as item_text', 'customers.name as customer_id_text', 'c.name as created_by_text', 'u.name as user_id_text', 'branches.text as branch_text', 'customers.mobile as customer_mobile')
+                          ->select('finance.*', 'i.text as item_text', 'customers.name as customer_id_text', 'c.name as created_by_text', 'u.name as user_id_text', 'branches.text as branch_text', 'customers.mobile as customer_mobile', 'ck.name as checked_by_text')
                           ->where(function ($query) { 
                                 // 起时间点
                                 if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'date_begin') && Session::get('finance_seek_array')['date_begin'] != '') {
@@ -57,6 +58,7 @@ class FinanceController extends Controller
                             });
                           // ->orderBy('finance.created_by', 'desc')
                           // ->orderBy('finance.date', 'desc')
+        return $records;
     }
 
     // index 
@@ -68,13 +70,10 @@ class FinanceController extends Controller
         ]);
 
         // 查询预处理
-        $this->prepare();
-
-        // 输出排序
-        $records = $this->records_prepare
-                        ->orderBy('finance.date', 'desc')
-                        ->orderBy('finance.created_by', 'desc')
-                        ->paginate(30);
+        $records = $this->prepare()
+            ->orderBy('finance.date', 'desc')
+            ->orderBy('finance.created_by', 'desc')
+            ->paginate(30);
 
         return view('finance.index', compact('form'))->with('records', $records);
     }
@@ -146,6 +145,23 @@ class FinanceController extends Controller
         return redirect('/customer/'.$all['customer_id']);
     }
 
+    // 审核
+    public function checking(Request $request)
+    {
+        $ticket_no = $request->input('no');
+        $id = $request->input('id');
+        // 授权
+        $auth = new Auth;
+        if(!$auth->finance())  return "无权操作";
+
+        $target = Finance::find($id)->update(['checked' => true, 'checked_by'=>Session::get('id'), 'checked_by_time'=>time(), 'ticket_no'=>$ticket_no]);
+        // return redirect('/finance');
+        // echo 'fuck';
+        return '票号:'.$ticket_no.'已成功审核!';
+    }
+
+
+
     // 输出Execl
     public function seekToExcel()
     {
@@ -153,8 +169,7 @@ class FinanceController extends Controller
             ['收付', '驾校', '学员', '学员电话', '应收/付', '实收付', '日期', '经手人', '推荐人'],
         ];
 
-        $this->prepare();
-        $records = $this->records_prepare->orderBy('finance.date')->get();
+        $this->prepare()->orderBy('finance.date')->get();
 
         if(count($records)) {
             foreach ($records as $record) {

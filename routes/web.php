@@ -31,10 +31,6 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/customer/download/excel', 'CustomerController@seekToExcel');
 
     // 员工
-    Route::get('/user/import', 'ImportController@userImport');
-    Route::post('/user/import/store', ['as'=>'import.user_store', 'uses'=>'ImportController@userStore']);
-    Route::get('/user/import/save', 'ImportController@userSave');
-
     Route::get('/user/doc', 'UserController@doc');
     Route::get('/user', 'UserController@index');
     Route::get('/user/create', 'UserController@create');
@@ -62,6 +58,18 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/finance/create/{id}', 'FinanceController@create');
     Route::post('/finance/store', ['as'=>'finance.store', 'uses'=>'FinanceController@store']);
     Route::get('/finance/download/excel', 'FinanceController@seekToExcel');
+    Route::post('/finance/checking', 'FinanceController@checking');
+    // Route::get('/finance/checking', 'FinanceController@checking');
+
+    // 导入 -用户
+    Route::get('/import/user', 'ImportController@userImport');
+    Route::post('/import/user/store', ['as'=>'import.user_store', 'uses'=>'ImportController@userStore']);
+    Route::get('/import/user/save', 'ImportController@userSave');
+
+    // 导入 -开班花名册
+    Route::get('/import/class', 'ImportController@classImport');
+    Route::post('/import/class/store', ['as'=>'import.class_store', 'uses'=>'ImportController@classStore']);
+    Route::get('/import/class/save', 'ImportController@classSave');
 
     // excel
     // Route::get('/import', 'ImportController@index');
@@ -73,7 +81,12 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 
 Route::get('/test', function() {
-// 
+    $a = new App\Helpers\Auth;
+    if($a->finance()){
+        echo "yes";
+    }else{
+        echo "fuck";
+    }
 });
 
 

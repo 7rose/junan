@@ -18,11 +18,13 @@ class CreateBizTable extends Migration
             $table->integer('customer_id'); // 用户id
             $table->integer('licence_type'); // 驾照类型
             $table->integer('class_type'); // 班类型
-            $table->integer('date'); // 报名日期
-            $table->integer('branch'); // 报名日期
+            $table->integer('date')->nullable(); // 报名日期
+            $table->integer('class_id')->nullable(); // 交管局开班档案号
             $table->integer('file_id')->nullable(); // 交管局开班档案号
+            $table->integer('branch')->nullable(); // 报名日期
             $table->integer('created_by')->nullable(); // 创建人
             $table->integer('state')->nullable(); // 状态
+            $table->integer('finished')->default(false); // 状态
             $table->integer('locked')->default(false); // 状态
             $table->integer('show')->default(true); // 状态
             $table->timestamps();
@@ -39,3 +41,4 @@ class CreateBizTable extends Migration
         Schema::dropIfExists('biz');
     }
 }
+

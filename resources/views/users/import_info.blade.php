@@ -25,9 +25,9 @@
                 没有通过校验的内容可以导入!
               </div>
            @else
-              <a href="/user/import/save" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-ok"></span>&nbsp写入数据库</a>
+              <a href="/import/user/save" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-ok"></span>&nbsp写入数据库</a>
            @endif
-              <a href="/user/import" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-remove"></span>&nbsp放弃并返回</a>&nbsp&nbsp
+              <a href="/import/user" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-remove"></span>&nbsp放弃并返回</a>&nbsp&nbsp
 
        </div>
     <div class="col-md-6 col-md-offset-3">

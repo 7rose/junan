@@ -14,7 +14,9 @@ class Auth
     private $my_auth; 
     private $root_id; 
     private $admin_id; 
-    // private $user_id; 
+    // private $user_id;
+    private $my_user_type; 
+    private $finance_id;  # 财务 
 
     function __construct()
     {
@@ -23,9 +25,12 @@ class Auth
         $this->admin_id = 5;
         $this->user_id = 6;
 
+        $this->finance_id = 47;
+
         // 初始化
         $this->my_id = Session::get('id');
         $this->my_auth = User::find($this->my_id)->auth_type;
+        $this->my_user_type = User::find($this->my_id)->user_type;
     }
 
     // 有管理权
@@ -73,6 +78,13 @@ class Auth
         if($this->root() || $this->admin()) return true;
         return $this->my_auth == $this->user_id ? true : false;
 
+    }
+
+    // 财务
+    public function finance()
+    {
+        if($this->root()) return true;
+        return $this->my_user_type == $this->finance_id ? true : false;
     }
 
     // 颜色
