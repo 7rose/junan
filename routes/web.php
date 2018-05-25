@@ -65,11 +65,13 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/import/user', 'ImportController@userImport');
     Route::post('/import/user/store', ['as'=>'import.user_store', 'uses'=>'ImportController@userStore']);
     Route::get('/import/user/save', 'ImportController@userSave');
-
     // 导入 -开班花名册
     Route::get('/import/class', 'ImportController@classImport');
     Route::post('/import/class/store', ['as'=>'import.class_store', 'uses'=>'ImportController@classStore']);
     Route::get('/import/class/save', 'ImportController@classSave');
+
+    // 考务
+    Route::get('/lesson', 'LessonController@index');
 
     // excel
     // Route::get('/import', 'ImportController@index');

@@ -51,7 +51,7 @@
                 <li class="{{ $seek->navClick('customer') ? 'active' : '' }}"><a href="/customer">学员</a></li>
                 <li class="{{ $seek->navClick('user') ? 'active' : '' }}"><a href="/user">成员</a></li>
                 <li class="{{ $seek->navClick('finance') ? 'active' : '' }}"><a href="/finance">财务</a></li>
-                <li class="{{ $seek->navClick('count') ? 'active' : '' }}"><a href="/count">统计</a></li>
+                <li class="{{ $seek->navClick('lesson') ? 'active' : '' }}"><a href="/lesson">考务</a></li>
                 @if(isset($auth) && $auth->admin())
                     <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">

@@ -253,7 +253,7 @@ class ImportController extends Controller
 
 
 
-        return view('class.import_info')
+        return view('classes.import_info')
                     ->with('all', count($all_id_number_list))
                     ->with('new', count($new_customer_list));
  

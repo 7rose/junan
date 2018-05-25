@@ -23,6 +23,40 @@
             @if($seek->seeking('seek_array', 'key'))
                 <a href="/customer/seek/reset" class="btn btn-sm btn-warning">重置查询条件</a>&nbsp&nbsp
             @endif
+
+<div class="dropdown pull-right">
+    <button type="button" class="btn dropdown-toggle btn-sm btn-info" id="dropdownMenu1" 
+            data-toggle="dropdown">
+        筛选
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">未开班的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">没有驾校的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目2/3未分配教练员的</a></li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目1: 具备预约条件的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目1: 提交预约申请的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目1: 报名成功的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目1: 不合格的</a></li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目2: 具备预约条件的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目2: 提交预约申请的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目2: 报名成功的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目2: 不合格的</a></li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目3: 具备预约条件的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目3: 提交预约申请的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目3: 报名成功的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目3: 不合格的</a></li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目4: 具备预约条件的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目4: 提交预约申请的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目4: 报名成功的</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目4: 不合格的</a></li>
+    </ul>
+</div>
+
         </caption>
         <thead>
             <tr>
