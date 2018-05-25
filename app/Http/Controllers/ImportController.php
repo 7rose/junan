@@ -74,6 +74,13 @@ class ImportController extends Controller
 
         for ($i=0; $i < count($resaults); $i++) { 
             $item = $resaults[$i];
+
+            // 检测字段存在
+            if(!isset($item['name']) || !isset($item['mobile']) || !isset($item['gender']) || !isset($item['user_type'])){
+                $error = '文件格式错误';
+                return redirect()->back()->withErrors(['file'=>$error])->withInput();
+            }
+            // 空记录中止
             if($item['mobile'] == '') break;
 
             if(!$validate->checkMobile($item['mobile'])) {
@@ -156,9 +163,9 @@ class ImportController extends Controller
     public function classImport()
     {
         // 授权
-        // $auth = new Auth;
-        // $auth_error = new Error;
-        // if(!$auth->admin())  return $auth_error->forbidden();
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
 
         $form = $this->form(ClassImportForm::class, [
             'method' => 'POST',
@@ -192,6 +199,13 @@ class ImportController extends Controller
         for ($i=0; $i < count($resaults); $i++) { 
 
             $item = $resaults[$i];
+            
+            // 检测字段存在
+            if(!isset($item['name']) || !isset($item['mobile']) || !isset($item['id_number']) || !isset($item['address']) || !isset($item['gender'])){
+                $error = '文件格式错误';
+                return redirect()->back()->withErrors(['file'=>$error])->withInput();
+            }
+            // 空记录中止
             if($item['id_number'] == '') break;
 
             if(!$validate->checkMobile($item['mobile'])) {
@@ -248,6 +262,11 @@ class ImportController extends Controller
     // 写入开班信息
     public function classSave()
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
         $error = new Error;
         $validate = new Validator;
         if(!Session::has('new_customer_list')|| !Session::has('all_id_number_list') || !count(Session::get('all_id_number_list'))) return $error->paramLost();
