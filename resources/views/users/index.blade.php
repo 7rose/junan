@@ -8,7 +8,9 @@
 @section('container')
     <ul id="myTab" class="nav nav-tabs">
         <li class="active">
-            <a href="#list" data-toggle="tab">{{ $seek->seeking('user_seek_array', 'key') || $seek->seeking('user_seek_array', 'branch') ? '查询结果' : '全部' }}</a>
+            @if(isset($records))
+            <a href="#list" data-toggle="tab">{{ $seek->seeking('user_seek_array', 'key') || $seek->seeking('user_seek_array', 'branch') ? '查询结果 - '.count($records) : '全部 -'.count($records)}}</a>
+            @endif
         </li>
         <li>
             <a href="#seek" data-toggle="tab">查询</a>

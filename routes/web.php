@@ -48,7 +48,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/user/download/excel', 'UserController@seekToExcel');
 
     // 业务
-    Route::get('/customer/biz/{id}', 'BizController@create');
+    Route::get('/customer/biz/{id?}', 'BizController@create');
     Route::post('/customer/biz/store', ['as'=>'biz.store', 'uses'=>'BizController@store']);
 
     // 财务
@@ -59,7 +59,6 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/finance/store', ['as'=>'finance.store', 'uses'=>'FinanceController@store']);
     Route::get('/finance/download/excel', 'FinanceController@seekToExcel');
     Route::post('/finance/checking', 'FinanceController@checking');
-    // Route::get('/finance/checking', 'FinanceController@checking');
 
     // 导入 -用户
     Route::get('/import/user', 'ImportController@userImport');
@@ -70,9 +69,14 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/import/class/store', ['as'=>'import.class_store', 'uses'=>'ImportController@classStore']);
     Route::get('/import/class/save', 'ImportController@classSave');
 
-    // 考务
-    Route::get('/lesson', 'LessonController@index');
+    // 过滤器
+    // Route::get('/filter', 'FilterController@trans');
+    Route::get('/filter', 'FilterController@index');
+    Route::get('/filter/{key}', 'FilterController@filter');
+    Route::post('/filter/part', 'FilterController@ex');
 
+    // 测试
+    Route::get('/test/{key?}', 'FilterController@test');
     // excel
     // Route::get('/import', 'ImportController@index');
     // Route::get('/user/import', 'ImportController@userImport');

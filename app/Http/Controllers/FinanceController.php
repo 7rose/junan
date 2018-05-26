@@ -98,11 +98,8 @@ class FinanceController extends Controller
     }
 
     // 新收费
-    public function create()
+    public function create($id)
     {
-        $config_list = new ConfigList;
-        $id = $config_list->idFromUrl();
-
         $record = Customer::find($id);
         $error = new Error;
 

@@ -110,14 +110,16 @@
             return false;
         }
 
-        $.post("/finance/checking",
-            {
-              no:no,
-              id:id
-            },
+        var post_url = "/finance/checking";
+        var post_data = {no:no, id:id};
+
+        $.post(
+            post_url,
+            post_data,
             function(message){
                $("#checking").html("<span class=\"label label-success\">"+message+"</span>");
-            });
+           }
+        );
     }
 </script>
 

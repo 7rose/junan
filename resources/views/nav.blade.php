@@ -26,6 +26,7 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>军安集团</title>
     <link rel="stylesheet" href="{{ URL::asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
     <script src="{{ URL::asset('node_modules/jquery/dist/jquery.min.js') }}"></script>
@@ -51,7 +52,7 @@
                 <li class="{{ $seek->navClick('customer') ? 'active' : '' }}"><a href="/customer">学员</a></li>
                 <li class="{{ $seek->navClick('user') ? 'active' : '' }}"><a href="/user">成员</a></li>
                 <li class="{{ $seek->navClick('finance') ? 'active' : '' }}"><a href="/finance">财务</a></li>
-                <li class="{{ $seek->navClick('lesson') ? 'active' : '' }}"><a href="/lesson">考务</a></li>
+                <li class="{{ $seek->navClick('filter') ? 'active' : '' }}"><a href="/filter">考务</a></li>
                 @if(isset($auth) && $auth->admin())
                     <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -79,4 +80,14 @@
         @yield("container")
     </div>
 </body>
+<script>
+    // ajax csrf
+    $(function(){ 
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+        });
+    });
+</script>
 </html>
