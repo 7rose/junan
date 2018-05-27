@@ -89,9 +89,6 @@ class Pre
                 $root_branch_text = DB::table('branches')->find(Session::get('branch_set'))->text;
             }
 
-            // $root_branch_text = Session::has('branch_set') ? DB::table('branches')->find(Session::get('branch_set')->text : '全部');
-            
-
             $menu = '';
             foreach ($branch_list as $key => $value) {
                 $menu .= '<li><a href="/branch/set/'.$key.'">'.$value.'</a></li>';

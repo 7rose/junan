@@ -110,7 +110,7 @@ class Auth
 
     public function branchLimit()
     {
-        $this->admin() || $this->me->branch == $this->root_branch_id ? false : $this->me->branch;
+        return $this->admin() || $this->me->branch == $this->root_branch_id ? false : $this->me->branch;
     }
 
     // end
