@@ -2,6 +2,9 @@
 namespace App\Helpers;
 
 use DB;
+use Session;
+use App\Helpers\Auth;
+use App\Helpers\ConfigList;
 
 /**
  * 预处理
@@ -67,6 +70,43 @@ class Pre
             }
         }
         return $out;
+    }
+
+    // 获取首页工作范围 
+    public function navBranches()
+    {
+        $auth = new Auth;
+
+        if($auth->branchLimit()) {
+            $branch_text = DB::table('branches')->find($auth->branchLimit())->text;
+            return '<li class="active"><a href="#">'.$branch_text.'</a></li>';
+        }else{
+            $branch = new ConfigList;
+            $branch_list = $branch->branchList();
+
+            $root_branch_text = '军安集团';
+            if(Session::has('branch_set')) {
+                $root_branch_text = DB::table('branches')->find(Session::get('branch_set'))->text;
+            }
+
+            // $root_branch_text = Session::has('branch_set') ? DB::table('branches')->find(Session::get('branch_set')->text : '全部');
+            
+
+            $menu = '';
+            foreach ($branch_list as $key => $value) {
+                $menu .= '<li><a href="/branch/set/'.$key.'">'.$value.'</a></li>';
+            }
+
+
+            return '<li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            '.$root_branch_text.' <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu pull-right">'
+                        .$menu.
+                        '</ul>
+                    </li>';
+        }
     }
 
     // end

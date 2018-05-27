@@ -46,6 +46,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/user/edit/{id}', 'UserController@edit');
     Route::post('/user/update/{id}', ['as'=>'user.update', 'uses'=>'UserController@update']);
     Route::get('/user/download/excel', 'UserController@seekToExcel');
+    Route::get('/branch/set/{id}', 'UserController@setBranch');
 
     // 业务
     Route::get('/customer/biz/{id?}', 'BizController@create');

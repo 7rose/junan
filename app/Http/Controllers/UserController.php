@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Session;
+use DB;
 use Hash;
 use Excel;
 use Illuminate\Http\Request;
@@ -378,6 +379,23 @@ class UserController extends Controller
             });
         })->export('xlsx');
     }
+
+    // 设置分支机构
+    public function setBranch(Request $request, $id)
+    {
+        // 授权
+        $auth = new Auth;
+        $error = new Error;
+
+        if($auth->branchLimit()) {
+            return $error->forbidden();
+        }else {
+            Session::put('branch_set', $id);
+        }
+        $text = DB::table('branches')->find($id)->text;
+        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'已经设置业务范围为: '.$text]);
+    }
+
 
     // docs
     public function doc()

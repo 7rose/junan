@@ -3,6 +3,7 @@
     $me = '<li><a href="/login">请登录</a></li>';
     if(Session::has('id')) {
         $auth = new App\Helpers\Auth;
+        $pre = new App\Helpers\Pre;
 
         $id = Session::get('id');
         $record = DB::table('users')
@@ -46,8 +47,10 @@
                 <span class="icon-bar"></span>
             </button>
             <a href="/"><img class="logo" src="{{ URL::asset('junan/images/logo.svg') }}"></a>
+            <div class="btn-group">
+    </div>
         </div>
-        <div class="collapse navbar-collapse" id="example-navbar-collapse">
+        <div class="collapse navbar-collapse pull-right" id="example-navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="{{ $seek->navClick('customer') ? 'active' : '' }}"><a href="/customer">学员</a></li>
                 <li class="{{ $seek->navClick('user') ? 'active' : '' }}"><a href="/user">成员</a></li>
@@ -65,8 +68,10 @@
                     </li>
                 @endif
                 {!! $me !!}
+                {!! $pre->navBranches() !!}
             </ul>
         </div>
+                
         </div>
     </nav>
     <!-- 顶部间距 -->
