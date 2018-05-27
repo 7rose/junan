@@ -68,7 +68,9 @@
                     </li>
                 @endif
                 {!! $me !!}
+                @if(Session::has('id'))
                 {!! $pre->navBranches() !!}
+                @endif
             </ul>
         </div>
                 
