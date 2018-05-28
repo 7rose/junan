@@ -51,7 +51,7 @@ class CustomerController extends Controller
                         '))
             ->where(function ($query) { 
                 // 分支机构限制
-                if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set'))) {
+                if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
                     $query->where('biz.branch', $this->auth->branchLimitId());
                     $query->where('biz.finished', false);
                     // $query->orWhere('finance.branch', '=', $this->auth->branchLimitId());

@@ -11,10 +11,7 @@
 
 @section('container')
     <div class="tab-pane fade in active" id="list">
-        @if(isset($records) && count($records))
-        <table class="table table-hover">
-        <caption>
-            
+        <div>
                 <div class="dropdown pull-right">
                     <button type="button" class="btn  btn-sm btn-info dropdown-toggle" id="dropdownMenu1" 
                             data-toggle="dropdown">
@@ -55,6 +52,10 @@
                     </form>
                         
                     @endif
+        </div>
+        @if(isset($records) && count($records))
+        <table class="table table-hover">
+        <caption>
 
         </caption>
         <thead>

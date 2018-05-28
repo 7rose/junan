@@ -17,6 +17,7 @@ class Auth
     private $admin_id; 
     private $finance_id;  # 财务 
     private $root_branch_id; # 总部
+    private $info_id;
 
     function __construct()
     {
@@ -26,6 +27,7 @@ class Auth
         $this->user_id = 6;
         $this->root_branch_id = 1;
         $this->finance_id = 47;
+        $this->info_id = 48;
 
         // 初始化
         $this->my_id = Session::get('id');
@@ -84,6 +86,13 @@ class Auth
     {
         if($this->root()) return true;
         return $this->me->user_type == $this->finance_id ? true : false;
+    }
+
+    // 信息中心
+    public function info()
+    {
+        if($this->root()) return true;
+        return $this->me->user_type == $this->info_id ? true : false;
     }
 
     // 颜色

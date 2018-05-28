@@ -29,7 +29,7 @@ class FilterController extends Controller
                         ->where('biz.finished', false)
                         ->where(function ($query) {
                         // 分支机构限制
-                        if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set'))) {
+                        if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
                                 $query->Where('biz.branch', $this->auth->branchLimitId());
                             }
                         })
@@ -105,7 +105,10 @@ class FilterController extends Controller
                 break;
 
             case 'ready_for_1': 
-                return $this->ready_for_1($request->all_id, $request->post_data);
+                $post_url = '/filter/ready_for_1/ex';
+                $btn_txt = '同批提交至: 科目1预约';
+
+                return $this->exNote($request->all_id, $request->post_data, $post_url, $btn_txt);
                 break;
             
             default:
@@ -114,7 +117,8 @@ class FilterController extends Controller
         }
     }
 
-    private function ready_for_1($all_id, $post_data)
+    // 科目1准备好预约
+    private function exNote($all_id, $post_data, $post_url, $btn_txt)
     {
         $all_id = substr($all_id,0,strlen($all_id)-1); 
         $all = explode(',', $all_id);
@@ -129,13 +133,27 @@ class FilterController extends Controller
             echo "fuck";
         }
         $real_num = count($all);
-        $ids = implode(',', $all);
+        $diff_id = implode(',', $all);
 
-        $txt = "<h3>".$real_num."条数据将同时处理!</h3>符合条件的记录共有".$all_num."条, 其中标记".$special_num."条";
-        
+        $txt = "<h3>多条数据将同时处理!</h3>符合条件的记录共有".$all_num."条, 其中标记".$special_num."条";
+
         return view('part')
                         ->with('txt', $txt)
-                        ->with('ids', $ids);
+                        ->with('post_url', $post_url)
+                        ->with('btn_txt', $btn_txt)
+                        ->with('all_id', $all_id)
+                        ->with('spec_id', $post_data)
+                        ->with('diff_id', $diff_id);
+
+    }
+
+    // 标记处理
+    public function ready_for_1_ex (Request $request)
+    {
+        $all = $request->all();
+        print_r($all);
+        // echo $all;
+        // intval($request->type) == 1  
 
     }
 

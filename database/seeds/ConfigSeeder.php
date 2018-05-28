@@ -202,6 +202,10 @@ class ConfigSeeder extends Seeder
                 'extra'   => NULL,
             ],[
                 'type'    => 'user_type',
+                'text'    => '信息',
+                'extra'   => NULL,
+            ],[
+                'type'    => 'user_type',
                 'text'    => '教练',
                 'extra'   => NULL,
             ],[

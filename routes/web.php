@@ -77,6 +77,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/filter', 'FilterController@index');
     Route::get('/filter/{key}', 'FilterController@filter');
     Route::post('/filter/part', 'FilterController@ex');
+    Route::post('/filter/ready_for_1/ex', 'FilterController@ready_for_1_ex');
 
     // 测试
     Route::get('/test/{key?}', 'FilterController@test');

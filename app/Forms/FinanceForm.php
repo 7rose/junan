@@ -2,14 +2,17 @@
 
 namespace App\Forms;
 
+use Session;
 use Kris\LaravelFormBuilder\Form;
 use App\Helpers\ConfigList;
+use App\Helpers\Auth;
 
 class FinanceForm extends Form
 {
     public function buildForm()
     {
         $list = new ConfigList;
+        $auth = new Auth;
         
         $this
             ->add('in', 'choice', [
@@ -23,14 +26,22 @@ class FinanceForm extends Form
                 'empty_value' => '-- 选择 --',
                 'choices'=> $list->getList('finance_item'),
                 'rules' => 'required'
-            ])
-            ->add('branch', 'choice', [
+            ]);
+
+        if($auth->branchLimit() || ($auth->admin() && Session::has('branch_set'))) {
+
+            $this->add('branch', 'hidden', [
+                'value' => $auth->branchLimitId()
+            ]);
+        }else{
+            $this->add('branch', 'choice', [
                 'label' => '所属驾校', 
                 'empty_value' => '-- 选择 --',
-                'choices'=> $list->branchList(),
+                'choices'=> $config_list->branchList(),
                 'rules' => 'required'
-            ])
-            ->add('date', 'date', [
+            ]);
+        }
+            $this->add('date', 'date', [
                 'label' => '日期',
                 'rules' => 'required'
             ])

@@ -37,7 +37,7 @@ class FinanceController extends Controller
                           ->select('finance.*', 'i.text as item_text', 'customers.name as customer_id_text', 'c.name as created_by_text', 'u.name as user_id_text', 'branches.text as branch_text', 'customers.mobile as customer_mobile', 'ck.name as checked_by_text')
                           ->where(function ($query) {
                                 // 分支机构限制
-                                if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set'))) {
+                                if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
                                     $query->Where('finance.branch', $this->auth->branchLimitId());
                                 }
                                  

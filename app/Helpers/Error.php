@@ -14,7 +14,7 @@ class Error
     // 账号锁定
     public function locked()
     {
-       return view('note')->with('custom', ['color'=>'warning', 'icon'=>'warning-sign', 'content'=>'您的账号被锁定, 请联系管理员!']);
+       return view('note')->with('custom', ['color'=>'warning', 'icon'=>'warning-sign', 'content'=>'您不是系统操作人员或账号被锁定, 请联系管理员!']);
     }
 
     public function forbidden()
