@@ -23,8 +23,6 @@
                     </button>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/no_class">未开班的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_1">没有驾校的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目2/3未分配教练员的</a></li>
                         <li role="presentation" class="divider"></li>
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_1">科目1: 具备预约条件的</a></li>
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目1: 提交预约申请的</a></li>
@@ -64,6 +62,7 @@
                 <th>姓名</th>
                 <th>电话</th>
                 <th>身份证</th>
+                <th>驾校</th>
                 <th>开班信息</th>
                 <th>证照类型</th>
                 <th>批处理标记</th>
@@ -76,6 +75,7 @@
                 <td>{{ $record->customer_name }}</td>
                 <td>{{ $record->customer_mobile }}</td>
                 <td>{{ $record->customer_id_number }}</td>
+                <td>{{ $record->branch_text }}</td>
                 <td>{{ explode('(', $record->class_branch_text)[0].$record->class_no }}</td>
                 <td>{{ $record->licence_type_text }}</td>
                 <td id="select{{ $record->id }}">

@@ -49,8 +49,10 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/branch/set/{id}', 'UserController@setBranch');
 
     // 业务
+    Route::get('/biz/claim/{id}', 'BizController@claim');
     Route::get('/customer/biz/{id?}', 'BizController@create');
     Route::post('/customer/biz/store', ['as'=>'biz.store', 'uses'=>'BizController@store']);
+
 
     // 财务
     Route::get('/finance', 'FinanceController@index');

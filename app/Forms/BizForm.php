@@ -4,13 +4,15 @@ namespace App\Forms;
 
 use Kris\LaravelFormBuilder\Form;
 use App\Helpers\ConfigList;
-// use Input;
+use App\Helpers\Auth;
+use Session;
 
 class BizForm extends Form
 {
     public function buildForm()
     {
         $list = new ConfigList;
+        $auth = new Auth;
         
         $this->add('licence_type', 'choice', [
             'label' => '证照类型', 
@@ -36,14 +38,23 @@ class BizForm extends Form
                 'label' => '实收款',
                 'attr' =>['step' => 0.01],
                 'rules' => 'required'
-        ])
-        ->add('branch', 'choice', [
+        ]);
+
+    if($auth->branchLimit() || ($auth->admin() && Session::has('branch_set'))) {
+
+        $this->add('branch', 'hidden', [
+            'value' => $auth->branchLimitId()
+        ]);
+    }else{
+        $this->add('branch', 'choice', [
             'label' => '所属驾校', 
             'empty_value' => '-- 选择 --',
             'choices'=> $list->branchList(),
             'rules' => 'required'
-        ])
-        ->add('user_id', 'text', [
+        ]);
+    }
+
+        $this->add('user_id', 'text', [
             'label' => '推荐人工号或手机号',
             'rules' => 'min:2|max:16'
         ])

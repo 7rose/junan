@@ -1,6 +1,8 @@
 <?php
     $date = new App\Helpers\Date;
     $seek = new App\Helpers\Seek;
+    $auth = new App\Helpers\Auth;
+    $pre = new App\Helpers\Pre;
 
 ?>
 @extends('../nav')
@@ -47,8 +49,9 @@
                 <td>{{ $date->birthdayFromId($record->id_number)}}&nbsp&nbsp<span class="label label-{{ $record->gender == 2 ? 'danger' : 'default' }}">{{ $date->ageFromId($record->id_number) }}</span></td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->id_number) !!}</td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->address) !!}</td>
-                <td>{!! $seek->seekLabel('seek_array', 'key', $record->finance_info) !!}</td>
-                <td>0</td>
+                <td>{!! '¥'.$seek->seekLabel('seek_array', 'key', $record->finance_info) !!}</td>
+               
+                <td>{!! $pre->customerBranch($record) !!}</td>
             </tr>
             @endforeach
         </tbody>

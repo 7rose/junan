@@ -18,12 +18,12 @@ class FinanceSeekForm extends Form
             'value' => Session::has('seek_array') ? Session::get('seek_array')['key'] : '',
             'rules' => 'min:1|max:16'
         ])
-        ->add('branch', 'choice', [
-            'label' => '所属驾校', 
-            'selected' => Session::has('finance_seek_array') && Session::get('finance_seek_array')['branch']!='' ? Session::get('finance_seek_array')['branch'] : '',
-            'empty_value' => '-- 选择 --',
-            'choices'=> $config_list->branchList(),
-        ])
+        // ->add('branch', 'choice', [
+        //     'label' => '所属驾校', 
+        //     'selected' => Session::has('finance_seek_array') && Session::get('finance_seek_array')['branch']!='' ? Session::get('finance_seek_array')['branch'] : '',
+        //     'empty_value' => '-- 选择 --',
+        //     'choices'=> $config_list->branchList(),
+        // ])
         ->add('date_begin', 'date', [
             'label' => '时间: 起点, 包含当日',
             'value' => Session::has('finance_seek_array') && Session::get('finance_seek_array')['date_begin']!='' ? Session::get('finance_seek_array')['date_begin'] : '',

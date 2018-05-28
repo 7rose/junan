@@ -5,36 +5,47 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use DB;
+use Session;
 use App\Helpers\Part;
+use App\Helpers\Auth;
 
 
 class FilterController extends Controller
 {
-    private $biz_prepare;
     private $biz_part;
+    private $auth;
 
-    function __construct()
+    private function prepare()
     {
-        $this->biz_prepare = DB::table('biz')
-                                ->leftJoin('lessons', 'biz.id', '=', 'lessons.biz_id')
-                                ->leftJoin('customers', 'biz.customer_id', '=', 'customers.id')
-                                ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
-                                ->leftJoin('classes', 'biz.class_id', '=', 'class_id')
-                                ->leftJoin('branches as cb', 'classes.branch', '=', 'cb.id')
-                                ->leftJoin('config', 'biz.licence_type', '=', 'config.id')
-                                ->where('biz.finished', false)
+        $this->auth = new Auth;
 
-                                ->select(
-                                    'biz.id',
-                                    'customers.name as customer_name',
-                                    'customers.mobile as customer_mobile',
-                                    'customers.id_number as customer_id_number',
-                                    'branches.text as branch_text',
-                                    'config.text as licence_type_text',
-                                    'cb.text as class_branch_text',
-                                    'classes.class_no as class_no',
-                                    DB::raw('count(lessons.id) as lessons_num')
-                                );
+        $records = DB::table('biz')
+                        ->leftJoin('lessons', 'biz.id', '=', 'lessons.biz_id')
+                        ->leftJoin('customers', 'biz.customer_id', '=', 'customers.id')
+                        ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
+                        ->leftJoin('classes', 'biz.class_id', '=', 'class_id')
+                        ->leftJoin('branches as cb', 'classes.branch', '=', 'cb.id')
+                        ->leftJoin('config', 'biz.licence_type', '=', 'config.id')
+                        ->where('biz.finished', false)
+                        ->where(function ($query) {
+                        // 分支机构限制
+                        if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set'))) {
+                                $query->Where('biz.branch', $this->auth->branchLimitId());
+                            }
+                        })
+
+                        ->select(
+                            'biz.id',
+                            'customers.name as customer_name',
+                            'customers.mobile as customer_mobile',
+                            'customers.id_number as customer_id_number',
+                            'branches.text as branch_text',
+                            'config.text as licence_type_text',
+                            'cb.text as class_branch_text',
+                            'classes.class_no as class_no',
+                            DB::raw('count(lessons.id) as lessons_num')
+                        );
+        return $records;
     }
 
     // 处理器
@@ -42,14 +53,14 @@ class FilterController extends Controller
     {
         switch ($key) {
             case 'no_class':
-                $tmp = $this->biz_prepare
+                $tmp = $this->prepare()
                         ->where('biz.class_id', null);
                 return $tmp;
                 break;
 
             case 'ready_for_1': 
                 // 未报名或者只报科目1并失败的
-                $tmp = $this->biz_prepare
+                $tmp = $this->prepare()
                         ->where('biz.class_id', '<>', null)
                         ->havingRaw('count(lessons.id) = 0');
                         // ->orHavingRaw('max(lessons.id) = 1');
@@ -61,7 +72,7 @@ class FilterController extends Controller
                 break;
             
             default:
-                return $this->biz_prepare;
+                return $this->prepare();
                 break;
         }
     }
@@ -98,7 +109,7 @@ class FilterController extends Controller
                 break;
             
             default:
-                return $this->biz_prepare;
+                return $this->prepare();
                 break;
         }
     }
@@ -118,19 +129,16 @@ class FilterController extends Controller
             echo "fuck";
         }
         $real_num = count($all);
+        $ids = implode(',', $all);
 
         $txt = "<h3>".$real_num."条数据将同时处理!</h3>符合条件的记录共有".$all_num."条, 其中标记".$special_num."条";
-
-        // print_r($all);
-        // echo $txt;
-        return view('part')->with('txt', $txt);
+        
+        return view('part')
+                        ->with('txt', $txt)
+                        ->with('ids', $ids);
 
     }
 
-    public function test(Request $request, $key=0)
-    {
-        echo $request->path();
-    }
 
 
 

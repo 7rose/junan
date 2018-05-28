@@ -22,8 +22,12 @@ class FinanceController extends Controller
 {
     use FormBuilderTrait;
 
+    private $auth;
+
     private function prepare() 
     {
+        $this->auth = new Auth;
+
         $records = Finance::leftJoin('config as i', 'finance.item', '=', 'i.id')
                           ->leftJoin('customers', 'finance.customer_id', '=', 'customers.id')
                           ->leftJoin('users as c', 'finance.created_by', '=', 'c.id')
@@ -31,7 +35,12 @@ class FinanceController extends Controller
                           ->leftJoin('users as u', 'finance.user_id', '=', 'u.id')
                           ->leftJoin('branches', 'finance.branch', '=', 'branches.id')
                           ->select('finance.*', 'i.text as item_text', 'customers.name as customer_id_text', 'c.name as created_by_text', 'u.name as user_id_text', 'branches.text as branch_text', 'customers.mobile as customer_mobile', 'ck.name as checked_by_text')
-                          ->where(function ($query) { 
+                          ->where(function ($query) {
+                                // 分支机构限制
+                                if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set'))) {
+                                    $query->Where('finance.branch', $this->auth->branchLimitId());
+                                }
+                                 
                                 // 起时间点
                                 if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'date_begin') && Session::get('finance_seek_array')['date_begin'] != '') {
                                     $query->Where('finance.date', '>=', strtotime(Session::get('finance_seek_array')['date_begin']));
@@ -40,11 +49,6 @@ class FinanceController extends Controller
                                 // 终时间点
                                 if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'date_end') && Session::get('finance_seek_array')['date_end'] != '') {
                                     $query->Where('finance.date', '<=', strtotime(Session::get('finance_seek_array')['date_end']));
-                                }
-
-                                // 驾校
-                                if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'branch') && Session::get('finance_seek_array')['branch'] != '') {
-                                    $query->Where('finance.branch', '=', Session::get('finance_seek_array')['branch']);
                                 }
 
                                 // 关键词

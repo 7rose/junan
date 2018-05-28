@@ -25,23 +25,23 @@ class UserController extends Controller
 {
     use FormBuilderTrait;
 
+    private $auth;
+
     private function prepare() 
     {
+        $this->auth = new Auth;
+
         $records = User::leftJoin('config as g', 'users.gender', '=', 'g.id')
                     ->leftJoin('config as t', 'users.user_type', '=', 't.id')
                     ->leftJoin('branches', 'users.branch', '=', 'branches.id')
                     ->leftJoin('users as c', 'users.created_by', '=', 'c.id')
                     ->select('users.*', 'g.text as gender_text', 't.text as user_type_text', 'branches.text as branch_text', 'c.name as created_by_text')
-                    ->where(function ($query) { 
-                            // // admin
-                            // if(!$this->tap->realRoot()) $query->where('staff.id', '>', 1);
-                            // if(!$this->tap->isAdmin()) {
-                            //     $query->where('staff.hide', false);
-                            //     $query->whereIn('staff.department', $this->tap->allVisibleDepartments());
-                            // }
-                            if(Session::has('user_seek_array') && array_has(Session::get('user_seek_array'), 'branch') && Session::get('user_seek_array')['branch'] != '') {
-                                $query->Where('users.branch', Session::get('user_seek_array')['branch']);
+                    ->where(function ($query) {
+                            // 分支机构限制
+                            if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set'))) {
+                                $query->Where('users.branch', $this->auth->branchLimitId());
                             }
+                            
                             // seek
                             if(Session::has('user_seek_array') && array_has(Session::get('user_seek_array'), 'key') && Session::get('user_seek_array')['key'] != '') {
                                 $query->Where('users.work_id', 'LIKE', '%'.Session::get('user_seek_array')['key'].'%');

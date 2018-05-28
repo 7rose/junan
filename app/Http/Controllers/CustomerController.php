@@ -24,38 +24,50 @@ class CustomerController extends Controller
 {
     use FormBuilderTrait;
 
+    private $auth;
+
     private function prepare() 
     {
         // 更新预处理财务结果数据
         $pre = new Pre;
         $pre->updateFinance();
 
+        $this->auth = new Auth;
+
         $records = DB::table('customers')
             ->leftJoin('config', 'customers.gender', '=', 'config.id')
             ->leftJoin('users', 'customers.created_by', '=', 'users.id')
-            ->select('customers.*','config.text as gender_text', 'users.name as created_by_text')
+            ->leftJoin('biz', 'customers.id', '=', 'biz.customer_id')
+            ->leftJoin('config as bc', 'biz.licence_type', '=', 'bc.id')
             // ->leftJoin('finance', 'customers.id', '=', 'finance.customer_id')
-            // ->select('customers.*',
-            //          'config.text as gender_text', 
-            //          'users.name as created_by_text', 
-            //          DB::raw('
-            //             group_concat(finance.customer_id) as num, 
-            //             group_concat(finance.price) as all_price, 
-            //             group_concat(finance.real_price) as all_real_price, 
-            //             group_concat(finance.in) as all_in
-            //             '))
+            ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
+            ->select('customers.*',
+                     'config.text as gender_text', 
+                     'users.name as created_by_text',
+                     DB::raw('
+                        group_concat(biz.branch) as biz_branch, 
+                        group_concat(bc.text) as licence_type_text, 
+                        group_concat(branches.text) as biz_branch_text
+                        '))
             ->where(function ($query) { 
-                    // 关键词
-                    if(Session::has('seek_array') && array_has(Session::get('seek_array'), 'key') && Session::get('seek_array')['key'] != '') {
-                        $query->Where('customers.name', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                        $query->orWhere('customers.mobile', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                        $query->orWhere('customers.id_number', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                        $query->orWhere('customers.finance_info', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                        $query->orWhere('customers.address', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                        $query->orWhere('customers.location', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                        $query->orWhere('customers.content', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
-                    }
-                });
+                // 分支机构限制
+                if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set'))) {
+                    $query->where('biz.branch', $this->auth->branchLimitId());
+                    $query->where('biz.finished', false);
+                    // $query->orWhere('finance.branch', '=', $this->auth->branchLimitId());
+                    $query->orWhere('biz.branch', null); # 认领
+                }
+                // 关键词
+                if(Session::has('seek_array') && array_has(Session::get('seek_array'), 'key') && Session::get('seek_array')['key'] != '') {
+                    $query->Where('customers.name', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                    $query->orWhere('customers.mobile', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                    $query->orWhere('customers.id_number', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                    $query->orWhere('customers.finance_info', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                    $query->orWhere('customers.address', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                    $query->orWhere('customers.location', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                    $query->orWhere('customers.content', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                }
+            });
         return $records;
     }
 
@@ -69,8 +81,10 @@ class CustomerController extends Controller
         ]);
 
         $records = $this->prepare()
-                        ->orderBy('customers.finance_info', 'desc')
+                        ->orderBy('biz.branch')
+                        // ->orderBy('customers.finance_info', 'desc')
                         ->orderBy('customers.created_at', 'desc')
+                        ->groupBy('customers.id')
                         ->paginate(50);
 
         return view('customers.index', compact('form'))->with('records', $records);

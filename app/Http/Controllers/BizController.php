@@ -8,6 +8,7 @@ use Session;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\BizForm;
 use App\Helpers\Error;
+use App\Helpers\Auth;
 // use App\Helpers\Unique;
 use App\Customer;
 use App\Finance;
@@ -64,6 +65,18 @@ class BizController extends Controller
         Biz::create($biz);
 
         return redirect('/customer/'.$all['customer_id']);
+    }
+
+
+    // 认领
+    public function claim($id)
+    {
+        $auth = new Auth;
+        $error = new Error;
+        if(!$auth->branchLimit()) return $error->forbidden();
+
+        Biz::where('customer_id', $id)->first()->update(['branch'=> $auth->branchLimit()]);
+        return redirect('/customer');
     }
 }
 

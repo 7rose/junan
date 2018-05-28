@@ -2,6 +2,7 @@
 
 namespace App\Forms;
 
+use Session;
 use Kris\LaravelFormBuilder\Form;
 use App\Helpers\ConfigList;
 use App\Helpers\Auth;
@@ -29,14 +30,23 @@ class UserForm extends Form
                 'empty_value' => '-- 选择 --',
                 'choices'=> ['1'=>'男', '2'=>'女'],
                 'rules' => 'required'
-            ])
-            ->add('branch', 'choice', [
+            ]);
+
+        if($auth->branchLimit() || ($auth->admin() && Session::has('branch_set'))) {
+
+            $this->add('branch', 'hidden', [
+                'value' => $auth->branchLimitId()
+            ]);
+        }else{
+            $this->add('branch', 'choice', [
                 'label' => '所属驾校', 
                 'empty_value' => '-- 选择 --',
                 'choices'=> $config_list->branchList(),
                 'rules' => 'required'
-            ])
-            ->add('user_type', 'choice', [
+            ]);
+        }
+
+            $this->add('user_type', 'choice', [
                 'label' => '用户类型', 
                 'empty_value' => '-- 选择 --',
                 'choices'=> $config_list->getList('user_type'),

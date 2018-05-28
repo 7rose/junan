@@ -108,9 +108,17 @@ class Auth
         }
     }
 
+    // 机构限制
     public function branchLimit()
     {
         return $this->admin() || $this->me->branch == $this->root_branch_id ? false : $this->me->branch;
+    }
+
+    // 获取机构代码
+    public function branchLimitId()
+    {
+        if($this->branchLimit()) return $this->branchLimit();
+        if($this->admin() && Session::has('branch_set')) return Session::get('branch_set');
     }
 
     // end
