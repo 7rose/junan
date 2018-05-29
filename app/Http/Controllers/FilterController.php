@@ -8,6 +8,7 @@ use App\Forms\ScoreForm;
 
 use DB;
 use Session;
+use Excel;
 use App\Helpers\Part;
 use App\Helpers\Auth;
 use App\Helpers\Error;
@@ -31,6 +32,7 @@ class FilterController extends Controller
                         ->leftJoin('classes', 'biz.class_id', '=', 'class_id')
                         ->leftJoin('branches as cb', 'classes.branch', '=', 'cb.id')
                         ->leftJoin('config', 'biz.licence_type', '=', 'config.id')
+                        ->leftJoin('users', 'biz.user_id', '=', 'users.id')
                         ->where('biz.finished', false)
                         ->where(function ($query) {
                         // 分支机构限制
@@ -48,6 +50,7 @@ class FilterController extends Controller
                             'config.text as licence_type_text',
                             'cb.text as class_branch_text',
                             'classes.class_no as class_no',
+                            'users.name as user_name',
                             DB::raw('count(lessons.id) as lessons_num, max(lessons.lesson) as max_lesson')
                         );
         return $records;
@@ -66,6 +69,7 @@ class FilterController extends Controller
             case 'ready_for_1': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
                             ->where('biz.next', '1.0'); 
                                             
                 return $next;
@@ -74,6 +78,7 @@ class FilterController extends Controller
             case 'date_for_1': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
                             ->where('biz.next', '1.1'); 
                                             
                 return $next;
@@ -87,6 +92,7 @@ class FilterController extends Controller
                  */
                 $fail = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
                             ->where('lessons.lesson', 1)
                             ->where('lessons.end', false)   
                             ->where('lessons.doing', false);
@@ -97,6 +103,8 @@ class FilterController extends Controller
             case 'ready_for_2':  
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
+                            ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
                             ->where('biz.next2', '2.0'); 
                                             
@@ -106,6 +114,8 @@ class FilterController extends Controller
             case 'date_for_2': 
                  $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
+                            ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
                             ->where('biz.next2', '2.1'); 
                                             
@@ -117,6 +127,8 @@ class FilterController extends Controller
                             ->where('biz.next', '1.3')
                             ->where('biz.next2', '2.0')
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
+                            ->whereNotNull('biz.user_id')
                             ->where('lessons.lesson', 2)
                             ->where('lessons.end', false)   
                             ->where('lessons.doing', false);
@@ -126,6 +138,8 @@ class FilterController extends Controller
             case 'ready_for_3':  
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
+                            ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
                             ->where('biz.next3', '3.0'); 
                                             
@@ -135,6 +149,8 @@ class FilterController extends Controller
             case 'date_for_3': 
                  $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
+                            ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
                             ->where('biz.next3', '3.1'); 
                                             
@@ -151,6 +167,8 @@ class FilterController extends Controller
                             ->where('biz.next', '1.3')
                             ->where('biz.next3', '3.0')
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
+                            ->whereNotNull('biz.user_id')
                             ->where('lessons.lesson', 3)
                             ->where('lessons.end', false)   
                             ->where('lessons.doing', false);
@@ -161,6 +179,7 @@ class FilterController extends Controller
             case 'ready_for_4': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
                             ->where('biz.next', '4.0'); 
                                             
                 return $next;
@@ -169,6 +188,7 @@ class FilterController extends Controller
             case 'date_for_4': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
                             ->where('biz.next', '4.1'); 
                                             
                 return $next;
@@ -183,6 +203,7 @@ class FilterController extends Controller
                 $fail = $this->prepare()
                             ->where('biz.next', '4.0')
                             ->whereNotNull('biz.class_id')
+                            ->whereNotNull('biz.branch')
                             ->where('lessons.lesson', 4)
                             ->where('lessons.end', false)   
                             ->where('lessons.doing', false);
@@ -206,6 +227,8 @@ class FilterController extends Controller
     {
         $records = $this->router($key)
                         ->groupBy('biz.id')
+                        ->orderBy('biz.branch')
+                        ->orderBy('biz.user_id')
                         ->get();
                         // ->toArray();
 
@@ -214,8 +237,9 @@ class FilterController extends Controller
         }
 
         // 取记录集
-        $this->biz_part = $records;
+        // $this->biz_part = $records;
         // print_r($records);
+        Session::put('biz_records', $records);
 
         return view('filters.index')->with('records', $records);
     }
@@ -532,6 +556,44 @@ class FilterController extends Controller
         DB::table('biz')->where('next', '5.0')->update(['finished'=>true]);
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
+    }
+
+    // Excel
+    public function filterToExcel()
+    {
+        $error = new Error;
+        $auth = new Auth;
+        if(!$auth->user()) return $error->forbidden();
+        if(!Session::has('biz_records')) return $error->paramLost();
+
+        $cellData = [
+            ['姓名', '电话', '身份证', '驾校', '教练', '开班信息', '证型']
+        ];
+        $records = Session::get('biz_records');
+
+        if(count($records)){
+            foreach ($records as $record) {
+                array_push($cellData, [
+                                        $record->customer_name, 
+                                        $record->customer_mobile, 
+                                        '#'.$record->customer_id_number, 
+                                        $record->branch_text, 
+                                        $record->user_name,
+                                        explode('(', $record->class_branch_text)[0].$record->class_no, 
+                                        $record->licence_type_text 
+                                    ]);
+            }
+        }
+
+        $file_name = '考务'.date('Y-m-d', time());
+
+        Excel::create($file_name,function($excel) use ($cellData){
+            $excel->sheet('列表', function($sheet) use ($cellData){
+                $sheet->rows($cellData);
+                $sheet->setAutoSize(true);
+                $sheet->freezeFirstRow();
+            });
+        })->export('xlsx');
     }
 
 }

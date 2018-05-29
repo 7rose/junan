@@ -13,6 +13,10 @@
     <div class="tab-pane fade in active" id="list">
         <div>
                 <div class="dropdown pull-right">
+                    @if(count($records))
+                    <a href="/filter/download/excel" class="btn btn-sm btn-success">导出Excel</a>
+                    @endif
+                    
                     <button type="button" class="btn  btn-sm btn-info dropdown-toggle" id="dropdownMenu1" 
                             data-toggle="dropdown">
                         筛选结果: 共{{ count($records) }}条记录
@@ -62,6 +66,8 @@
                     </form>
                     @endif
                 @endif
+
+
         </div>
         @if(isset($records) && count($records))
         <table class="table table-hover">
@@ -74,6 +80,7 @@
                 <th>电话</th>
                 <th>身份证</th>
                 <th>驾校</th>
+                <th>教练</th>
                 <th>开班信息</th>
                 <th>证照类型</th>
                 <th>批处理标记</th>
@@ -88,6 +95,7 @@
                     <td>{{ $record->customer_mobile }}</td>
                     <td>{{ $record->customer_id_number }}</td>
                     <td>{{ $record->branch_text }}</td>
+                    <td>{{ $record->user_name }}</td>
                     <td>{{ explode('(', $record->class_branch_text)[0].$record->class_no }}</td>
                     <td>{{ $record->licence_type_text }}</td>
                     <td id="select{{ $record->id }}">

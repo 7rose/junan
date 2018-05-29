@@ -116,7 +116,8 @@ class Pre
         $text ='';
         for ($i=0; $i < count($array_branch); $i++) { 
             if($array_branch[$i]){
-                $text .= '<span class="label label-success">'.explode(':', $array_licence_type_text[$i])[0].':'.explode('(', $array_branch_text[$i])[0].'</span>';
+                $color = $record->biz_user_id ? 'success' : 'warning';
+                $text .= '<span class="label label-'.$color.'">'.explode(':', $array_licence_type_text[$i])[0].':'.explode('(', $array_branch_text[$i])[0].'</span>';
             }else{
                 $auth = new Auth;
                 if($auth->branchLimit()){

@@ -46,6 +46,7 @@ class CustomerController extends Controller
                      'users.name as created_by_text',
                      DB::raw('
                         group_concat(biz.branch) as biz_branch, 
+                        group_concat(biz.user_id) as biz_user_id, 
                         group_concat(bc.text) as licence_type_text, 
                         group_concat(branches.text) as biz_branch_text
                         '))
@@ -166,10 +167,20 @@ class CustomerController extends Controller
                     ->leftJoin('config as lt', 'biz.licence_type', '=', 'lt.id')
                     ->leftJoin('config as ct', 'biz.class_type', '=', 'ct.id')
                     ->leftJoin('users', 'biz.created_by', '=', 'users.id')
+                    ->leftJoin('users as u', 'biz.user_id', '=', 'u.id')
                     ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
                     ->leftJoin('classes', 'biz.class_id', '=', 'classes.id')
                     ->leftJoin('branches as bb', 'classes.branch', '=', 'bb.id')
-                    ->select('biz.*', 'customers.name as customer_name', 'lt.text as licence_type_text', 'ct.text as class_type_text', 'users.name as created_by_text', 'branches.text as branch_text', 'classes.class_no as class_no', 'bb.text as class_branch_text')
+                    ->select('biz.*',
+                            'customers.name as customer_name', 
+                            'lt.text as licence_type_text', 
+                            'ct.text as class_type_text', 
+                            'users.name as created_by_text', 
+                            'branches.text as branch_text', 
+                            'classes.class_no as class_no', 
+                            'bb.text as class_branch_text', 
+                            'u.name as user_id_text'
+                        )
                     ->orderBy('biz.created_at', 'desc')
                     ->orderBy('biz.updated_at', 'desc')
                     ->get();
