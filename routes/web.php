@@ -77,10 +77,16 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/filter', 'FilterController@index');
     Route::get('/filter/{key}', 'FilterController@filter');
     Route::post('/filter/part', 'FilterController@ex');
-    Route::post('/filter/ready_for_1/ex', 'FilterController@ready_for_1_ex');
+    Route::get('/filter/score/choose', 'FilterController@score');
+    Route::post('/filter/score/ex', ['as'=>'score.ex', 'uses'=>'FilterController@score_ex']);
+    Route::post('/filter/score_ex/save', 'FilterController@score_save');
+    // Route::post('/filter/ready_for_1/ex', 'FilterController@ready_for_1_ex');
+    Route::post('/filter/ready/ex', 'FilterController@readyEx');
+    Route::post('/filter/date/ex', 'FilterController@dateEx');
+    // Route::post('/filter/date_for_1/ex', 'FilterController@date_for_1_ex');
 
     // 测试
-    Route::get('/test/{key?}', 'FilterController@test');
+    // Route::get('/test/{key?}', 'FilterController@test');
     // excel
     // Route::get('/import', 'ImportController@index');
     // Route::get('/user/import', 'ImportController@userImport');
@@ -91,12 +97,10 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 
 Route::get('/test', function() {
-    $a = new App\Helpers\Auth;
-    if($a->finance()){
-        echo "yes";
-    }else{
-        echo "fuck";
-    }
+    $a = [1,2,3];
+    array_slice($a, 1,1);
+    print_r($a);
+    // echo "fuck";
 });
 
 

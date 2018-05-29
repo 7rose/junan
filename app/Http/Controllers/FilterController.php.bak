@@ -59,24 +59,48 @@ class FilterController extends Controller
         switch ($key) {
             case 'no_class':
                 $tmp = $this->prepare()
-                        ->whereNull('biz.class_id');
+                        ->where('biz.class_id', null);
                 return $tmp;
                 break;
 
             case 'ready_for_1': 
-                $next = $this->prepare()
+                /**
+                 * 1. 已开班
+                 * 2. 没有科目成绩记录的
+                 * 3. 有记录, 但只有科目1记录, 且没过的
+                 */
+                $fail = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.next', '1.0'); 
-                                            
-                return $next;
+                            ->where('lessons.lesson', 1)
+                            ->where('lessons.end', false)   
+                            ->where('lessons.doing', false);    
+                            
+                $new = $this->prepare()
+                        ->whereNotNull('biz.class_id')
+                        ->havingRaw('count(lessons.id) = 0')
+                        ->union($fail);
+
+                return $new;
                 break;
 
             case 'date_for_1': 
-                $next = $this->prepare()
-                            ->whereNotNull('biz.class_id')
-                            ->where('biz.next', '1.1'); 
-                                            
-                return $next;
+                 /**
+                 * 1. 已开班
+                 * 2. 有科目1记录, 且最高为科目1
+                 * 3. 准备状态 - V
+                 * 4. 预约日期 - 空
+                 * 5. 通过状态 - X
+                 */
+                $tmp = $this->prepare()
+                        ->whereNotNull('biz.class_id')
+                        ->where('lessons.end', false)
+                        ->where('lessons.doing', true)
+                        ->where('lessons.lesson', 1)
+                        ->where('lessons.ready', true)
+                        ->whereNull('lessons.order_date')
+                        ->where('lessons.pass', false);
+
+                return $tmp;
                 break;
 
             case 'fail_for_1': 
@@ -94,96 +118,60 @@ class FilterController extends Controller
                 return $fail;
                 break;
 
-            case 'ready_for_2':  
-                $next = $this->prepare()
-                            ->whereNotNull('biz.class_id')
-                            ->where('biz.next', '1.3')
-                            ->where('biz.next2', '2.0'); 
-                                            
-                return $next;
-                break;
-
-            case 'date_for_2': 
-                 $next = $this->prepare()
-                            ->whereNotNull('biz.class_id')
-                            ->where('biz.next', '1.3')
-                            ->where('biz.next2', '2.1'); 
-                                            
-                return $next;
-                break;
-
-            case 'fail_for_2': 
-                $fail = $this->prepare()
-                            ->where('biz.next', '1.3')
-                            ->where('biz.next2', '2.0')
+            case 'ready_for_2': 
+                /**
+                 * 1. 已开班
+                 * 2. 科目1合格, 没报科目2,3的
+                 * 3. 有科目2,但没过的
+                 */
+                $fail_2 = $this->prepare()
                             ->whereNotNull('biz.class_id')
                             ->where('lessons.lesson', 2)
                             ->where('lessons.end', false)   
-                            ->where('lessons.doing', false);
-                return $fail;
-                break;
+                            ->where('lessons.doing', false);   
+                            
 
-            case 'ready_for_3':  
-                $next = $this->prepare()
+                $pass_1 = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.next', '1.3')
-                            ->where('biz.next3', '3.0'); 
-                                            
-                return $next;
+                            ->havingRaw('max(lessons.lesson) < 2')
+                            ->where('lessons.lesson', 1)
+                            ->where('lessons.end', true)   
+                            ->where('lessons.pass', true)   
+                            ->where('lessons.doing', false)
+                            ->union($fail_2);
+
+                return $pass_1;
                 break;
 
-            case 'date_for_3': 
-                 $next = $this->prepare()
-                            ->whereNotNull('biz.class_id')
-                            ->where('biz.next', '1.3')
-                            ->where('biz.next3', '3.1'); 
-                                            
-                return $next;
+            case 'date_for_2': 
+                 /**
+                 * 1. 已开班
+                 * 2. 有科目1记录, 且最高为科目1
+                 * 3. 准备状态 - V
+                 * 4. 预约日期 - 空
+                 * 5. 通过状态 - X
+                 */
+                $tmp = $this->prepare()
+                        ->whereNotNull('biz.class_id')
+                        ->where('lessons.end', false)
+                        ->where('lessons.doing', true)
+                        ->where('lessons.lesson', 2)
+                        ->where('lessons.ready', true)
+                        ->whereNull('lessons.order_date')
+                        ->where('lessons.pass', false);
+
+                return $tmp;
                 break;
 
-            case 'fail_for_3': 
+            case 'fail_for_2': 
                 /**
                  * 1. 已开班
                  * 2. 没有科目成绩记录的
                  * 3. 有记录, 但只有科目1记录, 且没过的
                  */
                 $fail = $this->prepare()
-                            ->where('biz.next', '1.3')
-                            ->where('biz.next3', '3.0')
                             ->whereNotNull('biz.class_id')
-                            ->where('lessons.lesson', 3)
-                            ->where('lessons.end', false)   
-                            ->where('lessons.doing', false);
-
-                return $fail;
-                break;
-
-            case 'ready_for_4': 
-                $next = $this->prepare()
-                            ->whereNotNull('biz.class_id')
-                            ->where('biz.next', '4.0'); 
-                                            
-                return $next;
-                break;
-
-            case 'date_for_4': 
-                $next = $this->prepare()
-                            ->whereNotNull('biz.class_id')
-                            ->where('biz.next', '4.1'); 
-                                            
-                return $next;
-                break;
-
-            case 'fail_for_4': 
-                /**
-                 * 1. 已开班
-                 * 2. 没有科目成绩记录的
-                 * 3. 有记录, 但只有科目1记录, 且没过的
-                 */
-                $fail = $this->prepare()
-                            ->where('biz.next', '4.0')
-                            ->whereNotNull('biz.class_id')
-                            ->where('lessons.lesson', 4)
+                            ->where('lessons.lesson', 2)
                             ->where('lessons.end', false)   
                             ->where('lessons.doing', false);
 
@@ -258,7 +246,6 @@ class FilterController extends Controller
                 $post_url = '/filter/ready/ex';
                 $btn_txt = '同批提交至: 科目2预约';
 
-                // return $this->exNote($request, $post_url, $btn_txt);
                 return $this->exNote($request, $post_url, $btn_txt, $date_input=false, $lesson=2, $order_date=false);
                 break;
 
@@ -268,38 +255,6 @@ class FilterController extends Controller
 
                 // return $this->exNote($request, $post_url, $btn_txt, $date_input=true);
                 return $this->exNote($request, $post_url, $btn_txt, $date_input=true, $lesson=2, $order_date=false);
-                break;
-
-            case 'ready_for_3': 
-                $post_url = '/filter/ready/ex';
-                $btn_txt = '同批提交至: 科目3预约';
-
-                // return $this->exNote($request, $post_url, $btn_txt);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=false, $lesson=3, $order_date=false);
-                break;
-
-            case 'date_for_3': 
-                $post_url = '/filter/date/ex';
-                $btn_txt = '批量设置科目3考试日期';
-
-                // return $this->exNote($request, $post_url, $btn_txt, $date_input=true);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=true, $lesson=3, $order_date=false);
-                break;
-
-            case 'ready_for_4': 
-                $post_url = '/filter/ready/ex';
-                $btn_txt = '同批提交至: 科目4预约';
-
-                // return $this->exNote($request, $post_url, $btn_txt);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=false, $lesson=4, $order_date=false);
-                break;
-
-            case 'date_for_4': 
-                $post_url = '/filter/date/ex';
-                $btn_txt = '批量设置科目4考试日期';
-
-                // return $this->exNote($request, $post_url, $btn_txt, $date_input=true);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=true, $lesson=4, $order_date=false);
                 break;
             
             default:
@@ -330,25 +285,12 @@ class FilterController extends Controller
                 ->update(['doing'=>true]);
 
         DB::table('lessons')->insert($out);
-        // DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>$request->lesson.'.1']);
-        // 未过标记
-        if($request->lesson==2 || $request->lesson==3) {
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next'.$request->lesson => $request->lesson.'.1']);
-        }else{
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next' => $request->lesson.'.1']);
-        }
-
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
     }
 
     // 处理器: 预约日期
     public function dateEx (Request $request)
     {
-        // 授权
-        $auth = new Auth;
-        $auth_error = new Error;
-        if(!$auth->info())  return $auth_error->forbidden();
-
         $resault = $request->type == 1 ? $request->diff_id :$request->spec_id;
 
         $error = new Error;
@@ -368,13 +310,6 @@ class FilterController extends Controller
             ->update(['order_date'=> strtotime($request->date)]);
 
             // print_r($request->all());
-        // DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>$request->lesson.'.2']);
-            // 未过标记
-        if($request->lesson==2 || $request->lesson==3) {
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next'.$request->lesson => $request->lesson.'.2']);
-        }else{
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next' => $request->lesson.'.2']);
-        }
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
     }
@@ -417,14 +352,56 @@ class FilterController extends Controller
 
     }
 
+    // // 科目1预约名单
+    // public function ready_for_1_ex (Request $request)
+    // {
+    //     $resault = $request->type == 1 ? $request->diff_id :$request->spec_id;
+
+    //     $error = new Error;
+    //     if(!$resault) return $error->paramLost();
+
+    //     $array_resault = explode(',', $resault);
+    //     $out = [];
+
+    //     foreach ($array_resault as $key) {
+    //         $item = ['biz_id'=>$key, 'lesson'=>1, 'doing'=>true];
+    //         array_push($out, $item);
+    //     }
+
+    //     DB::table('lessons')
+    //             ->whereIn('biz_id', $array_resault)
+    //             ->where('lesson', 1)
+    //             ->update(['doing'=>true]);
+
+    //     DB::table('lessons')->insert($out);
+    //     return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
+    // }
+
+    // // 科目1预约成功日期 
+    // public function date_for_1_ex (Request $request)
+    // {
+    //     $resault = $request->type == 1 ? $request->diff_id :$request->spec_id;
+
+    //     $error = new Error;
+    //     if(!$resault) return $error->paramLost();
+
+    //     $array_resault = explode(',', $resault);
+
+    //     DB::table('lessons')
+    //         ->havingRaw('max(lesson) = 1')
+    //         ->where('lesson', 1)
+    //         ->whereIn('biz_id', $array_resault)
+    //         ->where('ready', true)
+    //         ->where('order_date', null)
+    //         ->where('pass', false)
+    //         ->update(['order_date'=> strtotime($request->date)]);
+
+    //     return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
+    // }
+
     // 成绩导入
     public function score ()
     {
-        // 授权
-        $auth = new Auth;
-        $auth_error = new Error;
-        if(!$auth->info())  return $auth_error->forbidden();
-
         $form = $this->form(ScoreForm::class, [
             'method' => 'POST',
             'url' => route('score.ex')
@@ -439,11 +416,6 @@ class FilterController extends Controller
     // 学员列表
     public function score_ex (Request $request)
     {
-        // 授权
-        $auth = new Auth;
-        $auth_error = new Error;
-        if(!$auth->info())  return $auth_error->forbidden();
-
         $order_date = strtotime($request->order_date);
 
         $records = $this->prepare()
@@ -465,11 +437,6 @@ class FilterController extends Controller
     // 保存成绩
     public function score_save(Request $request)
     {
-        // 授权
-        $auth = new Auth;
-        $auth_error = new Error;
-        if(!$auth->info())  return $auth_error->forbidden();
-
        $resault = $request->type == 1 ? $request->diff_id :$request->spec_id;
        $others = $request->type == 2 ? $request->diff_id :$request->spec_id;
 
@@ -487,13 +454,6 @@ class FilterController extends Controller
                 ->where('order_date', $request->order_date)
                 ->where('pass', false)
                 ->update(['doing'=>false]);
-
-            // 未过标记
-            if($request->lesson==2 || $request->lesson==3) {
-                DB::table('biz')->whereIn('id', $others_array)->update(['next'.$request->lesson => $request->lesson.'.0']);
-            }else{
-                DB::table('biz')->whereIn('id', $others_array)->update(['next' => $request->lesson.'.0']);
-            }
 
         } 
 
@@ -514,26 +474,27 @@ class FilterController extends Controller
             ->whereIn('biz_id', $array_resault)
             ->update(['end'=>true]);
 
-        if($request->lesson==1) {
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>$request->lesson.'.3']);
-        }elseif ($request->lesson==2 || $request->lesson==3) {
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next'.$request->lesson=>$request->lesson.'.3']);
-            
-            DB::table('biz')
-                    ->where('next', '1.3')
-                    ->where('next2', '2.3')
-                    ->where('next3', '3.3')
-                    ->update(['next'=>'4.0']);
-
-        }else{
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>(intval($request->lesson)+1).'.0']);
-        }
-
-        DB::table('biz')->where('next', '5.0')->update(['finished'=>true]);
-
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
     }
 
+
+
+
+    // public function checking(Request $request)
+    // {
+    //     $ticket_no = $request->input('no');
+    //     $id = $request->input('id');
+    //     // 授权
+    //     $auth = new Auth;
+    //     if(!$auth->finance())  return "无权操作";
+
+    //     $target = Finance::find($id)->update(['checked' => true, 'checked_by'=>Session::get('id'), 'checked_by_time'=>time(), 'ticket_no'=>$ticket_no]);
+    //     // return redirect('/finance');
+    //     // echo 'fuck';
+    //     return '票号:'.$ticket_no.'已成功审核!';
+    // }
+
+    // end
 }
 
 

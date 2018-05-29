@@ -25,6 +25,9 @@ class CreateBizTable extends Migration
             $table->integer('created_by')->nullable(); // 创建人
             $table->integer('state')->nullable(); // 状态
             $table->integer('finished')->default(false); // 状态
+            $table->string('next')->default('1.0'); // 状态
+            $table->string('next2')->default('2.0'); // 状态
+            $table->string('next3')->default('3.0'); // 状态
             $table->integer('locked')->default(false); // 状态
             $table->integer('show')->default(true); // 状态
             $table->timestamps();

@@ -21,37 +21,47 @@
                     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/no_class">未开班的</a></li>
                         <li role="presentation" class="divider"></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/score/choose"><span class="glyphicon glyphicon-edit"></span>成绩处理和考生清单</a></li>
+                        <li role="presentation" class="divider"></li>
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_1">科目1: 具备预约条件的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目1: 提交预约申请的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目1: 报名成功的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目1: 不合格的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_1">科目1: 提交预约申请的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_1">科目1: 不合格的</a></li>
                         <li role="presentation" class="divider"></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目2: 具备预约条件的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目2: 提交预约申请的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目2: 报名成功的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目2: 不合格的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_2">科目2: 具备预约条件的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_2">科目2: 提交预约申请的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_2">科目2: 不合格的</a></li>
                         <li role="presentation" class="divider"></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目3: 具备预约条件的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目3: 提交预约申请的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目3: 报名成功的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目3: 不合格的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_3">科目3: 具备预约条件的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_3">科目3: 提交预约申请的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_3">科目3: 不合格的</a></li>
                         <li role="presentation" class="divider"></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目4: 具备预约条件的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目4: 提交预约申请的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目4: 报名成功的</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">科目4: 不合格的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_4">科目4: 具备预约条件的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_4">科目4: 提交预约申请的</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_4">科目4: 不合格的</a></li>
                     </ul>
                 </div>
+                {{-- 如果有科目和预约日期则处理成绩 --}}
+                @if(isset($lesson) && isset($order_date))
+                <form method="POST" action="/filter/part">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="lesson" value="{{ $lesson }}">
+                    <input type="hidden" name="order_date" value="{{ $order_date }}">
+                    <input type="hidden" name="all_id" value="{{ $all_id }}">
+                    <input type="hidden" name="action" value="score_ex">
+                    <input type="hidden" id="post_data" name="post_data" value="">
+                    <button type="submit" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-th"></span> 批处理 : {{ '科目'.$lesson.': '. date('Y-m-d', $order_date).'成绩' }}</button>
+                </form>
+                @else
                     @if($part->actionFromUrl())
                     <form method="POST" action="/filter/part">
                         {{ csrf_field() }}
                         <input type="hidden" name="all_id" value="{{ $all_id }}">
                         <input type="hidden" name="action" value="{{ $part->actionFromUrl() }}">
                         <input type="hidden" id="post_data" name="post_data" value="">
-                    <button type="submit" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-th"></span> 批处理 : {{ $part->actionText() }}</button>
+                         <button type="submit" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-th"></span> 批处理 : {{ $part->actionText() }}</button>
                     </form>
-                        
                     @endif
+                @endif
         </div>
         @if(isset($records) && count($records))
         <table class="table table-hover">
@@ -71,17 +81,19 @@
         </thead>
         <tbody>
             @foreach($records as $record)
+                
  
-            <tr>
-                <td>{{ $record->customer_name }}</td>
-                <td>{{ $record->customer_mobile }}</td>
-                <td>{{ $record->customer_id_number }}</td>
-                <td>{{ $record->branch_text }}</td>
-                <td>{{ explode('(', $record->class_branch_text)[0].$record->class_no }}</td>
-                <td>{{ $record->licence_type_text }}</td>
-                <td id="select{{ $record->id }}">
-                    <button  class="btn btn-xs btn-default" onclick="javascript:select({{ $record->id }})"><span class="glyphicon glyphicon-pushpin"></span> 标记</button>
+                <tr>
+                    <td>{{ $record->customer_name }}</td>
+                    <td>{{ $record->customer_mobile }}</td>
+                    <td>{{ $record->customer_id_number }}</td>
+                    <td>{{ $record->branch_text }}</td>
+                    <td>{{ explode('(', $record->class_branch_text)[0].$record->class_no }}</td>
+                    <td>{{ $record->licence_type_text }}</td>
+                    <td id="select{{ $record->id }}">
+                        <button  class="btn btn-xs btn-default" onclick="javascript:select({{ $record->id }})"><span class="glyphicon glyphicon-pushpin"></span> 标记</button>
                 </td>
+                
             @endforeach
         </tbody>
         </table>
