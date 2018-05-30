@@ -18,7 +18,10 @@ Route::post('/user/check', ['as'=>'user.check', 'uses'=>'UserController@check'])
 Route::get('/locked', 'UserController@lockInfo');
 
 Route::group(['middleware' => ['login', 'state_check']], function () {
-
+    // doc
+    Route::get('/doc', function() {
+        return view('users.doc');
+    });
     // 学员
     Route::get('/customer', 'CustomerController@index');
     Route::get('/customer/create', 'CustomerController@create');
@@ -92,10 +95,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 
 Route::get('/test', function() {
-    $a = [1,2,3];
-    array_slice($a, 1,1);
-    print_r($a);
-    // echo "fuck";
+    return view('users.welcome');
 });
 
 

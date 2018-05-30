@@ -125,7 +125,7 @@ class UserController extends Controller
         if (!Hash::check($request->password, $record->password)) return redirect()->back()->withErrors(['password'=>'密码错误!'])->withInput();
         Session::put('id', $record->id);
         // return redirect($request->path);
-        return redirect('/');
+        return redirect('/doc');
     }
 
     // 锁定
