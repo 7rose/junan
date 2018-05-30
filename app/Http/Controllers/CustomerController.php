@@ -54,7 +54,7 @@ class CustomerController extends Controller
                 // 分支机构限制
                 if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
                     $query->where('biz.branch', $this->auth->branchLimitId());
-                    $query->where('biz.finished', false);
+                    // $query->where('biz.finished', false);
                     // $query->orWhere('finance.branch', '=', $this->auth->branchLimitId());
                     $query->orWhere('biz.branch', null); # 认领
                 }
@@ -87,6 +87,7 @@ class CustomerController extends Controller
                         ->orderBy('customers.created_at', 'desc')
                         ->groupBy('customers.id')
                         ->paginate(50);
+        // Session::put('customer_list', $records);
 
         return view('customers.index', compact('form'))->with('records', $records);
     }
@@ -292,6 +293,10 @@ class CustomerController extends Controller
         ];
 
         $records = $this->prepare()
+                        ->orderBy('biz.branch')
+                        // ->orderBy('customers.finance_info', 'desc')
+                        ->orderBy('customers.created_at', 'desc')
+                        ->groupBy('customers.id')
                         // ->orderBy('finance.date')
                         ->get();
 
