@@ -109,7 +109,9 @@ class Pre
     // 驾校认领
     public function customerBranch($record)
     {
-        if(!$record->biz_branch) return '<span class="label label-default">无进行的业务</span>';
+        if(!$record->licence_type_text) return '<span class="label label-default">无业务</span>';
+        // if(!$record->class_id) return '<span class="label label-default">未开班</span>';
+
         $array_branch = explode(',', $record->biz_branch);
         $array_branch_text = explode(',', $record->biz_branch_text);
         $array_licence_type_text = explode(',', $record->licence_type_text);
