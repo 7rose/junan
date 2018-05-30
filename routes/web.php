@@ -52,6 +52,12 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/biz/claim/{id}', 'BizController@claim');
     Route::get('/customer/biz/{id?}', 'BizController@create');
     Route::post('/customer/biz/store', ['as'=>'biz.store', 'uses'=>'BizController@store']);
+    Route::get('/biz/edit/{id}', 'BizController@edit');
+    Route::post('/biz/update/{id}', ['as'=>'biz.update', 'uses'=>'BizController@update']);
+    Route::get('/biz/teacher/{key}', 'BizController@teacher');
+    Route::get('/biz/close/{id}', 'BizController@close');
+    Route::get('/biz/open/{id}', 'BizController@open');
+    // Route::post('/biz/update/{id}', ['as'=>'biz.update', 'uses'=>'BizController@update']);
 
     // 财务
     Route::get('/finance', 'FinanceController@index');

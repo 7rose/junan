@@ -62,6 +62,7 @@ class FilterController extends Controller
         switch ($key) {
             case 'no_class':
                 $tmp = $this->prepare()
+                        ->where('biz.finished', false)
                         ->whereNull('biz.class_id');
                 return $tmp;
                 break;
@@ -69,6 +70,7 @@ class FilterController extends Controller
             case 'ready_for_1': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->where('biz.next', '1.0'); 
                                             
@@ -78,6 +80,7 @@ class FilterController extends Controller
             case 'date_for_1': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->where('biz.next', '1.1'); 
                                             
@@ -92,6 +95,7 @@ class FilterController extends Controller
                  */
                 $fail = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->where('lessons.lesson', 1)
                             ->where('lessons.end', false)   
@@ -103,6 +107,7 @@ class FilterController extends Controller
             case 'ready_for_2':  
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
@@ -114,6 +119,7 @@ class FilterController extends Controller
             case 'date_for_2': 
                  $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
@@ -127,6 +133,7 @@ class FilterController extends Controller
                             ->where('biz.next', '1.3')
                             ->where('biz.next2', '2.0')
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->whereNotNull('biz.user_id')
                             ->where('lessons.lesson', 2)
@@ -138,6 +145,7 @@ class FilterController extends Controller
             case 'ready_for_3':  
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
@@ -149,6 +157,7 @@ class FilterController extends Controller
             case 'date_for_3': 
                  $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
@@ -167,6 +176,7 @@ class FilterController extends Controller
                             ->where('biz.next', '1.3')
                             ->where('biz.next3', '3.0')
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->whereNotNull('biz.user_id')
                             ->where('lessons.lesson', 3)
@@ -179,6 +189,7 @@ class FilterController extends Controller
             case 'ready_for_4': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->where('biz.next', '4.0'); 
                                             
@@ -188,6 +199,7 @@ class FilterController extends Controller
             case 'date_for_4': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->where('biz.next', '4.1'); 
                                             
@@ -203,6 +215,7 @@ class FilterController extends Controller
                 $fail = $this->prepare()
                             ->where('biz.next', '4.0')
                             ->whereNotNull('biz.class_id')
+                            ->where('biz.finished', false)
                             ->whereNotNull('biz.branch')
                             ->where('lessons.lesson', 4)
                             ->where('lessons.end', false)   
@@ -344,14 +357,14 @@ class FilterController extends Controller
         $out = [];
 
         foreach ($array_resault as $key) {
-            $item = ['biz_id'=>$key, 'lesson'=>$request->lesson, 'doing'=>true];
+            $item = ['biz_id'=>$key, 'lesson'=>$request->lesson];
             array_push($out, $item);
         }
 
-        DB::table('lessons')
-                ->whereIn('biz_id', $array_resault)
-                ->where('lesson', $request->lesson)
-                ->update(['doing'=>true]);
+        // DB::table('lessons')
+        //         ->whereIn('biz_id', $array_resault)
+        //         ->where('lesson', $request->lesson)
+        //         ->update(['doing'=>true]);
 
         DB::table('lessons')->insert($out);
         // DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>$request->lesson.'.1']);
@@ -385,7 +398,7 @@ class FilterController extends Controller
             ->where('lesson', $request->lesson)
             ->whereIn('biz_id', $array_resault)
             ->where('ready', true)
-            ->whereNull('order_date')
+            ->where('order_date',0)
             ->where('pass', false)
             ->where('end', false)
             ->where('doing', true)
@@ -510,6 +523,7 @@ class FilterController extends Controller
                 ->where('ready', true)
                 ->where('order_date', $request->order_date)
                 ->where('pass', false)
+                ->where('doing', true)
                 ->update(['doing'=>false]);
 
             // 未过标记
@@ -531,6 +545,7 @@ class FilterController extends Controller
             ->where('ready', true)
             ->where('order_date', $request->order_date)
             ->where('pass', false)
+            ->where('doing', true)
             ->update(['pass'=> true, 'doing'=>false]);
 
         DB::table('lessons')

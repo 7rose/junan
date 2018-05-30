@@ -148,10 +148,89 @@ class Pre
         return $num;
     }
 
+    // 用户业务信息
+    public function customerBiz($record)
+    {
+        $auth = new Auth;
+
+        $edit = $auth->admin() ? '<a href="/biz/edit/'.$record->id.'" class="btn btn-sm btn-default">修改</a>' : '';
+        $close = $auth->admin() ? '<a href="/biz/close/'.$record->id.'" class="btn btn-sm btn-default">关闭业务!</a>' : '';
+        $open = $auth->root() ? '<a href="/biz/open/'.$record->id.'" class="btn btn-sm btn-danger">重新打开业务!</a>' : '';
+
+        $class_info = $record->class_id ? explode('(', $record->class_branch_text)[0].$record->class_no.'期' : '<span class="label label-warning">未开班</span>';
+        $user_text = $record->user_id ? $record->user_id_text : '无教练';
+
+        if($record->finished){
+            $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.', '.$user_text.$open;
+        }else{
+            $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.$this->userList($record->branch, $user_text, $record->id).', '.$user_text.' '.$edit.' '.$close;
+        }
+
+        return $txt;
+    }
+
+    // 教练列表
+    private function userList($branch, $text, $id)
+    {
+        if(!$branch) return '';
+
+        $teacher_id = 49;
+        $teachers = DB::table('users')->where('branch', $branch)->where('user_type', $teacher_id)->get();
+
+        $list = '';
+
+        foreach ($teachers as $teacher) {
+            $list .= '<li role="presentation"><a role="menuitem" tabindex="-1" href="/biz/teacher/'.$id.'-'.$teacher->id.'">'.$teacher->name.'</a></li>';
+        }
+
+        $menu = '<div class="dropdown pull-right">
+                    <button type="button" class="btn btn-xs btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">'.$text.'
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                        '.$list.'
+                    </ul>
+                </div>';
+        return $menu;
+    }
+
+    // 科目列表
+    public function lessonList($record)
+    {
+        if(!$record->lesson) return false;
+
+        $lessons = explode(',', $record->lesson);
+        if(!count($lessons)) return "没有科目相关记录";
+
+        $ready = explode(',', $record->lesson_ready);
+        $order_date = explode(',', $record->lesson_order_date);
+        $pass = explode(',', $record->lesson_pass);
+        $doing = explode(',', $record->lesson_doing);
+        $end = explode(',', $record->lesson_end);
+
+        $line = '';
+
+        for ($i=0; $i < count($lessons); $i++) { 
+            $color = 'default';
+
+            $ready_txt = '-';
+            $pass_txt = '-';
+            $date_txt = '-';
+
+            if(intval($ready[$i])==1) $ready_txt='已申请';
+            if(intval($order_date[$i])!=0) $date_txt = date('Y-m-d', $order_date[$i]);
+            if(intval($pass[$i])==1) $pass_txt='<span class="label label-success">通过</span>';
+            if(intval($pass[$i])==0 && $order_date[$i] != '' && intval($doing[$i])==0) $pass_txt='<span class="label label-danger">不通过</span>';
+
+            $line .= '<tr class="'.$color.'"><td>'.$lessons[$i].'</td><td>'.$ready_txt.'</td><td>'.$date_txt.'</td><td>'.$pass_txt.'</td></tr>';
+        }
+
+
+        return $line;
+    }
+
     // end
 }
-
-
 
 
 

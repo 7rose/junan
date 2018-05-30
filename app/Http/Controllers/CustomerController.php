@@ -171,6 +171,7 @@ class CustomerController extends Controller
                     ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
                     ->leftJoin('classes', 'biz.class_id', '=', 'classes.id')
                     ->leftJoin('branches as bb', 'classes.branch', '=', 'bb.id')
+                    ->leftJoin('lessons', 'biz.id', '=', 'lessons.biz_id')
                     ->select('biz.*',
                             'customers.name as customer_name', 
                             'lt.text as licence_type_text', 
@@ -179,10 +180,21 @@ class CustomerController extends Controller
                             'branches.text as branch_text', 
                             'classes.class_no as class_no', 
                             'bb.text as class_branch_text', 
-                            'u.name as user_id_text'
+                            'u.name as user_id_text',
+                            DB::raw('
+                                group_concat(lessons.lesson) as lesson, 
+                                group_concat(lessons.ready) as lesson_ready, 
+                                group_concat(lessons.order_date) as lesson_order_date, 
+                                group_concat(lessons.pass) as lesson_pass, 
+                                group_concat(lessons.doing) as lesson_doing, 
+                                group_concat(lessons.end) as lesson_end
+                                    ')
                         )
-                    ->orderBy('biz.created_at', 'desc')
-                    ->orderBy('biz.updated_at', 'desc')
+                    // ->orderBy('lessons.pass')
+                    ->groupBy('lessons.biz_id')
+                    ->orderByRaw('lessons.lesson - lessons.lesson DESC')
+                    ->orderBy('lessons.lesson', 'desc')
+                    // ->orderBy('lessons.lesson')
                     ->get();
 
         $finance = DB::table('finance')

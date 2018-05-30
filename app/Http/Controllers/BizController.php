@@ -7,6 +7,7 @@ use Session;
 
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\BizForm;
+use App\Forms\BizEditForm;
 use App\Helpers\Error;
 use App\Helpers\Auth;
 // use App\Helpers\Unique;
@@ -78,6 +79,79 @@ class BizController extends Controller
         Biz::where('customer_id', $id)->first()->update(['branch'=> $auth->branchLimit()]);
         return redirect('/customer');
     }
+
+    // 修改
+    public function edit($id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        $record = Biz::find($id);
+
+        $form = $this->form(BizEditForm::class, [
+            'method' => 'POST',
+            'model' => $record,
+            //'url' => route('fashion.update')
+            'url' => '/biz/update/'.$id
+        ]);
+
+        return view('form', compact('form'))->with('custom',['title'=>'信息修改 - '.$record->name, 'icon'=>'cog']);
+    }
+
+    // 更新
+    public function update(Request $request, $id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        $record = Biz::find($id);
+        $record->update(['class_type'=>$request->class_type, 'branch'=>$request->branch, 'user_id'=>null]);
+
+        // if($request->branch != $record->branch) $record->update(['user_id'=>null]);
+
+        return redirect('/customer/'.$record->customer_id);
+    }
+
+    // 设置教练
+    public function teacher($key)
+    {
+        $key_array = explode('-', $key);
+        $record = Biz::find($key_array[0]);
+        $record->update(['user_id'=>$key_array[1]]);
+        return redirect('/customer/'.$record->customer_id);
+    }
+
+    // 关闭业务
+    public function close($id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        $record = Biz::find($id);
+        $record->update(['finished'=>true]);
+        return redirect('/customer/'.$record->customer_id);
+    }
+
+    // 打开业务
+    public function open($id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->root())  return $auth_error->forbidden();
+
+        $record = Biz::find($id);
+        $record->update(['finished'=>false]);
+        return redirect('/customer/'.$record->customer_id);
+    }
+
+    // end
 }
 
 

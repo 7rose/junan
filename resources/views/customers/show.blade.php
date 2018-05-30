@@ -1,6 +1,7 @@
 <?php
     $date = new App\Helpers\Date;
     $auth = new App\Helpers\Auth;
+    $pre = new App\Helpers\Pre;
 ?>
 @extends('../nav')
 
@@ -94,18 +95,33 @@
     {{-- 业务 --}}
     @if(count($biz))
         @foreach($biz as $b)
-            <div class="panel panel-success">
+            <div class="panel panel-{{ $b->finished ? 'default' : 'success' }}">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{{ $b->licence_type_text.' - '.$b->class_type_text.' ['.explode('(', $b->class_branch_text)[0].$b->class_no.'期]' }}</h3>
+                    <h3 class="panel-title">{!! $pre->customerBiz($b) !!}</h3>
                 </div>
                 <div class="panel-body">
-                    <ul class="list-inline">
-                    <li>开班</li>
-                    <li>科目1</li>
-                    <li>科目2</li>
-                    <li>科目3</li>
-                    <li>科目4</li>
-                </ul>
+                @if($b->class_id)
+                    @if($pre->lessonList($b))
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>科目</th>
+                                <th>预约申请</th>
+                                <th>考试日期</th>
+                                <th>考试结果</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {!! $pre->lessonList($b) !!}
+                        </tbody>
+                    </table>
+                    @else
+                    <div class="alert alert-warning">尚无科目考试相关记录</div>
+                    @endif
+                    
+                @else
+                    <div class="alert alert-warning">尚未开班</div>
+                @endif
             </div>
         
             </div>
