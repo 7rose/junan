@@ -109,6 +109,7 @@ class Pre
     // 驾校认领
     public function customerBranch($record)
     {
+        if(!$record->biz_branch) return '暂无业务';
         $array_branch = explode(',', $record->biz_branch);
         $array_branch_text = explode(',', $record->biz_branch_text);
         $array_licence_type_text = explode(',', $record->licence_type_text);
