@@ -37,7 +37,7 @@ class FinanceForm extends Form
             $this->add('branch', 'choice', [
                 'label' => '所属驾校', 
                 'empty_value' => '-- 选择 --',
-                'choices'=> $config_list->branchList(),
+                'choices'=> $list->branchList(),
                 'rules' => 'required'
             ]);
         }

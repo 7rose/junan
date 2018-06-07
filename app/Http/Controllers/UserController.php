@@ -171,7 +171,7 @@ class UserController extends Controller
     {
         $form = $this->form(UserPasswordForm::class, [
             'method' => 'POST',
-            'url' => route('password.store')
+            'url'    => route('password.store')
         ]);
 
         $title = '重设密码';

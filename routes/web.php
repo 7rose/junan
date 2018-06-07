@@ -52,7 +52,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/branch/set/{id}', 'UserController@setBranch');
 
     // 业务
-    Route::get('/biz/claim/{id}', 'BizController@claim');
+    Route::post('/biz/claim', 'BizController@claim');
     Route::get('/customer/biz/{id?}', 'BizController@create');
     Route::post('/customer/biz/store', ['as'=>'biz.store', 'uses'=>'BizController@store']);
     Route::get('/biz/edit/{id}', 'BizController@edit');
@@ -70,6 +70,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/finance/store', ['as'=>'finance.store', 'uses'=>'FinanceController@store']);
     Route::get('/finance/download/excel', 'FinanceController@seekToExcel');
     Route::post('/finance/checking', 'FinanceController@checking');
+    Route::post('/finance/check_2', 'FinanceController@check_2');
 
     // 导入 -用户
     Route::get('/import/user', 'ImportController@userImport');
@@ -81,10 +82,26 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/import/class/save', 'ImportController@classSave');
 
     // 过滤器
+    Route::post('/filter/seek/set', 'FilterController@seek');
+    Route::post('/filter/seek/reset', 'FilterController@seekReset');
+
+    Route::post('/filter/select/{id}', 'FilterController@select');
+    Route::post('/filter/cancel/{id}', 'FilterController@cancel');
+
     Route::get('/filter', 'FilterController@index');
-    Route::get('/filter/{key}', 'FilterController@filter');
+    Route::any('/filter/{key}', 'FilterController@filter');
+    Route::any('/filter/ex1/{key}', 'FilterController@ex1');
+    Route::any('/filter/ex2/{key}', 'FilterController@ex2');
+    Route::post('/filter/do/ready', 'FilterController@doReady');
+    Route::post('/filter/do/date', 'FilterController@doDate');
+    // Route::post('/filter/do/score', 'FilterController@doScore');
+    Route::get('/filter/score/choose', 'FilterController@scoreChoose');
+    Route::post('/filter/do/score', ['as'=>'score.do', 'uses'=>'FilterController@doScore']);
+    Route::get('/filter/do/score', 'FilterController@doScoreList');
+    Route::post('/filter/save/score', 'FilterController@saveScore');
+
+
     Route::post('/filter/part', 'FilterController@ex');
-    Route::get('/filter/score/choose', 'FilterController@score');
     Route::post('/filter/score/ex', ['as'=>'score.ex', 'uses'=>'FilterController@score_ex']);
     Route::post('/filter/score_ex/save', 'FilterController@score_save');
     Route::post('/filter/ready/ex', 'FilterController@readyEx');
@@ -95,7 +112,9 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 
 Route::get('/test', function() {
-    return view('users.welcome');
+    $old = Session::get('filter_select');
+
+    print_r($old);
 });
 
 

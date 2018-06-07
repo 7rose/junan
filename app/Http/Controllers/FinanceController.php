@@ -32,9 +32,10 @@ class FinanceController extends Controller
                           ->leftJoin('customers', 'finance.customer_id', '=', 'customers.id')
                           ->leftJoin('users as c', 'finance.created_by', '=', 'c.id')
                           ->leftJoin('users as ck', 'finance.checked_by', '=', 'ck.id')
+                          ->leftJoin('users as ck2', 'finance.checked_2_by', '=', 'ck2.id')
                           ->leftJoin('users as u', 'finance.user_id', '=', 'u.id')
                           ->leftJoin('branches', 'finance.branch', '=', 'branches.id')
-                          ->select('finance.*', 'i.text as item_text', 'customers.name as customer_id_text', 'c.name as created_by_text', 'u.name as user_id_text', 'branches.text as branch_text', 'customers.mobile as customer_mobile', 'ck.name as checked_by_text')
+                          ->select('finance.*', 'i.text as item_text', 'customers.name as customer_id_text', 'c.name as created_by_text', 'u.name as user_id_text', 'branches.text as branch_text', 'customers.mobile as customer_mobile', 'ck.name as checked_by_text', 'ck2.name as checked_2_by_name')
                           ->where(function ($query) {
                                 // 分支机构限制
                                 if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
@@ -54,6 +55,7 @@ class FinanceController extends Controller
                                 // 关键词
                                 if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'key') && Session::get('finance_seek_array')['key'] != '') {
                                     $query->Where('finance.price', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
+                                    $query->orWhere('finance.real_price', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
                                     $query->orWhere('customers.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
                                     $query->orWhere('c.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
                                     $query->orWhere('u.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
@@ -86,7 +88,7 @@ class FinanceController extends Controller
     public function seek(Request $request)
     {
         $finance_seek_array = [];
-        if($request->has('key')) $finance_seek_array = array_add($finance_seek_array, 'key', $request->key);
+        if($request->has('key') && trim($request->key) != '') $finance_seek_array = array_add($finance_seek_array, 'key', trim($request->key));
         if($request->has('branch')) $finance_seek_array = array_add($finance_seek_array, 'branch', $request->branch);
         if($request->has('date_begin')) $finance_seek_array = array_add($finance_seek_array, 'date_begin', $request->date_begin);
         if($request->has('date_end')) $finance_seek_array = array_add($finance_seek_array, 'date_end', $request->date_end);
@@ -146,19 +148,36 @@ class FinanceController extends Controller
         return redirect('/customer/'.$all['customer_id']);
     }
 
-    // 审核
+    // 登记单据
     public function checking(Request $request)
     {
         $ticket_no = $request->input('no');
         $id = $request->input('id');
         // 授权
         $auth = new Auth;
-        if(!$auth->finance())  return "无权操作";
+        if(!$auth->user() && !$auth->finance())  return "无权操作";
 
         $target = Finance::find($id)->update(['checked' => true, 'checked_by'=>Session::get('id'), 'checked_by_time'=>time(), 'ticket_no'=>$ticket_no]);
         // return redirect('/finance');
         // echo 'fuck';
-        return '票号:'.$ticket_no.'已成功审核!';
+        return '票号:'.$ticket_no.'已成功登记!';
+    }
+
+    // 审核单据
+    public function check_2 (Request $request)
+    {
+        $id = $request->input('id');
+
+        // 授权
+        $auth = new Auth;
+        if(!$auth->financeMaster())  return "无权操作";
+
+        $target = Finance::find($id);
+        if(!$target->checked || !$target->checked_by || !$target->ticket_no) return "记录单据登记异常!";
+
+        $target->update(['checked_2' => true, 'checked_2_by'=>Session::get('id'), 'checked_2_by_time'=>time()]); 
+
+        return "审核成功!!".date('Y-m-d h:m:s', $target->checked_2_by_time);
     }
 
 

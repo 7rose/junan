@@ -32,6 +32,7 @@
         </caption>
         <thead>
             <tr>
+                <th>#</th>
                 <th>姓名</th>
                 <th>手机</th>
                 <th>出生日期</th>
@@ -44,6 +45,7 @@
         <tbody>
             @foreach($records as $record)
             <tr class="{{ $record->finance_info > 0 ? 'warning' : 'default' }}">
+                <td>{{ $record->id }}</td>
                 <td><a class="btn btn-sm btn-{{ $record->finance_info > 0 ? 'warning' : 'default' }}"  href="/customer/{{ $record->id }}" >{!! $seek->seekLabel('seek_array', 'key', $record->name) !!}</a></td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->mobile) !!}</td>
                 <td>{{ $date->birthdayFromId($record->id_number)}}&nbsp&nbsp<span class="label label-{{ $record->gender == 2 ? 'danger' : 'default' }}">{{ $date->ageFromId($record->id_number) }}</span></td>
@@ -51,7 +53,7 @@
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->address) !!}</td>
                 <td>{!! '¥'.$seek->seekLabel('seek_array', 'key', $record->finance_info) !!}</td>
                
-                <td>{!! $pre->customerBranch($record) !!}</td>
+                <td id="claim_msg{{ $record->id }}">{!! $pre->customerBranch($record) !!}</td>
             </tr>
             @endforeach
         </tbody>
@@ -76,5 +78,71 @@
             </div>
         </div>
     </div>
+{{-- 弹出窗口 --}}
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" 
+                        aria-hidden="true">×
+                </button>
+
+            </div>
+            <div class="modal-body" id='modal-msg'>
+                msg
+            </div>
+            <div class="modal-footer" id='modal-btn'>
+                btn
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+    function claim(id, name)
+    {
+        var msg = "您正在认领序列号为"+id+"的学员, 此操作无法自行撤销, 只能申请管理员进行重新调配!!"
+        $("#modal-msg").html(msg);
+
+        var close_btn = '<button type=\"button\" class=\"btn btn-sm btn-default\" data-dismiss=\"modal\">关闭</button>';
+        var click_btn = '<button type=\"button\" class=\"btn btn-sm btn-danger\" onClick=\"javascript:claim_ex('+id+')\">确定认领</button>';
+        $("#modal-btn").html(close_btn+click_btn);
+
+        $("#myModal").modal();
+    }
+
+    function claim_ex(id)
+    {
+        var post_url = "/biz/claim";
+        var post_data = {id:id};
+
+        $.post(
+            post_url,
+            post_data,
+            function(message){
+                $("#modal-msg").html(message);
+                $("#claim_msg"+id).html("<span class=\"label label-info\">"+message+"</span>");
+           }
+        );
+    }
+</script>
 
 @endsection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

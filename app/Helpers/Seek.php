@@ -20,7 +20,15 @@ class Seek
     public function seekLabel($array, $key, $string)
     {
         $sample = $this->seeking($array, $key);
-        $new = "<span class=\"text text-info\"><strong> ".$sample." </strong></span>";
+        // if(!$sample)
+        return $this->seekKey($string, $sample);
+    }
+
+    public function seekKey($string, $sample)
+    {
+        if(!$sample) return $string;
+        
+        $new = $new = "<span class=\"text text-info\"><strong> ".$sample." </strong></span>";
         if($sample && str_contains($string, $sample)) {
             return str_replace($sample, $new, $string);
         }else{

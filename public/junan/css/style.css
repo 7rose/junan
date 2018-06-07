@@ -17,3 +17,11 @@
 .doc-well{
     text-align: left;
 }
+
+.same-high{
+    height: 1000px;
+}
+
+.li-pad{
+    padding-top: 5px;
+}

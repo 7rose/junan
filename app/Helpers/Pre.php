@@ -124,7 +124,7 @@ class Pre
             }else{
                 $auth = new Auth;
                 if($auth->branchLimit()){
-                    $text .= '<a href="/biz/claim/'.$record->id.'" class="btn btn-xs btn-danger">'.explode(':', $array_licence_type_text[$i])[0].' - 本校认领'.'</a>';
+                    $text .= '<button onClick="javascript:claim('.$record->id.')" class="btn btn-xs btn-danger">'.explode(':', $array_licence_type_text[$i])[0].' - 本校认领'.'</button>';
                 }else{
                     $text .= '<span class="label label-danger">'.explode(':', $array_licence_type_text[$i])[0].' - 无驾校!'.'</a>';
                 }

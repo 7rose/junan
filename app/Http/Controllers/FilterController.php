@@ -34,13 +34,7 @@ class FilterController extends Controller
                         ->leftJoin('config', 'biz.licence_type', '=', 'config.id')
                         ->leftJoin('users', 'biz.user_id', '=', 'users.id')
                         ->where('biz.finished', false)
-                        ->where(function ($query) {
-                        // 分支机构限制
-                        if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
-                                $query->Where('biz.branch', $this->auth->branchLimitId());
-                            }
-                        })
-
+                        ->whereNotNull('customers.id_number')
                         ->select(
                             'biz.id',
                             'customers.name as customer_name',
@@ -52,7 +46,23 @@ class FilterController extends Controller
                             'classes.class_no as class_no',
                             'users.name as user_name',
                             DB::raw('count(lessons.id) as lessons_num, max(lessons.lesson) as max_lesson')
-                        );
+                        )
+                        ->where(function ($query) {
+                            if(Session::has('filter_key')){
+                                $query->where('customers.name', 'LIKE', '%'.Session::get('filter_key').'%');
+                                $query->orWhere('customers.mobile', 'LIKE', '%'.Session::get('filter_key').'%');
+                                $query->orWhere('customers.id_number', 'LIKE', '%'.Session::get('filter_key').'%');
+                                $query->orWhere('branches.text', 'LIKE', '%'.Session::get('filter_key').'%');
+                                $query->orWhere('users.name', 'LIKE', '%'.Session::get('filter_key').'%');
+                                $query->orWhere('classes.class_no', 'LIKE', '%'.Session::get('filter_key').'%');
+                            }
+
+                            // 分支机构限制
+                            if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
+                                $query->Where('biz.branch', $this->auth->branchLimitId());
+                            }
+                        });
+
         return $records;
     }
 
@@ -235,6 +245,59 @@ class FilterController extends Controller
         return redirect('/filter/no_class');
     }
 
+    // 查询
+    public function seek(Request $request)
+    {
+        if($request->key && trim($request->key) != '') Session::put('filter_key', trim($request->key));
+        if((!$request->key || trim($request->key) == '') && Session::has('filter_key')) Session::forget('filter_key');
+        return redirect('/'.$request->path);
+    }
+
+    // 查询
+    public function seekReset(Request $request)
+    {
+        if(Session::has('filter_key')) Session::forget('filter_key');
+        return redirect('/'.$request->path);
+    }
+
+    // 标记
+    public function select(Request $request, $id)
+    {
+        if(Session::has('filter_select')) {
+            $old = Session::get('filter_select');
+            array_push($old, $id);
+            $new = array_unique($old);
+
+            Session::put('filter_select', $new);
+        }else{
+            Session::put('filter_select', [$id]);
+        }
+
+        return redirect($request->url);
+    }
+
+    // 取消标记
+    public function cancel(Request $request, $id)
+    {
+        if(Session::has('filter_select')) {
+            $old = Session::get('filter_select');
+            $new = array_unique($old);
+
+            // unset($new[array_search($id, $new)]);
+            if(in_array($id, $new)) unset($new[array_search($id, $new)]);
+            // print_r($new);
+
+            if(count($new)) {
+                Session::put('filter_select', $new);
+            }else{
+                Session::forget('filter_select');
+            }
+        }
+
+        return redirect($request->url);
+    }
+
+
     // 过滤器
     public function filter($key)
     {
@@ -245,115 +308,236 @@ class FilterController extends Controller
                         ->get();
                         // ->toArray();
 
-        for ($i=0; $i < count($records); $i++) { 
-            if(!$records[$i]->customer_id_number) unset($records[$i]);
-        }
-
-        // 取记录集
-        // $this->biz_part = $records;
-        // print_r($records);
         Session::put('biz_records', $records);
+        // return $records->toJson();
 
-        return view('filters.index')->with('records', $records);
+        $pages = $this->router($key)
+                        ->groupBy('biz.id')
+                        ->orderBy('biz.branch')
+                        ->orderBy('biz.user_id')
+                        ->paginate(20);
+
+        return view('filters.main')
+                ->with('records', $this->picker($pages))
+                ->with('selected_records', $this->selected($pages));
     }
 
-
-    // part
-    public function ex(Request $request)
+    // 批处理分捡器
+    public function picker($records)
     {
-        $key = $request->action;
+        if(count($records)){
+            if(Session::has('filter_select') && count(Session::get('filter_select'))){
+                $selected_array = Session::get('filter_select');
+                foreach ($records as $record) {
+                    $record->selected = in_array($record->id, $selected_array) ? true : false;
+                }
+            }else{
+                foreach ($records as $record) {
+                    $record->selected = false;
+                }
+            }
+        }
+        return $records;
+    }
 
+    // 分捡部分
+    public function selected($records)
+    {
+        $selected_records=[];
+
+        if(count($records) && Session::has('filter_select')){
+            $selected_array = Session::get('filter_select');
+            $selected_records = DB::table('biz')
+                                ->leftJoin('customers', 'biz.customer_id', '=', 'customers.id')
+                                ->whereIn('biz.id', $selected_array)
+                                ->select('biz.id','customers.name as customer_name', 'customers.id_number as customer_id_number')
+                                ->orderBy('biz.id')
+                                ->get();
+
+        }
+        return $selected_records;
+    }
+
+    // 排除法
+    public function ex1($key)
+    {
+        $error = new Error;
+        $ex_array = [];
+
+        if(Session::has('biz_records') && count(Session::get('biz_records'))){
+            $new_biz_records = Session::get('biz_records');
+            $main_array = [];
+            $rest_array = [];
+
+            if(Session::has('filter_select') && count(Session::get('filter_select'))){
+                $selected_array = Session::get('filter_select');
+                if(count($selected_array) == count($new_biz_records)) return $error->paramLost();
+                foreach ($new_biz_records as $record) {
+                    if(!in_array($record->id, $selected_array))  array_push($main_array, $record->id);
+                    // $new_biz_records->main = in_array($record->id, $selected_array) ? false : true;
+                }
+                $rest_array = array_values($selected_array);
+            }else{
+                foreach ($new_biz_records as $record) {
+                    array_push($main_array, $record->id);
+                }
+            }
+
+            $ex_array = ['main'=>$main_array, 'rest'=>$rest_array];
+            Session::put('ex_array', $ex_array);
+
+            return $this->note2($key);
+            // echo $key;
+        }
+    }
+
+    // 仅标记
+    public function ex2($key)
+    {
+        $error = new Error;
+        $ex_array = [];
+
+        if(Session::has('biz_records') && count(Session::get('biz_records'))){
+            $new_biz_records = Session::get('biz_records');
+            $main_array = [];
+            $rest_array = [];
+
+            if(Session::has('filter_select') && count(Session::get('filter_select'))){
+                $selected_array = Session::get('filter_select');
+
+                foreach ($new_biz_records as $record) {
+                    if(!in_array($record->id, $selected_array))  array_push($rest_array, $record->id);
+                }
+                $main_array = array_values($selected_array);
+            }else{
+                return $error->paramLost();
+            }
+            $ex_array = ['main'=>$main_array, 'rest'=>$rest_array];
+            Session::put('ex_array', $ex_array);
+
+            return $this->note2($key);
+        }
+    }
+
+    // 二次提示
+    private function note2($key)
+    {
         switch ($key) {
             case 'no_class':
                 return redirect('/import/class') ;
                 break;
 
             case 'ready_for_1': 
-                $post_url = '/filter/ready/ex';
+                $post_url = '/filter/do/ready';
                 $btn_txt = '同批提交至: 科目1预约';
-
-                // return $this->exNote($request, $post_url, $btn_txt);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=false, $lesson=1, $order_date=false);
+                return view('filters.note')
+                                ->with('lesson', 1)
+                                ->with('post_url', $post_url)
+                                ->with('btn_txt', $btn_txt);
                 break;
 
             case 'date_for_1': 
-                $post_url = '/filter/date/ex';
+                $post_url = '/filter/do/date';
                 $btn_txt = '批量设置科目1考试日期';
 
-                // return $this->exNote($request, $post_url, $btn_txt, $date_input=true);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=true, $lesson=1, $order_date=false);
+                return view('filters.note')
+                                ->with('lesson', 1)
+                                ->with('date_input', true)
+                                ->with('post_url', $post_url)
+                                ->with('btn_txt', $btn_txt);
                 break;
 
-            case 'score_ex': 
-                $post_url = '/filter/score_ex/save';
+            case 'score': 
+                $post_url = '/filter/save/score';
                 $btn_txt = '登记为通过';
 
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=false, $lesson=$request->lesson, $order_date=$request->order_date);
-                break;
+                return view('filters.note')
+                                ->with('lesson', Session::get('score_lesson'))
+                                // ->with('date_input', true)
+                                ->with('post_url', $post_url)
+                                ->with('btn_txt', $btn_txt);
 
             case 'ready_for_2': 
-                $post_url = '/filter/ready/ex';
+                $post_url = '/filter/do/ready';
                 $btn_txt = '同批提交至: 科目2预约';
-
-                // return $this->exNote($request, $post_url, $btn_txt);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=false, $lesson=2, $order_date=false);
+                return view('filters.note')
+                                ->with('lesson', 2)
+                                ->with('post_url', $post_url)
+                                ->with('btn_txt', $btn_txt);
                 break;
 
             case 'date_for_2': 
-                $post_url = '/filter/date/ex';
+                $post_url = '/filter/do/date';
                 $btn_txt = '批量设置科目2考试日期';
 
-                // return $this->exNote($request, $post_url, $btn_txt, $date_input=true);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=true, $lesson=2, $order_date=false);
+                return view('filters.note')
+                                ->with('lesson', 2)
+                                ->with('date_input', true)
+                                ->with('post_url', $post_url)
+                                ->with('btn_txt', $btn_txt);
                 break;
 
             case 'ready_for_3': 
-                $post_url = '/filter/ready/ex';
+                $post_url = '/filter/do/ready';
                 $btn_txt = '同批提交至: 科目3预约';
-
-                // return $this->exNote($request, $post_url, $btn_txt);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=false, $lesson=3, $order_date=false);
+                return view('filters.note')
+                                ->with('lesson', 3)
+                                ->with('post_url', $post_url)
+                                ->with('btn_txt', $btn_txt);
                 break;
 
             case 'date_for_3': 
-                $post_url = '/filter/date/ex';
+                $post_url = '/filter/do/date';
                 $btn_txt = '批量设置科目3考试日期';
 
-                // return $this->exNote($request, $post_url, $btn_txt, $date_input=true);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=true, $lesson=3, $order_date=false);
+                return view('filters.note')
+                                ->with('lesson', 3)
+                                ->with('date_input', true)
+                                ->with('post_url', $post_url)
+                                ->with('btn_txt', $btn_txt);
                 break;
 
             case 'ready_for_4': 
-                $post_url = '/filter/ready/ex';
+                $post_url = '/filter/do/ready';
                 $btn_txt = '同批提交至: 科目4预约';
-
-                // return $this->exNote($request, $post_url, $btn_txt);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=false, $lesson=4, $order_date=false);
+                return view('filters.note')
+                                ->with('lesson', 4)
+                                ->with('post_url', $post_url)
+                                ->with('btn_txt', $btn_txt);
                 break;
 
             case 'date_for_4': 
-                $post_url = '/filter/date/ex';
+                $post_url = '/filter/do/date';
                 $btn_txt = '批量设置科目4考试日期';
 
-                // return $this->exNote($request, $post_url, $btn_txt, $date_input=true);
-                return $this->exNote($request, $post_url, $btn_txt, $date_input=true, $lesson=4, $order_date=false);
+                return view('filters.note')
+                                ->with('lesson', 4)
+                                ->with('date_input', true)
+                                ->with('post_url', $post_url)
+                                ->with('btn_txt', $btn_txt);
                 break;
             
             default:
-                return $this->prepare();
+                // return view('filters.note');
                 break;
         }
     }
 
-    // 处理器: 准备
-    public function readyEx (Request $request)
+    // 清除选择
+    private function clearSelect()
     {
-        $resault = $request->type == 1 ? $request->diff_id :$request->spec_id;
+        if(Session::has('filter_select')) Session::forget('filter_select');
+    }
 
+    // 科目1, 2 ,3, 4预约申请
+    public function doReady(Request $request)
+    {
         $error = new Error;
-        if(!$resault) return $error->paramLost();
 
-        $array_resault = explode(',', $resault);
+        if(!Session::has('ex_array') || !count(Session::get('ex_array')['main'])) return $error->paramLost();
+
+        $array_resault = Session::get('ex_array')['main'];
+
         $out = [];
 
         foreach ($array_resault as $key) {
@@ -361,37 +545,27 @@ class FilterController extends Controller
             array_push($out, $item);
         }
 
-        // DB::table('lessons')
-        //         ->whereIn('biz_id', $array_resault)
-        //         ->where('lesson', $request->lesson)
-        //         ->update(['doing'=>true]);
-
         DB::table('lessons')->insert($out);
-        // DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>$request->lesson.'.1']);
-        // 未过标记
+
         if($request->lesson==2 || $request->lesson==3) {
             DB::table('biz')->whereIn('id', $array_resault)->update(['next'.$request->lesson => $request->lesson.'.1']);
         }else{
             DB::table('biz')->whereIn('id', $array_resault)->update(['next' => $request->lesson.'.1']);
         }
+        // 清除选择
+        $this->clearSelect();
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
     }
 
-    // 处理器: 预约日期
-    public function dateEx (Request $request)
+    // 科目1, 2, 3 ,4预约日期设置
+    public function doDate(Request $request) 
     {
-        // 授权
-        $auth = new Auth;
-        $auth_error = new Error;
-        if(!$auth->info())  return $auth_error->forbidden();
-
-        $resault = $request->type == 1 ? $request->diff_id :$request->spec_id;
-
         $error = new Error;
-        if(!$resault) return $error->paramLost();
 
-        $array_resault = explode(',', $resault);
+        if(!Session::has('ex_array') || !count(Session::get('ex_array')['main'])) return $error->paramLost();
+
+        $array_resault = Session::get('ex_array')['main'];
 
         DB::table('lessons')
             // ->havingRaw('max(lesson) = 1')
@@ -404,159 +578,141 @@ class FilterController extends Controller
             ->where('doing', true)
             ->update(['order_date'=> strtotime($request->date)]);
 
-            // print_r($request->all());
-        // DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>$request->lesson.'.2']);
-            // 未过标记
         if($request->lesson==2 || $request->lesson==3) {
             DB::table('biz')->whereIn('id', $array_resault)->update(['next'.$request->lesson => $request->lesson.'.2']);
         }else{
             DB::table('biz')->whereIn('id', $array_resault)->update(['next' => $request->lesson.'.2']);
         }
+        // 清除选择
+        $this->clearSelect();
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
     }
 
-    // 科目1准备好预约
-    private function exNote($request, $post_url, $btn_txt, $date_input=false, $lesson=false, $order_date=false)
+    // 成绩批量输入界面
+    public function scoreChoose ()
     {
-        $all_id = $request->all_id;
-        $post_data = $request->post_data;
+        // // 授权
+        // $auth = new Auth;
+        // $auth_error = new Error;
+        // if(!$auth->info())  return $auth_error->forbidden();
 
-        $error = new Error;
-        if(!$all_id) return $error->paramLost();
-
-        $all_id = substr($all_id,0,strlen($all_id)-1); 
-        $all = explode(',', $all_id);
-        $all_num = count($all);
-        $special_num = 0;
-
-        if($post_data) {
-            $arr  = explode(',', $post_data);
-            $special_num = count($arr);
-            $all = array_diff($all, $arr);
-        }
-
-        $real_num = count($all);
-        $diff_id = implode(',', $all);
-
-        $txt = "<h3>多条数据将同时处理!</h3>符合条件的记录共有".$all_num."条, 其中标记".$special_num."条";
-
-        return view('part')
-                        ->with('lesson', $lesson)
-                        ->with('order_date', $order_date)
-                        ->with('txt', $txt)
-                        ->with('date_input', $date_input)
-                        ->with('post_url', $post_url)
-                        ->with('btn_txt', $btn_txt)
-                        ->with('all_id', $all_id)
-                        ->with('spec_id', $post_data)
-                        ->with('diff_id', $diff_id);
-
-    }
-
-    // 成绩导入
-    public function score ()
-    {
-        // 授权
-        $auth = new Auth;
-        $auth_error = new Error;
-        if(!$auth->info())  return $auth_error->forbidden();
+        // 清除选择
+        $this->clearSelect();
 
         $form = $this->form(ScoreForm::class, [
             'method' => 'POST',
-            'url' => route('score.ex')
+            'url' => route('score.do')
         ]);
 
         $title = '成绩处理';
         $icon = 'check';
 
         return view('form', compact('form'))->with('custom',['title'=>$title, 'icon'=>$icon]);
+
     }
 
-    // 学员列表
-    public function score_ex (Request $request)
+    // 科目1, 2, 3, 4成绩录入
+    public function doScore(Request $request) 
     {
-        // 授权
-        $auth = new Auth;
-        $auth_error = new Error;
-        if(!$auth->info())  return $auth_error->forbidden();
+        // // 授权
+        // $auth = new Auth;
+        // $auth_error = new Error;
+        // if(!$auth->info())  return $auth_error->forbidden();
+        Session::put('score_date', strtotime($request->order_date));
+        Session::put('score_lesson', $request->lesson);
 
-        $order_date = strtotime($request->order_date);
+        return $this->doScoreList();
+    }
 
-        $records = $this->prepare()
+    // 成绩列表
+    public function doScoreList()
+    {
+        $error = new Error;
+
+        if(!Session::has('score_lesson') || !Session::has('score_date')) return $error->paramLost();
+
+        $pre = $this->prepare()
                         ->whereNotNull('biz.class_id')
                         // ->havingRaw('max(lessons.lesson) = '.$request->lesson)
-                        ->where('lessons.lesson', $request->lesson)
+                        ->where('lessons.lesson', Session::get('score_lesson'))
                         ->where('lessons.ready', true)
-                        ->where('lessons.order_date', $order_date)
+                        ->where('lessons.order_date', Session::get('score_date'))
                         ->where('lessons.pass', false)
-                        ->groupBy('biz.id')
-                        ->get();
+                        ->groupBy('biz.id');
 
-        return view('filters.index')
-                    ->with('order_date', $order_date)
-                    ->with('lesson', $request->lesson)
-                    ->with('records', $records);
+                        // ->paginate(20);
+
+        Session::put('biz_records', $pre->get());
+        // return $records->toJson();
+
+        $pages = $pre->paginate(20);
+        // // 清除选择
+        // $this->clearSelect();
+
+        return view('filters.main')
+                ->with('records', $this->picker($pages))
+                ->with('selected_records', $this->selected($pages));
     }
 
     // 保存成绩
-    public function score_save(Request $request)
+    public function saveScore()
     {
-        // 授权
-        $auth = new Auth;
-        $auth_error = new Error;
-        if(!$auth->info())  return $auth_error->forbidden();
+        // // 授权
+        // $auth = new Auth;
+        // $auth_error = new Error;
+        // if(!$auth->info())  return $auth_error->forbidden();
 
-       $resault = $request->type == 1 ? $request->diff_id :$request->spec_id;
-       $others = $request->type == 2 ? $request->diff_id :$request->spec_id;
+       if(!Session::has('ex_array') || !count(Session::get('ex_array')['main'])) return $error->paramLost();
+       if(!Session::has('score_lesson') || !Session::has('score_date')) return $error->paramLost();
 
-        $error = new Error;
-        if(!$resault) return $error->paramLost();
+
+        $array_resault = Session::get('ex_array')['main'];
+        $others_array = Session::get('ex_array')['rest'];
+        $lesson = Session::get('score_lesson');
+        $order_date = Session::get('score_date');
 
         // 失败者
-        if($others) {
-            $others_array = explode(',', $others);
-
+        if(count($others_array)) {
             DB::table('lessons')
-                ->where('lesson', $request->lesson)
+                ->where('lesson', $lesson)
                 ->whereIn('biz_id', $others_array)
                 ->where('ready', true)
-                ->where('order_date', $request->order_date)
+                ->where('order_date', $order_date)
                 ->where('pass', false)
                 ->where('doing', true)
                 ->update(['doing'=>false]);
 
             // 未过标记
-            if($request->lesson==2 || $request->lesson==3) {
-                DB::table('biz')->whereIn('id', $others_array)->update(['next'.$request->lesson => $request->lesson.'.0']);
+            if($lesson==2 || $lesson==3) {
+                DB::table('biz')->whereIn('id', $others_array)->update(['next'.$lesson => $lesson.'.0']);
             }else{
-                DB::table('biz')->whereIn('id', $others_array)->update(['next' => $request->lesson.'.0']);
+                DB::table('biz')->whereIn('id', $others_array)->update(['next' => $lesson.'.0']);
             }
 
         } 
 
-        $array_resault = explode(',', $resault);
         // print_r($request->all());
         // 成功者
         DB::table('lessons')
-            // ->havingRaw('max(lesson) = '.$request->lesson)
-            ->where('lesson', $request->lesson)
+            // ->havingRaw('max(lesson) = '.$lesson)
+            ->where('lesson', $lesson)
             ->whereIn('biz_id', $array_resault)
             ->where('ready', true)
-            ->where('order_date', $request->order_date)
+            ->where('order_date', $order_date)
             ->where('pass', false)
             ->where('doing', true)
             ->update(['pass'=> true, 'doing'=>false]);
 
         DB::table('lessons')
-            ->where('lesson', $request->lesson)
+            ->where('lesson', $lesson)
             ->whereIn('biz_id', $array_resault)
             ->update(['end'=>true]);
 
-        if($request->lesson==1) {
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>$request->lesson.'.3']);
-        }elseif ($request->lesson==2 || $request->lesson==3) {
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next'.$request->lesson=>$request->lesson.'.3']);
+        if($lesson==1) {
+            DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>$lesson.'.3']);
+        }elseif ($lesson==2 || $lesson==3) {
+            DB::table('biz')->whereIn('id', $array_resault)->update(['next'.$lesson=>$lesson.'.3']);
             
             DB::table('biz')
                     ->where('next', '1.3')
@@ -565,10 +721,15 @@ class FilterController extends Controller
                     ->update(['next'=>'4.0']);
 
         }else{
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>(intval($request->lesson)+1).'.0']);
+            DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>(intval($lesson)+1).'.0']);
         }
 
         DB::table('biz')->where('next', '5.0')->update(['finished'=>true]);
+
+        // 清除选择
+        $this->clearSelect();
+        if(Session::has('score_lesson')) Session::forget('score_lesson');
+        if(Session::has('score_date')) Session::forget('score_date');
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
     }

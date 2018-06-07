@@ -26,10 +26,10 @@ class UserForm extends Form
                 'rules' => 'required|min:2|max:16'
             ])
             ->add('gender', 'choice', [
-                'label' => '性别', 
+                'label'       => '性别', 
                 'empty_value' => '-- 选择 --',
-                'choices'=> ['1'=>'男', '2'=>'女'],
-                'rules' => 'required'
+                'choices'     => ['1'=>'男', '2'=>'女'],
+                'rules'       => 'required'
             ]);
 
         if($auth->branchLimit() || ($auth->admin() && Session::has('branch_set'))) {
@@ -39,18 +39,18 @@ class UserForm extends Form
             ]);
         }else{
             $this->add('branch', 'choice', [
-                'label' => '所属驾校', 
+                'label'       => '所属驾校', 
                 'empty_value' => '-- 选择 --',
-                'choices'=> $config_list->branchList(),
-                'rules' => 'required'
+                'choices'     => $config_list->branchList(),
+                'rules'       => 'required'
             ]);
         }
 
             $this->add('user_type', 'choice', [
-                'label' => '用户类型', 
+                'label'       => '用户类型', 
                 'empty_value' => '-- 选择 --',
-                'choices'=> $config_list->getList('user_type'),
-                'rules' => 'required'
+                'choices'     => $config_list->getList('user_type'),
+                'rules'       => 'required'
             ]);
 
             if(!$auth->self($config_list->idFromUrl())){

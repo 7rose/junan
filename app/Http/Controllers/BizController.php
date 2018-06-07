@@ -70,14 +70,17 @@ class BizController extends Controller
 
 
     // 认领
-    public function claim($id)
+    public function claim (Request $request)
     {
         $auth = new Auth;
         $error = new Error;
-        if(!$auth->branchLimit()) return $error->forbidden();
+        if(!$auth->branchLimit()) return "无权操作";
+
+        $id = $request->input('id');
 
         Biz::where('customer_id', $id)->first()->update(['branch'=> $auth->branchLimit()]);
-        return redirect('/customer');
+        
+        return "认领成功!";
     }
 
     // 修改

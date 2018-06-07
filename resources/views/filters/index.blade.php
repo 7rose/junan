@@ -10,6 +10,9 @@
 @extends('../nav')
 
 @section('container')
+    @if($part->actionFromUrl())
+        <div class="alert alert-info"><h4>{{ $part->actionText() }}</h4></div>
+    @endif
     <div class="tab-pane fade in active" id="list">
         <div>
                 <div class="dropdown pull-right">
@@ -72,7 +75,7 @@
         @if(isset($records) && count($records))
         <table class="table table-hover">
         <caption>
-
+        
         </caption>
         <thead>
             <tr>
@@ -115,7 +118,12 @@
     </div>
 
 {{-- 审核 --}}
+<script src="{{ URL::asset('junan/js/seekPages.js') }}"></script>
 <script>
+    $(function(){ 
+    　　init('ready_for_1');
+    }); 
+    
     function select(key) {
         var selected = "<button  class=\"btn btn-xs btn-danger\" onclick=\"javascript:cancel("+key +")\"><span class=\"glyphicon glyphicon-pushpin\"></span> 已标记</button>";
         var td = $("#select"+key);

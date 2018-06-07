@@ -88,6 +88,13 @@ class Auth
         return $this->me->user_type == $this->finance_id ? true : false;
     }
 
+    // 财务主管
+    public function financeMaster()
+    {
+        if($this->root()) return true;
+        return $this->me->user_type == $this->finance_id && $this->me->branch == $this->root_branch_id ? true : false;
+    }
+
     // 信息中心
     public function info()
     {
