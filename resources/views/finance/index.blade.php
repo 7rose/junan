@@ -77,7 +77,7 @@
                             {{ $record->ticket_no.','.$record->checked_by_text.','.date('Y-m-d h:m:s', $record->checked_by_time) }}
                         </span>
                     @else
-                        @if($auth->finance() && !$record->abandon)
+                        @if(($auth->finance() || $auth->user()) && !$record->abandon)
                             <div id="checking{{ $record->id }}" class="input-group input-group-sm">
                                 <input id="no{{ $record->id }}" type="number" class="form-control" placeholder="请输入票号...">
                                 <span class="input-group-btn">
