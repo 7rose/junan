@@ -56,6 +56,16 @@
                 <li class="{{ $seek->navClick('user') ? 'active' : '' }}"><a href="/user">成员</a></li>
                 <li class="{{ $seek->navClick('finance') ? 'active' : '' }}"><a href="/finance">财务</a></li>
                 <li class="{{ $seek->navClick('filter') ? 'active' : '' }}"><a href="/filter">考务</a></li>
+
+                <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        统计 <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/counter/finance"><span class="glyphicon glyphicon-usd"></span> 财务</a></li>
+                        <li><a href="/counter/biz"><span class="glyphicon glyphicon-stats"></span> 业务</a></li>
+                    </ul>
+                </li>
                 @if(isset($auth) && $auth->admin())
                     <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">

@@ -22,6 +22,9 @@ class Part
             case 'no_class':
                 return "未开班的";
                 break;
+            case 'score':
+                    return "各科成绩和参考名单";
+                    break;
 
             case 'ready_for_1':
                     return "具备科目1预约条件的";

@@ -71,6 +71,8 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/finance/download/excel', 'FinanceController@seekToExcel');
     Route::post('/finance/checking', 'FinanceController@checking');
     Route::post('/finance/check_2', 'FinanceController@check_2');
+    Route::post('/finance/cancel', 'FinanceController@cancel');
+    Route::post('/finance/abandon', 'FinanceController@abandon');
 
     // 导入 -用户
     Route::get('/import/user', 'ImportController@userImport');
@@ -101,12 +103,20 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/filter/save/score', 'FilterController@saveScore');
 
 
-    Route::post('/filter/part', 'FilterController@ex');
-    Route::post('/filter/score/ex', ['as'=>'score.ex', 'uses'=>'FilterController@score_ex']);
-    Route::post('/filter/score_ex/save', 'FilterController@score_save');
-    Route::post('/filter/ready/ex', 'FilterController@readyEx');
-    Route::post('/filter/date/ex', 'FilterController@dateEx');
+    // Route::post('/filter/part', 'FilterController@ex');
+    // Route::post('/filter/score/ex', ['as'=>'score.ex', 'uses'=>'FilterController@score_ex']);
+    // Route::post('/filter/score_ex/save', 'FilterController@score_save');
+    // Route::post('/filter/ready/ex', 'FilterController@readyEx');
+    // Route::post('/filter/date/ex', 'FilterController@dateEx');
     Route::get('/filter/download/excel', 'FilterController@filterToExcel');
+
+    // 统计
+    Route::get('/counter/finance', 'CounterController@finance');
+    Route::get('/counter/finance/{id}', 'CounterController@financeShow');
+    Route::get('/counter/finance/set/{date}', 'CounterController@set');
+    Route::get('/counter/finance/download/excel/{key}', 'CounterController@getExcel');
+
+    Route::get('/counter/biz', 'CounterController@biz');
 
 });
 

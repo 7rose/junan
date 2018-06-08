@@ -180,7 +180,37 @@ class FinanceController extends Controller
         return "审核成功!!".date('Y-m-d h:m:s', $target->checked_2_by_time);
     }
 
+    // 撤销单据
+    public function cancel (Request $request)
+    {
+        // 授权
+        $auth = new Auth;
+        if(!$auth->admin())  return "无权操作";
 
+        $id = $request->input('id');
+        // if(!$target->checked || !$target->checked_by || !$target->ticket_no) return "记录单据登记异常!";
+
+        $target = Finance::find($id);
+        $target = Finance::find($id)->update(['checked' => false, 'checked_by'=>null, 'checked_by_time'=>null, 'ticket_no'=>null]);
+
+        return "已撤销!!";
+    }
+
+     // 废弃单据
+    public function abandon (Request $request)
+    {
+        // 授权
+        $auth = new Auth;
+        if(!$auth->root())  return "无权操作";
+
+        $id = $request->input('id');
+        // if(!$target->checked || !$target->checked_by || !$target->ticket_no) return "记录单据登记异常!";
+
+        $target = Finance::find($id);
+        $target = Finance::find($id)->update(['abandon' => true]);
+
+        return "已废弃!!";
+    }
 
     // 输出Execl
     public function seekToExcel()
@@ -189,7 +219,10 @@ class FinanceController extends Controller
             ['收付', '驾校', '学员', '学员电话', '应收/付', '实收付', '日期', '经手人', '推荐人'],
         ];
 
-        $this->prepare()->orderBy('finance.date')->get();
+        $this->prepare()
+                ->where('abandon', false)
+                ->orderBy('finance.date')
+                ->get();
 
         if(count($records)) {
             foreach ($records as $record) {

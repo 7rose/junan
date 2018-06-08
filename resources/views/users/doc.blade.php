@@ -16,7 +16,7 @@
     <h4>用户</h4>
     <ol>
         <li>权限设置: 
-            <p><span class="label label-info">高级管理管理员</span>系统根用户,拥有最权限</p>
+            <p><span class="label label-info">高级管理管理员</span>系统根用户,拥有最高权限</p>
             <p><span class="label label-primary">管理员</span>管理员</p>
             <p><span class="label label-success">用户</span>基本系统用户, 在本文档中,未标明的均视为此类用户</p>
             <p><span class="label label-default">员工</span>无权操作系统, 但为业务相关者或者内部员工</p>
@@ -41,7 +41,7 @@
             </ul>
         </li>
     </ol>
-    <div class="alert alert-info">因企业业务逻辑属于商业秘密, 各模块操作及业务流实现均以现场培训为准. 军安也可能会根据需要对本系统和业务逻辑作出修改.</div>
+    <div class="alert alert-info">各模块操作及业务流实现均以现场培训为准. 军安也可能会根据需要对本系统和业务逻辑作出修改.</div>
 </div>
     <span>2018&nbsp&copy&nbsp江苏军安驾培集团</span>
 </div>

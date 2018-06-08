@@ -11,7 +11,7 @@ use Session;
 class Auth
 {
     private $my_id;
-    private $me;
+    public $me;
 
     private $root_id; 
     private $admin_id; 

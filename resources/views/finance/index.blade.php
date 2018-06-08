@@ -1,4 +1,5 @@
 <?php
+
     $date = new App\Helpers\Date;
     $seek = new App\Helpers\Seek;
     $auth = new App\Helpers\Auth;
@@ -8,7 +9,8 @@
 @section('container')
     <ul id="myTab" class="nav nav-tabs">
         <li class="active">
-            <a href="#list" data-toggle="tab">{{ $seek->seeking('finance_seek_array', 'key') || $seek->seeking('finance_seek_array', 'branch') || $seek->seeking('finance_seek_array', 'date_begin') || $seek->seeking('finance_seek_array', 'date_end') ? '查询结果' : '全部' }}</a>
+            <a href="#list" data-toggle="tab">{{ $seek->seeking('finance_seek_array', 'key') || $seek->seeking('finance_seek_array', 'branch') || $seek->seeking('finance_seek_array', 'date_begin') || $seek->seeking('finance_seek_array', 'date_end') ? '查询结果' : '全部' }}
+            -{{ isset($records) && count($records) ? count($records) : 0 }}</a>
         </li>
         <li>
             <a href="#seek" data-toggle="tab">查询</a>
@@ -43,9 +45,20 @@
         </thead>
         <tbody>
             @foreach($records as $record)
- 
-            <tr class="{{ $record->in ? 'default' : 'danger' }}">
-                <td>{{ $record->id}}</td>
+                @if($record->abandon)
+            <tr class="danger">
+                @else
+            <tr class="{{ $record->in ? 'default' : 'warning' }}">
+                @endif
+                <td>
+                    @if($auth->root() && !$record->abandon)
+                        <button class="btn btn-info btn-xs" type="button" onClick="javascript:abandon({{ $record->id }})">废弃!</button>
+                    @endif
+                    @if($record->abandon)
+                        <span class="label label-danger">已废弃</span>
+                    @endif
+                    {{ $record->id}}
+                </td>
                 <td>{{ $record->in ? '+' : '-' }}</td>
                 <td>{!! $seek->seekLabel('finance_seek_array', 'key', $record->branch_text) !!}</td>
                 <td>{!! $seek->seekLabel('finance_seek_array', 'key', $record->item_text) !!}</td>
@@ -57,14 +70,16 @@
                 <td>{!! $seek->seekLabel('finance_seek_array', 'key', $record->user_id_text) !!}</td>
                 <td>{{ date('Y-m-d', $record->date) }}</td>
                 <td>
+                
+                    {{-- 操作 --}}
                     @if($record->checked)
                         <span class="btn btn-success btn-xs">
-                            {{ $record->ticket_no.' - '.$record->checked_by_text.', '.date('Y-m-d h:m:s', $record->checked_by_time) }}
+                            {{ $record->ticket_no.','.$record->checked_by_text.','.date('Y-m-d h:m:s', $record->checked_by_time) }}
                         </span>
                     @else
-                        @if($auth->user() || $auth->finance())
+                        @if($auth->finance() && !$record->abandon)
                             <div id="checking{{ $record->id }}" class="input-group input-group-sm">
-                                <input id="no{{ $record->id }}" type="text" class="form-control" placeholder="请输入票号...">
+                                <input id="no{{ $record->id }}" type="number" class="form-control" placeholder="请输入票号...">
                                 <span class="input-group-btn">
                                     <button class="btn btn-warning" type="button" onClick="javascript:check({{ $record->id }})">
                                         完成
@@ -80,11 +95,15 @@
                 
                 {{-- 审核必须完成登记 --}}
                 @if($record->checked)
+                    
                     @if($record->checked_2)
                         <span class="label label-info">{{ $record->checked_2_by_name.','.date('Y-m-d h:m:s', $record->checked_2_by_time) }}</span>
                     @else
-                        @if($auth->financeMaster())
-                            <button class="btn btn-danger btn-xs" type="button" onClick="javascript:check_2({{ $record->id }})">审核</button>
+                        @if($auth->financeMaster() && !$record->abandon)
+                            <button class="btn btn-info btn-xs" type="button" onClick="javascript:check_2({{ $record->id }})">审核</button>
+                            @if($auth->admin()  && !$record->abandon)
+                            <button class="btn btn-warning btn-xs" type="button" onClick="javascript:cancel({{ $record->id }})">撤销!</button>
+                            @endif
                         @else
                             <span class="label label-warning">未审核</span>
                         @endif
@@ -92,6 +111,8 @@
                 @else
                     -
                 @endif
+                {{-- 操作结束 --}}
+            
                     
                 </td>
             </tr>
@@ -145,7 +166,9 @@
     // 登记
     function check(id) {
         var no = $("#no"+id).val();
-        if(no == '') {
+        var trim_no = no.replace(/(^\s*)|(\s*$)/g, ""); 
+
+        if(trim_no == '') {
             alert('票号必须输入!');
             return false;
         }
@@ -192,6 +215,62 @@
     function check_2_ex(id)
     {
         var post_url = "/finance/check_2";
+        var post_data = {id:id};
+
+        $.post(
+            post_url,
+            post_data,
+            function(message){
+                $("#modal-msg").html(message);
+                $("#check_2_msg"+id).html("<span class=\"label label-info\">"+message+"</span>");
+           }
+        );
+    }
+
+    // 撤销
+    function cancel(id)
+    {
+        var msg = "您即将撤销序号为"+id+"的单据号及输入记录, 此操作本身无法撤销, 请谨慎操作!!"
+        $("#modal-msg").html(msg);
+
+        var close_btn = '<button type=\"button\" class=\"btn btn-sm btn-default\" data-dismiss=\"modal\">关闭</button>';
+        var click_btn = '<button type=\"button\" class=\"btn btn-sm btn-danger\" onClick=\"javascript:cancel_ex('+id+')\">确定撤销!</button>';
+        $("#modal-btn").html(close_btn+click_btn);
+
+        $("#myModal").modal();
+    }
+
+    function cancel_ex(id)
+    {
+        var post_url = "/finance/cancel";
+        var post_data = {id:id};
+
+        $.post(
+            post_url,
+            post_data,
+            function(message){
+                $("#modal-msg").html(message);
+                $("#check_2_msg"+id).html("<span class=\"label label-info\">"+message+"</span>");
+           }
+        );
+    }
+
+    // 废弃
+    function abandon(id)
+    {
+        var msg = "您即将废弃序号为"+id+"的单据, 废弃后的记录仍会显示在列表中, 以红色背景标注, 废弃后的数据不计入统计; 此操作本身无法撤销, 请谨慎操作!!"
+        $("#modal-msg").html(msg);
+
+        var close_btn = '<button type=\"button\" class=\"btn btn-sm btn-default\" data-dismiss=\"modal\">关闭</button>';
+        var click_btn = '<button type=\"button\" class=\"btn btn-sm btn-danger\" onClick=\"javascript:abandon_ex('+id+')\">确定废弃!</button>';
+        $("#modal-btn").html(close_btn+click_btn);
+
+        $("#myModal").modal();
+    }
+
+    function abandon_ex(id)
+    {
+        var post_url = "/finance/abandon";
         var post_data = {id:id};
 
         $.post(

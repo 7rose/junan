@@ -47,7 +47,7 @@
             <tr class="{{ $record->locked ? 'warning' : 'default' }}">
         @endif
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->work_id) !!}</td>
-                <td>{!! '<a class="btn btn-sm btn-'.$auth->authColor($record->auth_type).'" href="/user/'.$record->id.'">'. $seek->seekLabel('user_seek_array', 'key', $record->name).'</a>' !!}</td>
+                <td>{!! '<a class="btn btn-xs btn-block btn-'.$auth->authColor($record->auth_type).'" href="/user/'.$record->id.'">'. $seek->seekLabel('user_seek_array', 'key', $record->name).'</a>' !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->mobile) !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->branch_text) !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->user_type_text) !!}</td>

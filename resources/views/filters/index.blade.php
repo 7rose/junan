@@ -117,6 +117,9 @@
         @endif
     </div>
 
+
+<input type="text" name="name" id="name">
+
 {{-- 审核 --}}
 <script src="{{ URL::asset('junan/js/seekPages.js') }}"></script>
 <script>

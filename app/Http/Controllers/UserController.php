@@ -6,6 +6,7 @@ use Session;
 use DB;
 use Hash;
 use Excel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\User;
 use App\Finance;
@@ -331,18 +332,54 @@ class UserController extends Controller
             return $error->notFound();
         }
 
+        // 本月
+        $now = Carbon::now();
+        $start = $now->startOfMonth(); 
+        $end = $now->copy()->endOfMonth(); 
 
-        $finance = Finance::where('finance.user_id', $id)
+        $finance = DB::table('finance')
+                            ->where('finance.user_id', $id)
+                            ->whereBetween('date', [strtotime($start), strtotime($end)])
                             ->leftJoin('config', 'finance.item', '=', 'config.id')
                             ->leftJoin('customers', 'finance.customer_id', '=', 'customers.id')
                             ->leftJoin('users as c', 'finance.created_by', '=', 'c.id')
                             ->leftJoin('users as a', 'finance.user_id', '=', 'a.id')
                             ->leftJoin('branches', 'finance.branch', '=', 'branches.id')
-                            ->select('finance.*', 'customers.name as customer_id_text', 'config.text as item_text', 'c.name as created_by_text', 'a.name as user_id_text', 'branches.text as branch_text')
+                            ->select(
+                                    'finance.*', 
+                                    'customers.name as customer_id_text', 
+                                    'config.text as item_text', 
+                                    'c.name as created_by_text', 
+                                    'a.name as user_id_text', 
+                                    'branches.text as branch_text'
+                                )
                             ->get();
+
+        $biz = DB::table('biz')
+                        ->leftJoin('customers', 'biz.customer_id', '=', 'customers.id')
+                        ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
+                        ->leftJoin('classes', 'biz.class_id', '=', 'class_id')
+                        ->leftJoin('branches as cb', 'classes.branch', '=', 'cb.id')
+                        ->leftJoin('config', 'biz.licence_type', '=', 'config.id')
+                        ->leftJoin('users', 'biz.user_id', '=', 'users.id')
+                        ->where('biz.finished', false)
+                        ->where('biz.user_id', $id)
+                        ->select(
+                            'customers.name as customer_name', 
+                            'customers.mobile as customer_mobile', 
+                            'customers.id_number as customer_id_number', 
+                            'config.text as licence_type_text', 
+                            'branches.text as branch_text', 
+                            'users.name as user_name', 
+                            'cb.text as class_branch_text', 
+                            'classes.class_no as class_no'
+                            )
+                        ->get();
+
 
         return view('users.show')
                         ->with('record', $record)
+                        ->with('biz', $biz)
                         ->with('finance', $finance);
     }
 

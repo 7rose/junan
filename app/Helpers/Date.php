@@ -51,5 +51,41 @@ class Date
         return $out == "" ? false : $out;
     }
 
+    public function dateRange($date)
+    {
+        $now = Carbon::now();
+        // 当月
+        $month_start = $now->startOfMonth(); 
+        $month_end = $now->copy()->endOfMonth(); 
+        $this_month = $now->copy()->month; 
+        // 当年
+        $year_start = $now->copy()->startOfYear(); 
+        $year_end = $now->copy()->endOfYear();
+        $this_year = $now->copy()->year;  
+
+        if($date == 'month') return ['text'=>'今年'.$this_month.'月份', 'range' =>[strtotime($month_start), strtotime($month_end)]];
+        if($date == 'year') return ['text'=>$this_year.'全年', 'range' =>[strtotime($year_start), strtotime($year_end)]];
+    
+        return false;
+    }
+
     // end
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
