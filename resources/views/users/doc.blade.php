@@ -10,7 +10,7 @@
     <h4>用户示例</h4>
     <ol>
         <li>权限设置: 
-            <p><span class="label label-info">高级管理管理员</span>系统根用户,拥有最高权限</p>
+            <p><span class="label label-info">高级管理员</span>系统根用户,拥有最高权限</p>
             <p><span class="label label-primary">管理员</span>管理员</p>
             <p><span class="label label-success">用户</span>基本系统用户, 在本文档中,未标明的均视为此类用户</p>
             <p><span class="label label-default">员工</span>无权操作系统, 但为业务相关者或者内部员工</p>
