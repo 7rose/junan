@@ -36,7 +36,16 @@ class UserController extends Controller
                     ->leftJoin('config as t', 'users.user_type', '=', 't.id')
                     ->leftJoin('branches', 'users.branch', '=', 'branches.id')
                     ->leftJoin('users as c', 'users.created_by', '=', 'c.id')
-                    ->select('users.*', 'g.text as gender_text', 't.text as user_type_text', 'branches.text as branch_text', 'c.name as created_by_text')
+                    ->leftJoin('biz', 'users.id', '=', 'biz.user_id')
+                    ->select(
+                        'users.*', 
+                        'g.text as gender_text', 
+                        't.text as user_type_text', 
+                        'branches.text as branch_text', 
+                        'c.name as created_by_text',
+                        DB::raw('
+                                count(biz.id) as biz_num
+                            '))
                     ->where(function ($query) {
                             // 分支机构限制
                             if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
@@ -65,11 +74,12 @@ class UserController extends Controller
         ]);
 
         $records = $this->prepare()
+                    ->groupBy('users.id')
                     ->orderBy('users.user_type')
                     ->orderBy('users.work_id')
                     // ->orderBy('users.auth_type')
                     // ->orderBy('users.created_at', 'desc')
-                    ->paginate(30);
+                    ->paginate(40);
 
         return view('users.index', compact('form'))->with('records', $records);
     }

@@ -35,6 +35,7 @@
                 <th>手机</th>
                 <th>机构</th>
                 <th>类型</th>
+                <th>累计业务量</th>
             </tr>
         </thead>
         <tbody>
@@ -49,6 +50,7 @@
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->mobile) !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->branch_text) !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->user_type_text) !!}</td>
+                <td>{!! $record->biz_num !!}</td>
             </tr>
             @endforeach
         </tbody>

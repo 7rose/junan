@@ -314,6 +314,7 @@ class ImportController extends Controller
             $licence_type_id = Config::where('text', 'LIKE', $licence_type.":%")->first()->id;
 
             $default_class_type_id = 23;
+            
             $has = Biz::where('customer_id', $customer_id)
                         ->where('licence_type', $licence_type_id)
                         ->where('finished', false)
