@@ -195,6 +195,7 @@ class ImportController extends Controller
         // print_r($array);
         $all_id_number_list = [];
         $new_customer_list = [];
+        $update_customer_list = [];
 
         for ($i=0; $i < count($resaults); $i++) { 
 
@@ -230,6 +231,8 @@ class ImportController extends Controller
             // 如果数据库中无记录, 则新建
             if(!$unique->exists_id_number($item['id_number'], 'id_number', 'customers')){
                 array_push($new_customer_list, $item_to_import);
+            }else{
+                array_push($update_customer_list, $item_to_import);
             }
 
             // 所有开班人员
@@ -249,6 +252,7 @@ class ImportController extends Controller
         $class_info = ['branch'=>$request->branch, 'date'=>$request->date, 'class_no'=>$request->class_no];
         Session::put('new_customer_list', $new_customer_list);
         Session::put('all_id_number_list', $all_id_number_list);
+        Session::put('update_customer_list', $update_customer_list);
         Session::put('class_info', $class_info);
 
 
@@ -273,13 +277,25 @@ class ImportController extends Controller
 
         $new_customer_list = Session::get('new_customer_list');
         $all_id_number_list = Session::get('all_id_number_list');
+        $update_customer_list = Session::get('update_customer_list');
         $class_info = Session::get('class_info');
 
         if(Session::has('new_customer_list')) Session::forget('new_customer_list');
         if(Session::has('all_id_number_list')) Session::forget('all_id_number_list');
+        if(Session::has('update_customer_list')) Session::forget('update_customer_list');
         if(Session::has('class_info')) Session::forget('class_info');
 
         if(count($new_customer_list)) Customer::insert($new_customer_list);
+
+        // 更新客户地址和姓名字段
+        if(count($update_customer_list)){
+            foreach ($update_customer_list as $key) {
+                $customer = Customer::where('id_number', $key['id_number'])
+                                    ->first()
+                                    ->update(['name'=>$key['name'], 'address'=>$key['address']]);
+            }
+        } 
+
         // print_r($class_info);
 
         $has = Classes::where('branch', $class_info['branch'])->where('class_no', $class_info['class_no'])->first();
@@ -292,7 +308,9 @@ class ImportController extends Controller
         }
 
         foreach ($all_id_number_list as $id_number => $licence_type) {
-            $customer_id = Customer::where('id_number', $id_number)->first()->id;
+            $customer = Customer::where('id_number', $id_number)->first();
+            $customer_id = $customer->id;
+
             $licence_type_id = Config::where('text', 'LIKE', $licence_type.":%")->first()->id;
 
             $default_class_type_id = 23;
@@ -300,10 +318,13 @@ class ImportController extends Controller
                         ->where('licence_type', $licence_type_id)
                         ->where('finished', false)
                         ->first();
+
+            // $customer = Customer::find()
+
             if(!$has){
                 Biz::insert(['customer_id'=>$customer_id, 'licence_type'=>$licence_type_id, 'created_by'=>Session::get('id'), 'class_id'=>$class_id, 'class_type'=>$default_class_type_id]);
             }else{
-                $has->update(['class_id'=>$class_id]);
+                $has->update(['class_id'=>$class_id, 'licence_type'=>$licence_type_id]);
             }
         }
 

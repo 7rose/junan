@@ -97,8 +97,8 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/filter/do/ready', 'FilterController@doReady');
     Route::post('/filter/do/date', 'FilterController@doDate');
     // Route::post('/filter/do/score', 'FilterController@doScore');
-    Route::get('/filter/score/choose', 'FilterController@scoreChoose');
-    Route::post('/filter/do/score', ['as'=>'score.do', 'uses'=>'FilterController@doScore']);
+    // Route::get('/filter/score/choose', 'FilterController@scoreChoose');
+    // Route::post('/filter/do/score', ['as'=>'score.do', 'uses'=>'FilterController@doScore']);
     Route::get('/filter/do/score', 'FilterController@doScoreList');
     Route::post('/filter/save/score', 'FilterController@saveScore');
 
