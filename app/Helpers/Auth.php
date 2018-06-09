@@ -134,7 +134,7 @@ class Auth
     public function branchLimitId()
     {
         if($this->branchLimit()) return $this->branchLimit();
-        if($this->admin() && Session::has('branch_set')) return Session::get('branch_set');
+        if(!$this->branchLimit() && Session::has('branch_set') && Session::get('branch_set') != 1) return Session::get('branch_set');
     }
 
     // end
