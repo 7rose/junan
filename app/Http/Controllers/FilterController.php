@@ -611,6 +611,24 @@ class FilterController extends Controller
         return view('form', compact('form'))->with('custom',['title'=>$title, 'icon'=>$icon]);
 
     }
+        // 科目1, 2, 3, 4成绩录入
+    public function exScore($key) 
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+
+        $key_array = explode('-', $key);
+
+        Session::put('score_lesson', $key_array[0]);
+        Session::put('score_date', $key_array[1]);
+        Session::put('branch_set', $key_array[2]);
+
+        if(!$auth->admin() && $auth->me->branch != intval(Session::get('branch_set')))  return $auth_error->forbidden();
+
+        // return $this->doScoreList();
+        return redirect('/filter/do/score');
+    }
 
     // 科目1, 2, 3, 4成绩录入
     public function doScore(Request $request) 
@@ -659,12 +677,14 @@ class FilterController extends Controller
     public function saveScore()
     {
         // // 授权
-        // $auth = new Auth;
+        $auth = new Auth;
         // $auth_error = new Error;
         // if(!$auth->info())  return $auth_error->forbidden();
 
        if(!Session::has('ex_array') || !count(Session::get('ex_array')['main'])) return $error->paramLost();
        if(!Session::has('score_lesson') || !Session::has('score_date')) return $error->paramLost();
+
+       if(!$auth->admin() && $auth->me->branch != intval(Session::get('branch_set')))  return $auth_error->forbidden();
 
 
         $array_resault = Session::get('ex_array')['main'];

@@ -176,10 +176,121 @@ class CounterController extends Controller
         })->export('xlsx');
     }
 
+    // 业务预处理
+    public function bizPre()
+    {
+        $pre = DB::table('lessons')
+                        ->leftJoin('biz', 'lessons.biz_id', '=', 'biz.id')
+                        ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
+                        ->where('lessons.order_date', '>', 0) 
+                        ->select(
+                            'lessons.id',
+                            'lessons.lesson',
+                            'lessons.order_date',
+                            'biz.branch',
+                            'branches.text as branch_text',
+                            DB::raw(' 
+                                group_concat(lessons.pass) as lesson_pass, 
+                                group_concat(lessons.doing) as lesson_doing, 
+                                group_concat(lessons.end) as lesson_end
+                            '));
+                        
+        return $pre;
+    }
+
     // 业务
     public function biz()
     {
-        # code...
+        $records = $this->bizPre()
+                        ->groupBy('lessons.order_date')
+                        ->groupBy('biz.branch')
+                        ->groupBy('lessons.lesson')
+                        ->orderBy('lessons.order_date', 'desc')
+                        ->orderBy('lessons.lesson')
+                        ->paginate(50);
+
+        $sum = $this->bizPre()
+                        ->groupBy('biz.branch')
+                        ->groupBy('lessons.lesson')
+                        ->orderBy('biz.branch')
+                        ->orderBy('lessons.lesson')
+                        ->get();
+
+        $all = $this->bizPre()
+                        ->groupBy('lessons.lesson')
+                        ->orderBy('lessons.lesson')
+                        ->get();
+
+        Session::put('counter_biz_sum', $sum);
+        Session::put('counter_biz_all', $all);
+        
+        return view('counter.biz')
+                    ->with('records_sum', $sum)
+                    ->with('all', $all)
+                    ->with('records', $records);
+        // print_r($records);
+    }
+
+    // 下载excel
+    public function bizExcel()
+    {
+
+        $error = new Error;
+        if(!Session::has('counter_biz_sum')) return $error->paramLost();
+        if(!Session::has('counter_biz_all')) return $error->paramLost();
+
+        $sum = Session::get('counter_biz_sum');
+        $all = Session::get('counter_biz_all');
+
+        $cellData = [
+            ['机构', '科目' ,'累计人次', '累计合格人次', '合格率'],
+        ];
+
+        $counter = new Counter;
+
+        if(count($sum)) {
+            foreach ($sum as $s) {
+                array_push($cellData, [
+                                        $s->branch_text,
+                                        $s->lesson,
+                                        $counter->lessonSum($s)['all'],
+                                        $counter->lessonSum($s)['pass'],
+                                        $counter->lessonSum($s)['percent'].'%'
+                                    ]);
+            }
+        }
+
+        $cellData2 = [
+            ['科目' ,'累计人次', '累计合格人次', '合格率'],
+        ];
+
+        if(count($all)) {
+            foreach ($all as $a) {
+                array_push($cellData2, [
+                                        $a->lesson,
+                                        $counter->lessonSum($a)['all'],
+                                        $counter->lessonSum($a)['pass'],
+                                        $counter->lessonSum($a)['percent'].'%'
+                                    ]);
+            }
+        }
+
+        $file_name = '业务统计'.date('Y-m-d', time());
+
+
+        Excel::create($file_name,function($excel) use ($cellData, $cellData2){
+            $excel->sheet('各驾校', function($sheet) use ($cellData){
+                $sheet->rows($cellData);
+                $sheet->setAutoSize(true);
+                $sheet->freezeFirstRow();
+            });
+
+            $excel->sheet('军安总体', function($sheet) use ($cellData2){
+                $sheet->rows($cellData2);
+                $sheet->setAutoSize(true);
+                $sheet->freezeFirstRow();
+            });
+        })->export('xlsx');
     }
 
     // end

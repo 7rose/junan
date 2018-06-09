@@ -77,7 +77,7 @@ class Part
                     break;
             
             default:
-                # code...
+                return false;
                 break;
         }
     }

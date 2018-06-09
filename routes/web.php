@@ -102,6 +102,8 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/filter/do/score', 'FilterController@doScoreList');
     Route::post('/filter/save/score', 'FilterController@saveScore');
 
+    Route::get('/filter/score_ex/{key}', 'FilterController@exScore');
+
 
     // Route::post('/filter/part', 'FilterController@ex');
     // Route::post('/filter/score/ex', ['as'=>'score.ex', 'uses'=>'FilterController@score_ex']);
@@ -115,6 +117,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/counter/finance/{id}', 'CounterController@financeShow');
     Route::get('/counter/finance/set/{date}', 'CounterController@set');
     Route::get('/counter/finance/download/excel/{key}', 'CounterController@getExcel');
+    Route::get('/counter/biz/download/excel', 'CounterController@bizExcel');
 
     Route::get('/counter/biz', 'CounterController@biz');
 

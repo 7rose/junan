@@ -179,6 +179,54 @@ class Counter
         return ['total_num'=>count($records) ,'total'=>$out];
     }
 
+    /**
+     *
+     * 业务统计
+     *
+     */
+    public function lessonInfo($record)
+    {
+        $pass_array = $this->arrayFromStr($record->lesson_pass);
+        $doing_array = $this->arrayFromStr($record->lesson_doing);
+        // $pass_array = $this->arrayFromStr($record->lesson_end);
+
+        if(!count($pass_array) || !count($doing_array)) return false;
+
+        // 成绩录入
+        $ex_score = '<a class="btn btn-xs btn-block btn-info" href="/filter/score_ex/'.$record->lesson.'-'.$record->order_date.'-'.$record->branch.'">成绩录入</a>';
+
+        $all = count($pass_array);
+        $pass = 0;
+
+        for ($i=0; $i < count($pass_array); $i++) { 
+            if(intval($doing_array[$i]) == 1) return $ex_score;
+            if(intval($pass_array[$i]) == 1) $pass += 1;
+
+        }
+
+        // $resault = $pass * 100 / $all;
+
+        return $all.'人参加考试, 合格'.$pass.'人, 合格率:  '.$this->percent($pass, $all).'%';
+    }
+
+    public function lessonSum($record)
+    {
+        $pass_array = $this->arrayFromStr($record->lesson_pass);
+        $doing_array = $this->arrayFromStr($record->lesson_doing);
+
+        if(!count($pass_array) || !count($doing_array)) return false;
+
+        $all = count($pass_array);
+        $pass = 0;
+
+        for ($i=0; $i < count($pass_array); $i++) { 
+            if(intval($pass_array[$i]) == 1) $pass += 1;
+        }
+
+        $out = ['all'=>$all, 'pass'=>$pass, 'percent'=>$this->percent($pass, $all)];
+        return $out;
+    }
+
     // end
 }
 

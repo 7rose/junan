@@ -4,6 +4,9 @@ $part = new App\Helpers\Part;
 $seek = new App\Helpers\Seek;
 $key = Session::has('filter_key') ? Session::get('filter_key') : null;
 
+$lesson_info = Session::has('score_date') ? date('Y-m-d', Session::get('score_date')) : '';
+$lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score_lesson') : '';
+
 ?>
 @extends('../nav')
 
@@ -16,7 +19,7 @@ $key = Session::has('filter_key') ? Session::get('filter_key') : null;
         <div class="alert alert-info">
             <div class="col-sm-3">
                 @if($part->actionFromUrl())
-                    <strong>{{ $part->actionText() }}</strong>
+                    <strong>{{ $part->actionText() ? $part->actionText() : $lesson_info }}</strong>
                 @endif
             </div>
 
@@ -56,7 +59,7 @@ $key = Session::has('filter_key') ? Session::get('filter_key') : null;
             <ul class="dropdown-menu" role="menu" aria-labelledby="selector">
                 <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/no_class">未开班的</a></li>
                 <li role="presentation" class="divider"></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/score/choose"><span class="glyphicon glyphicon-edit"></span>各科成绩和参考名单</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="/counter/biz"><span class="glyphicon glyphicon-edit"></span> 各科成绩处理</a></li>
                 <li role="presentation" class="divider"></li>
                 <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_1">科目1: 具备预约条件的</a></li>
                 <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_1">科目1: 提交预约申请的</a></li>

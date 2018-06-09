@@ -52,7 +52,7 @@ class UserSeeder extends Seeder
                 'branch'=>1,
                 'gender'=>2,
                 'name'=>"刘琳",
-                'password'=>bcrypt('1001'),
+                'password'=>bcrypt('10011001'),
                 'user_type'=>47,
                 'auth_type'=>6,
                 'created_by'=>3,
