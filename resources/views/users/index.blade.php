@@ -35,8 +35,6 @@
                 <th>手机</th>
                 <th>机构</th>
                 <th>类型</th>
-                <th>业务</th>
-                <th>财务</th>
             </tr>
         </thead>
         <tbody>
@@ -51,8 +49,6 @@
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->mobile) !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->branch_text) !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->user_type_text) !!}</td>
-                <td>1</td>
-                <td>1</td>
             </tr>
             @endforeach
         </tbody>
@@ -78,5 +74,4 @@
             </div>
         </div>
     </div>
-
 @endsection
