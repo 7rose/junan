@@ -39,7 +39,7 @@ class UserController extends Controller
                     ->select('users.*', 'g.text as gender_text', 't.text as user_type_text', 'branches.text as branch_text', 'c.name as created_by_text')
                     ->where(function ($query) {
                             // 分支机构限制
-                            if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
+                            if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
                                 $query->Where('users.branch', $this->auth->branchLimitId());
                             }
                             

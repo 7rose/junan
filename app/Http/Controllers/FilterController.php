@@ -58,7 +58,7 @@ class FilterController extends Controller
                             }
 
                             // 分支机构限制
-                            if($this->auth->branchLimit() || ($this->auth->admin() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
+                            if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
                                 $query->Where('biz.branch', $this->auth->branchLimitId());
                             }
                         });
