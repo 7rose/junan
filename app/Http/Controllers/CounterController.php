@@ -123,9 +123,9 @@ class CounterController extends Controller
 
         if($range) Session::put('date_range', $range);
 
-        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'统计周期已成功切换!']);
+        // return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'统计周期已成功切换!']);
 
-        // return redirect('/counter/finance');
+        return redirect('/counter/finance');
     }
 
     // 下载excel

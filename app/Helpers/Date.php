@@ -54,19 +54,40 @@ class Date
     public function dateRange($date)
     {
         $now = Carbon::now();
-        // 当月
-        $month_start = $now->startOfMonth(); 
+
+        // 上个月
+        $pre_month_start = $now->copy()->subMonth()->startOfMonth(); 
+        $pre_month_end = $now->copy()->subMonth()->endOfMonth(); 
+        $pre_month_year = $now->copy()->subMonth()->year; 
+        $pre_month = $now->copy()->subMonth()->month; 
+        
+        // 本日
+        $today_start = $now->copy()->startOfDay();
+        $today_end = $now->copy()->endOfDay();
+        $today = $now->copy()->day;
+
+        // 本周
+        $week_start = $now->copy()->startOfWeek();
+        $week_end = $now->copy()->endOfWeek();
+
+        // 本月
+        $month_start = $now->copy()->startOfMonth(); 
         $month_end = $now->copy()->endOfMonth(); 
         $this_month = $now->copy()->month; 
-        // 当年
+
+        // 本年
         $year_start = $now->copy()->startOfYear(); 
         $year_end = $now->copy()->endOfYear();
         $this_year = $now->copy()->year;  
 
+        if($date == 'pre_month') return ['text'=>'上个月'.$pre_month_year.'年'.$pre_month.'月份', 'range' =>[strtotime($pre_month_start), strtotime($pre_month_end)]];
+        if($date == 'today') return ['text'=>'今天'.$today.'日', 'range' =>[strtotime($today_start), strtotime($today_end)]];
+        if($date == 'week') return ['text'=>'本周', 'range' =>[strtotime($week_start), strtotime($week_end)]];
         if($date == 'month') return ['text'=>'今年'.$this_month.'月份', 'range' =>[strtotime($month_start), strtotime($month_end)]];
         if($date == 'year') return ['text'=>$this_year.'全年', 'range' =>[strtotime($year_start), strtotime($year_end)]];
     
-        return false;
+        // return false;
+        echo $pre_month_year;
     }
 
     // end

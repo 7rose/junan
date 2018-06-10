@@ -125,9 +125,8 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 
 Route::get('/test', function() {
-    $old = Session::get('filter_select');
-
-    print_r($old);
+    $a = new App\Helpers\Date;
+    $a->dateRange('today');
 });
 
 
