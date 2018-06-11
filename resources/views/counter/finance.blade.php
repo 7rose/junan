@@ -75,7 +75,5 @@
         <div class="alert alert-info">无记录</div>
         @endif
     </table>
-    @else
-        <div class="alert alert-warning">无记录</div>
     @endif
 @endsection
