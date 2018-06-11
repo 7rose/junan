@@ -7,13 +7,15 @@
 @extends('../nav')
 
 @section('container')
-    @if(isset($records) && count($records))
+    @if(isset($records))
     <table class="table table-hover">
         <caption>
             @if(isset($all))
             <div class="alert alert-info">
                 {{ Session::has('export') ? Session::get('export')['branch'] : '' }}: {{ Session::has('date_range') ? Session::get('date_range')['text'] : '' }}财务记录:{{ $all['total_num'] }}, 总营收: ¥{{ $all['total'] }}
+                @if(count($records))
                 <a href="/counter/finance/download/excel/branch" class="btn btn-success btn-sm">导出Excel</a>
+                @endif
 
                 <div class="dropdown pull-right">
                     <button type="button" class="btn btn-sm dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">{{ Session::has('date_range') ? Session::get('date_range')['text'] : '选择' }}
@@ -21,10 +23,20 @@
                     </button>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                         <li role="presentation">
-                            <a role="menuitem" tabindex="-1" href="/counter/finance/set/month">当月 - {{ $carbon->now()->month }}月份</a>
+                            <a role="menuitem" tabindex="-1" href="/counter/finance/set/today">今天 - {{ $carbon->now()->day }}日</a>
                         </li>
                         <li role="presentation">
-                            <a role="menuitem" tabindex="-1" href="/counter/finance/set/year">当年 - {{ $carbon->now()->year }}年</a>
+                            <a role="menuitem" tabindex="-1" href="/counter/finance/set/week">本周</a>
+                        </li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="/counter/finance/set/month">本月 - {{ $carbon->now()->month }}月份</a>
+                        </li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="/counter/finance/set/year">本年度 - {{ $carbon->now()->year }}年</a>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="/counter/finance/set/pre_month">上个月</a>
                         </li>
 
                     </ul>
@@ -33,6 +45,7 @@
             </div>
             @endif
         </caption>
+        @if(count($records))
         <thead>
             <tr>
                 <th>员工</th>
@@ -59,6 +72,9 @@
             </tr>
             @endforeach
         </tbody>
+        @else
+        <div class="alert alert-info">无记录</div>
+        @endif
     </table>
     @else
         <div class="alert alert-warning">无记录</div>

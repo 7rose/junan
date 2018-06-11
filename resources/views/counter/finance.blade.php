@@ -70,8 +70,10 @@
                 <td>{{ $counter->percent($counter->fllow($record)['change_class'][2], $counter->fllow($record)['all'][2]).'%' }}</td>
             </tr>
             @endforeach
-        @endif
         </tbody>
+        @else
+        <div class="alert alert-info">无记录</div>
+        @endif
     </table>
     @else
         <div class="alert alert-warning">无记录</div>
