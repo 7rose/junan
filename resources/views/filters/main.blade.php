@@ -59,7 +59,7 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
             <ul class="dropdown-menu" role="menu" aria-labelledby="selector">
                 <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/no_class">未开班的</a></li>
                 <li role="presentation" class="divider"></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/counter/biz"><span class="glyphicon glyphicon-edit"></span> 各科成绩处理</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="/counter/biz"><span class="glyphicon glyphicon-edit"></span> 成绩处理和考务流水</a></li>
                 <li role="presentation" class="divider"></li>
                 <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_1">科目1: 具备预约条件的</a></li>
                 <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_1">科目1: 提交预约申请的</a></li>
