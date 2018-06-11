@@ -71,8 +71,6 @@
             </tr>
             @endforeach
         </tbody>
-        @else
-        <div class="alert alert-info">无记录</div>
         @endif
     </table>
     @endif
