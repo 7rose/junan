@@ -744,7 +744,7 @@ class FilterController extends Controller
             DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>(intval($lesson)+1).'.0']);
         }
 
-        DB::table('biz')->where('next', '5.0')->update(['finished'=>true]);
+        DB::table('biz')->where('next', '5.0')->update(['finished'=>true, 'finish_time'=>time()]);
 
         // 清除选择
         $this->clearSelect();

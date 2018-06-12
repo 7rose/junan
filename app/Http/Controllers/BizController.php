@@ -43,7 +43,8 @@ class BizController extends Controller
     public function store(Request $request)
     {
         $all = $request->all();
-        $all['date'] =  strtotime($all['date']);
+        $all['date'] =  time();
+        // $all['date'] =  strtotime($all['date']);
         $all['created_by'] = Session::get('id');
 
         // 财务表

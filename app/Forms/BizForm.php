@@ -25,10 +25,10 @@ class BizForm extends Form
             'choices'=> $list->getList('class_type'),
             'rules' => 'required'
         ])
-        ->add('date', 'date', [
-            'label' => '报名日期',
-            'rules' => 'required'
-        ])
+        // ->add('date', 'date', [
+        //     'label' => '报名日期',
+        //     'rules' => 'required'
+        // ])
         ->add('price', 'number', [
                 'label' => '应收款',
                 'attr' =>['step' => 0.01],

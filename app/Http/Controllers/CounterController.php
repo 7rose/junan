@@ -27,8 +27,8 @@ class CounterController extends Controller
         $date_range_int = [intval(Session::get('date_range')['range'][0]), intval(Session::get('date_range')['range'][1])];
 
         $pre = DB::table('finance')
-                    ->whereBetween('date', $date_range_int)
-                    ->where('abandon', false)
+                    ->whereBetween('finance.date', $date_range_int)
+                    ->where('finance.abandon', false)
                     // ->where('checked', true)
                     // ->where('checked_2', true)
                     ->leftJoin('config', 'finance.item', '=', 'config.id')
@@ -123,9 +123,9 @@ class CounterController extends Controller
 
         if($range) Session::put('date_range', $range);
 
-        // return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'统计周期已成功切换!']);
+        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'统计周期已成功切换!']);
 
-        return redirect('/counter/finance');
+        // return redirect('/counter/finance');
     }
 
     // 下载excel
@@ -176,8 +176,8 @@ class CounterController extends Controller
         })->export('xlsx');
     }
 
-    // 业务预处理
-    public function bizPre()
+    // 考务预处理
+    public function lessonPre()
     {
         $pre = DB::table('lessons')
                         ->leftJoin('biz', 'lessons.biz_id', '=', 'biz.id')
@@ -199,9 +199,9 @@ class CounterController extends Controller
     }
 
     // 业务
-    public function biz()
+    public function lesson()
     {
-        $records = $this->bizPre()
+        $records = $this->lessonPre()
                         ->groupBy('lessons.order_date')
                         ->groupBy('biz.branch')
                         ->groupBy('lessons.lesson')
@@ -209,22 +209,22 @@ class CounterController extends Controller
                         ->orderBy('lessons.lesson')
                         ->paginate(50);
 
-        $sum = $this->bizPre()
+        $sum = $this->lessonPre()
                         ->groupBy('biz.branch')
                         ->groupBy('lessons.lesson')
                         ->orderBy('biz.branch')
                         ->orderBy('lessons.lesson')
                         ->get();
 
-        $all = $this->bizPre()
+        $all = $this->lessonPre()
                         ->groupBy('lessons.lesson')
                         ->orderBy('lessons.lesson')
                         ->get();
 
-        Session::put('counter_biz_sum', $sum);
-        Session::put('counter_biz_all', $all);
+        Session::put('counter_lesson_sum', $sum);
+        Session::put('counter_lesson_all', $all);
         
-        return view('counter.biz')
+        return view('counter.lesson')
                     ->with('records_sum', $sum)
                     ->with('all', $all)
                     ->with('records', $records);
@@ -232,15 +232,15 @@ class CounterController extends Controller
     }
 
     // 下载excel
-    public function bizExcel()
+    public function lessonExcel()
     {
 
         $error = new Error;
-        if(!Session::has('counter_biz_sum')) return $error->paramLost();
-        if(!Session::has('counter_biz_all')) return $error->paramLost();
+        if(!Session::has('counter_lesson_sum')) return $error->paramLost();
+        if(!Session::has('counter_lesson_all')) return $error->paramLost();
 
-        $sum = Session::get('counter_biz_sum');
-        $all = Session::get('counter_biz_all');
+        $sum = Session::get('counter_lesson_sum');
+        $all = Session::get('counter_lesson_all');
 
         $cellData = [
             ['机构', '科目' ,'累计人次', '累计合格人次', '合格率'],
@@ -275,7 +275,7 @@ class CounterController extends Controller
             }
         }
 
-        $file_name = '业务统计'.date('Y-m-d', time());
+        $file_name = '考务统计'.date('Y-m-d', time());
 
 
         Excel::create($file_name,function($excel) use ($cellData, $cellData2){
@@ -293,7 +293,95 @@ class CounterController extends Controller
         })->export('xlsx');
     }
 
-    // end
+    // 业务预处理
+    public function bizPre()
+    {
+        if(!Session::has('date_range')){
+            $date = new Date;
+            $range = $date->dateRange('month');
+            if($range) Session::put('date_range', $range);
+        } 
+
+        $date_range_int = [intval(Session::get('date_range')['range'][0]), intval(Session::get('date_range')['range'][1])];
+
+        $pre = DB::table('biz')
+                    // ->whereBetween('biz.date', $date_range_int)
+                    // ->orWhereBetween('biz.finish_time', $date_range_int)
+                    // ->orWhere('biz.finished', false)
+                    ->leftJoin('customers', 'biz.customer_id', '=', 'customers.id')
+                    ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
+                    ->leftJoin('classes', 'biz.class_id', '=', 'class_id')
+                    ->leftJoin('branches as cb', 'classes.branch', '=', 'cb.id')
+                    ->leftJoin('config', 'biz.licence_type', '=', 'config.id')
+                    ->leftJoin('users', 'biz.user_id', '=', 'users.id')
+                    ->select(
+                            'biz.branch',
+                            'branches.text as branch_text',
+                            'config.text as licence_type_text',
+                            DB::raw(' 
+                                group_concat(biz.date) as biz_date,  
+                                group_concat(biz.finish_time) as biz_finish_time,
+                                group_concat(biz.finished) as biz_finish
+                            '));
+        return $pre;
+    }
+
+    // 业务
+    public function biz()
+    {
+        $records = $this->bizPre()
+                        ->whereNotNull('biz.branch')
+                        ->whereNotNull('biz.licence_type')
+                        ->groupBy('biz.branch')
+                        ->groupBy('biz.licence_type')
+                        ->orderBy('biz.branch')
+                        ->orderBy('biz.licence_type')
+                        ->get();
+
+        Session::put('counter_biz', $records);
+
+        return view('counter.biz')
+                        ->with('records', $records);
+    }
+
+    // 下载excel
+    public function bizExcel()
+    {
+
+        $error = new Error;
+        if(!Session::has('counter_biz')) return $error->paramLost();
+
+        $all = Session::get('counter_biz');
+
+        $cellData = [
+            ['机构', '证照类型' ,'在学(现在)', '新招', '毕业'],
+        ];
+
+        $counter = new Counter;
+
+        if(count($all)) {
+            foreach ($all as $a) {
+                array_push($cellData, [
+                                        $a->branch_text,
+                                        $a->licence_type_text,
+                                        $counter->bizSum($a)['doing'],
+                                        $counter->bizSum($a)['new'],
+                                        $counter->bizSum($a)['finished']
+                                    ]);
+            }
+        }
+
+        $file_name = '业务统计'.date('Y-m-d', time());
+
+
+        Excel::create($file_name,function($excel) use ($cellData){
+            $excel->sheet('各驾校', function($sheet) use ($cellData){
+                $sheet->rows($cellData);
+                $sheet->setAutoSize(true);
+                $sheet->freezeFirstRow();
+            });
+        })->export('xlsx');
+    }
 }
 
 

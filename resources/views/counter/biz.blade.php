@@ -1,115 +1,71 @@
 <?php
 
     $counter = new App\Helpers\Counter;
-    //$carbon = new Carbon\Carbon;
+    $carbon = new Carbon\Carbon;
 ?>
 
 @extends('../nav')
 
 @section('container')
+    @if(isset($records))
+    <table class="table table-hover">
+        <caption>
+            @if(isset($records))
+            <div class="alert alert-info">
+                军安集团: {{ Session::has('date_range') ? Session::get('date_range')['text'] : '' }}各驾校业务情况
+                @if(count($records))
+                <a href="/counter/biz/download/excel" class="btn btn-success btn-sm">导出Excel</a>
+                @endif
+                <div class="dropdown pull-right">
+                    <button type="button" class="btn btn-sm dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">{{ Session::has('date_range') ? Session::get('date_range')['text'] : '选择' }}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="/counter/set/today">今天 - {{ $carbon->now()->day }}日</a>
+                        </li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="/counter/set/week">本周</a>
+                        </li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="/counter/set/month">本月 - {{ $carbon->now()->month }}月份</a>
+                        </li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="/counter/set/year">本年度 - {{ $carbon->now()->year }}年</a>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="/counter/set/pre_month">上个月</a>
+                        </li>
 
-<ul id="myTab" class="nav nav-tabs">
-    <li class="active"><a href="#home" data-toggle="tab">考务流水</a></li>
-    <li><a href="#ios" data-toggle="tab">统计</a></li>
-</ul>
+                    </ul>
+                </div>
 
-<div id="myTabContent" class="tab-content">
-    <div class="tab-pane fade in active" id="home">
-        @if(isset($records) && count($records))
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>日期</th>
-                    <th>科目</th>
-                    <th>驾校</th>
-                    <th>结果</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($records as $record)
-                <tr>
-                    <td>{{ date('Y-m-d', $record->order_date) }}</td>
-                    <td>{{ $record->lesson }}</td>
-                    <td>{{ $record->branch_text }}</td>
-                    <td>{!! $counter->lessonInfo($record) !!}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        <div style="text-align:center;">{{ $records->links() }}</div>
-        @else
-            <div class="alert alert-warning">无记录</div>
-        @endif
-    </div>
-    <div class="tab-pane fade" id="ios">
-        <div style="height: 40px"></div>
-        <div class="col-sm-5">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        军安集团总体
-                    </h3>
-                </div>
-                <div class="panel-body">
-                    @if(isset($all) && count($all))
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>科目</th>
-                                    <th>累计人次</th>
-                                    <th>合格人次</th>
-                                    <th>合格率</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($all as $a)
-                                <tr>
-                                    <td>{{ $a->lesson }}</td>
-                                    <td>{!! $counter->lessonSum($a)['all'] !!}</td>
-                                    <td>{!! $counter->lessonSum($a)['pass'] !!}</td>
-                                    <td>{!! $counter->lessonSum($a)['percent'].'%' !!}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @endif
-                </div>
             </div>
-        </div>
-        
-        @if(isset($records_sum) && count($records_sum))
-            <table class="table table-hover">
-                <caption>
-                    <a href="/counter/biz/download/excel" class="btn btn-success btn-sm">下载Excel</a>
-                </caption>
-                <thead>
-                    <tr>
-                        <th>驾校</th>
-                        <th>科目</th>
-                        <th>累计人次</th>
-                        <th>合格人次</th>
-                        <th>合格率</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($records_sum as $sum)
-                    <tr>
-                        <td>{{ $sum->branch_text }}</td>
-                        <td>{{ $sum->lesson }}</td>
-                        <td>{!! $counter->lessonSum($sum)['all'] !!}</td>
-                        <td>{!! $counter->lessonSum($sum)['pass'] !!}</td>
-                        <td>{!! $counter->lessonSum($sum)['percent'].'%' !!}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        <div style="text-align:center;">{{ $records->links() }}</div>
-        @else
-            <div class="alert alert-warning">无记录</div>
+            @endif
+        </caption>
+        @if(count($records))
+        <thead>
+            <tr>
+                <th>驾校</th>
+                <th>证照类型</th>
+                <th>在学(现在)</th>
+                <th>新招</th>
+                <th>毕业</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($records as $record)
+            <tr>
+                <td>{{ $record->branch_text }}</td>
+                <td>{{ $record->licence_type_text }}</td>
+                <td>{{ $counter->bizSum($record)['doing'] }}</td>
+                <td>{{ $counter->bizSum($record)['new'] }}</td>
+                <td>{{ $counter->bizSum($record)['finished'] }}</td>
+            </tr>
+            @endforeach
+        </tbody>
         @endif
-
-    </div>
-</div>
-
-    
+    </table>
+    @endif
 @endsection

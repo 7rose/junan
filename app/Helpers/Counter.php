@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+use Session;
 
 /**
  * 统计
@@ -224,6 +225,34 @@ class Counter
         }
 
         $out = ['all'=>$all, 'pass'=>$pass, 'percent'=>$this->percent($pass, $all)];
+        return $out;
+    }
+
+    // 业务-新招, 在学, 毕业
+    public function bizSum($record)
+    {
+        $finish_array = $this->arrayFromStr($record->biz_finish);
+        $date_array = $this->arrayFromStr($record->biz_date);
+        $finish_time_array = $this->arrayFromStr($record->biz_finish_time);
+
+        if(!count($date_array) || !count($finish_time_array) || !Session::has('date_range')) return false;
+
+        $date_small = intval(Session::get('date_range')['range'][0]);
+        $date_big = intval(Session::get('date_range')['range'][1]);
+
+        $all = count($date_array);
+
+        $new = 0;
+        $finished = 0;
+        $doing = 0;
+
+        for ($i=0; $i < count($date_array); $i++) { 
+            if(intval($date_array[$i]) >= $date_small && intval($date_array[$i]) <= $date_big) $new += 1;
+            if(intval($finish_time_array[$i]) >= $date_small && intval($finish_time_array[$i]) <= $date_big) $finished += 1;
+            if(intval($finish_array[$i]) < 1) $doing += 1;
+        }
+
+        $out = ['new'=>$new, 'finished'=>$finished, 'doing'=>$doing];
         return $out;
     }
 

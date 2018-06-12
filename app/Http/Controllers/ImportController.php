@@ -226,6 +226,7 @@ class ImportController extends Controller
                 'address'=>$item['address'],
                 'gender'=>$item['gender'] == '女' ? 2 : 1,
                 'created_by'=>Session::get('id'),
+                // 'date'=>time(),
             ];
 
             // 如果数据库中无记录, 则新建
@@ -323,7 +324,7 @@ class ImportController extends Controller
             // $customer = Customer::find()
 
             if(!$has){
-                Biz::insert(['customer_id'=>$customer_id, 'licence_type'=>$licence_type_id, 'created_by'=>Session::get('id'), 'class_id'=>$class_id, 'class_type'=>$default_class_type_id]);
+                Biz::insert(['customer_id'=>$customer_id, 'licence_type'=>$licence_type_id, 'created_by'=>Session::get('id'), 'class_id'=>$class_id, 'class_type'=>$default_class_type_id, 'date'=>time()]);
             }else{
                 $has->update(['class_id'=>$class_id, 'licence_type'=>$licence_type_id]);
             }

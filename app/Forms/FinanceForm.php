@@ -41,11 +41,11 @@ class FinanceForm extends Form
                 'rules' => 'required'
             ]);
         }
-            $this->add('date', 'date', [
-                'label' => '日期',
-                'rules' => 'required'
-            ])
-            ->add('price', 'number', [
+            // $this->add('date', 'date', [
+            //     'label' => '日期',
+            //     'rules' => 'required'
+            // ])
+            $this->add('price', 'number', [
                     'label' => '应收/付',
                     'attr' =>['step' => 0.01],
                     'rules' => 'required'

@@ -11,6 +11,11 @@
                         ->select('users.name', 'branches.text as branch_text')
                         ->where('users.id', $id)
                         ->first();
+        if(!$record){
+            Session::flush();
+            return redirect('/');
+        }
+        
         $me = '<li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         '.$record->name.'-'.$record->branch_text.' <b class="caret"></b>
@@ -65,6 +70,7 @@
                     <ul class="dropdown-menu">
                         <li><a href="/counter/finance"><span class="glyphicon glyphicon-usd"></span> 财务</a></li>
                         <li><a href="/counter/biz"><span class="glyphicon glyphicon-stats"></span> 业务</a></li>
+                        <li><a href="/counter/lesson"><span class="glyphicon glyphicon-edit"></span> 考务</a></li>
                     </ul>
                 </li>
                 @if(isset($auth) && $auth->admin())

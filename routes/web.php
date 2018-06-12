@@ -113,13 +113,16 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/filter/download/excel', 'FilterController@filterToExcel');
 
     // 统计
+    Route::get('/counter/set/{date}', 'CounterController@set');
+
     Route::get('/counter/finance', 'CounterController@finance');
     Route::get('/counter/finance/{id}', 'CounterController@financeShow');
-    Route::get('/counter/finance/set/{date}', 'CounterController@set');
     Route::get('/counter/finance/download/excel/{key}', 'CounterController@getExcel');
-    Route::get('/counter/biz/download/excel', 'CounterController@bizExcel');
+    Route::get('/counter/lesson/download/excel', 'CounterController@lessonExcel');
+    Route::get('/counter/lesson', 'CounterController@lesson');
 
     Route::get('/counter/biz', 'CounterController@biz');
+    Route::get('/counter/biz/download/excel', 'CounterController@bizExcel');
 
 });
 

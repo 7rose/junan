@@ -142,7 +142,8 @@ class FinanceController extends Controller
         $all['in'] =  $all['in'] == 1 ? true :false; 
 
         $all['created_by'] = Session::get('id');
-        $all['date'] = strtotime($all['date']);
+        $all['date'] = time();
+        // $all['date'] = strtotime($all['date']);
 
         $id = Finance::create($all);
         return redirect('/customer/'.$all['customer_id']);
