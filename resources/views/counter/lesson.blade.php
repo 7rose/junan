@@ -105,6 +105,7 @@
             </table>
         <div style="text-align:center;">{{ $records->links() }}</div>
         @else
+            <div style="height: 20px"></div>
             <div class="alert alert-warning">无记录</div>
         @endif
 
