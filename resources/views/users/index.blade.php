@@ -40,6 +40,7 @@
                 <th>手机</th>
                 <th>机构</th>
                 <th>类型</th>
+                <th>创建日期</th>
             </tr>
         </thead>
         <tbody>
@@ -53,7 +54,8 @@
                 <td>{!! '<a class="btn btn-xs btn-block btn-'.$auth->authColor($record->auth_type).'" href="/user/'.$record->id.'">'. $seek->seekLabel('user_seek_array', 'key', $record->name).'</a>' !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->mobile) !!}</td>
                 <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->branch_text) !!}</td>
-                <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->user_type_text) !!}</td>   
+                <td>{!! $seek->seekLabel('user_seek_array', 'key', $record->user_type_text) !!}</td>
+                <td>{{ $record->created_at ? $record->created_at : '-' }}</td>   
             </tr>
             @endforeach
         </tbody>

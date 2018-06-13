@@ -36,12 +36,12 @@
         </caption>
         <thead>
             <tr>
-                <th>#</th>
                 <th>姓名</th>
                 <th>手机</th>
                 <th>出生日期</th>
                 <th>身份证</th>
                 <th>身份证地址</th>
+                <th>创建日期</th>
                 <th>财务</th>
                 <th>业务</th>
             </tr>
@@ -49,12 +49,12 @@
         <tbody>
             @foreach($records as $record)
             <tr class="{{ $record->finance_info > 0 ? 'warning' : 'default' }}">
-                <td>{{ $record->id }}</td>
                 <td><a class="btn btn-xs btn-block btn-{{ $record->finance_info > 0 ? 'warning' : 'default' }}"  href="/customer/{{ $record->id }}" >{!! $seek->seekLabel('seek_array', 'key', $record->name) !!}</a></td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->mobile) !!}</td>
                 <td>{{ $date->birthdayFromId($record->id_number)}}&nbsp&nbsp<span class="label label-{{ $record->gender == 2 ? 'danger' : 'default' }}">{{ $date->ageFromId($record->id_number) }}</span></td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->id_number) !!}</td>
                 <td>{!! $seek->seekLabel('seek_array', 'key', $record->address) !!}</td>
+                <td>{{ $record->created_at }}</td>
                 <td>{!! '¥'.$seek->seekLabel('seek_array', 'key', $record->finance_info) !!}</td>
                
                 <td id="claim_msg{{ $record->id }}">{!! $pre->customerBranch($record) !!}</td>
@@ -105,7 +105,7 @@
 <script>
     function claim(id, name)
     {
-        var msg = "您正在认领序列号为"+id+"的学员, 此操作无法自行撤销, 只能申请管理员进行重新调配!!"
+        var msg = "您确定认领这个学员吗?此操作无法自行撤销, 只能申请管理员进行重新调配!!"
         $("#modal-msg").html(msg);
 
         var close_btn = '<button type=\"button\" class=\"btn btn-sm btn-default\" data-dismiss=\"modal\">关闭</button>';

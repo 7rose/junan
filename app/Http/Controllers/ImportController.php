@@ -153,8 +153,12 @@ class ImportController extends Controller
             $ok_list[$i]['password'] = bcrypt($next.$next);
             $next = $validate->nextWorkId($next);
         }
+        if(count($ok_list)) {
+            foreach ($ok_list as $key) {
+                User::create($key);
+            }
+        }
 
-        User::insert($ok_list);
         if(Session::has('ok_list')) Session::forget('ok_list');
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'Excel导入已成功!']);
     }
@@ -226,6 +230,7 @@ class ImportController extends Controller
                 'address'=>$item['address'],
                 'gender'=>$item['gender'] == '女' ? 2 : 1,
                 'created_by'=>Session::get('id'),
+                // 'created_at'=>time(),
                 // 'date'=>time(),
             ];
 
@@ -286,7 +291,11 @@ class ImportController extends Controller
         if(Session::has('update_customer_list')) Session::forget('update_customer_list');
         if(Session::has('class_info')) Session::forget('class_info');
 
-        if(count($new_customer_list)) Customer::insert($new_customer_list);
+        if(count($new_customer_list)) {
+            foreach ($new_customer_list as $key) {
+                Customer::create($key);
+            }
+        }
 
         // 更新客户地址和姓名字段
         if(count($update_customer_list)){
