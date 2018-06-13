@@ -48,7 +48,7 @@
 
     // 添加按钮
     function add_btn() {
-        var btn = "<a class=\"btn btn-info btn-sm\" href=\"javascript:open()\">选择</a>";
+        var btn = "  <a class=\"btn btn-info btn-sm\" href=\"javascript:open()\">选择</a>";
         $("#user_id_selector").append(btn);
     }
 
