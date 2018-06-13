@@ -29,6 +29,7 @@ class BizForm extends Form
         //     'label' => '报名日期',
         //     'rules' => 'required'
         // ])
+        
         ->add('price', 'number', [
                 'label' => '应收款',
                 'attr' =>['step' => 0.01],
@@ -37,6 +38,10 @@ class BizForm extends Form
         ->add('real_price', 'number', [
                 'label' => '实收款',
                 'attr' =>['step' => 0.01],
+                'rules' => 'required'
+        ])
+        ->add('ticket_no', 'number', [
+                'label' => '票据号',
                 'rules' => 'required'
         ]);
 

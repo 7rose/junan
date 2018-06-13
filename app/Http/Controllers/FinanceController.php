@@ -143,6 +143,9 @@ class FinanceController extends Controller
 
         $all['created_by'] = Session::get('id');
         $all['date'] = time();
+        $all['checked'] = true;
+        $all['checked_by'] = Session::get('id');
+        $all['checked_by_time'] = time();
         // $all['date'] = strtotime($all['date']);
 
         $id = Finance::create($all);
@@ -156,7 +159,8 @@ class FinanceController extends Controller
         $id = $request->input('id');
         // 授权
         $auth = new Auth;
-        if(!$auth->user() && !$auth->finance())  return "无权操作";
+        // if(!$auth->user() && !$auth->finance())  return "无权操作";
+        if(!$auth->user())  return "无权操作";
 
         $target = Finance::find($id)->update(['checked' => true, 'checked_by'=>Session::get('id'), 'checked_by_time'=>time(), 'ticket_no'=>$ticket_no]);
         // return redirect('/finance');

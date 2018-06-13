@@ -55,6 +55,10 @@ class FinanceForm extends Form
                     'attr' =>['step' => 0.01],
                     'rules' => 'required'
             ])
+            ->add('ticket_no', 'number', [
+                'label' => '票据号',
+                'rules' => 'required'
+            ])
             ->add('user_id', 'text', [
                 'label' => '推荐人工号或手机号',
                 'rules' => 'min:2|max:16'

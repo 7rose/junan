@@ -46,6 +46,12 @@ class BizController extends Controller
         $all['date'] =  time();
         // $all['date'] =  strtotime($all['date']);
         $all['created_by'] = Session::get('id');
+        
+        // $all['checked_by_time'] = time();
+
+
+
+        // 'checked' => true, 'checked_by'=>Session::get('id'), 'checked_by_time'=>time(), 'ticket_no'=>$ticket_no
 
         // 财务表
         // 推荐人
@@ -61,16 +67,19 @@ class BizController extends Controller
 
         $finance = array_except($all, ['licence_type', 'class_type']);
         $finance['item'] =  27;
+        $finance['checked'] = true;
+        $finance['checked_by'] = Session::get('id');
+        $finance['checked_by_time'] = time();
         Finance::create($finance);
          // 存储业务表
-        $biz = array_except($all, ['price', 'real_price', 'user_id']);
+        $biz = array_except($all, ['price', 'real_price', 'user_id', 'ticket_no']);
         Biz::create($biz);
 
         return redirect('/customer/'.$all['customer_id']);
     }
 
 
-    // 认领
+    // 认领 
     public function claim (Request $request)
     {
         $auth = new Auth;
