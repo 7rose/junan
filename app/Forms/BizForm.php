@@ -63,7 +63,7 @@ class BizForm extends Form
             'label' => '推荐人工号',
             'label_attr' => ['id' => 'user_id_selector'],
             'attr' =>['readonly' => 'readonly', 'id'=>'user_id'],
-            'rules' => 'min:2|max:16'
+            'rules' => 'required|min:2|max:16'
         ])
         ->add('customer_id', 'hidden', ['value' => $list->idFromUrl()])
         ->add('submit','submit',[

@@ -44,18 +44,11 @@
     $(document).ready(function(){
       add_btn();
       pre();
-
-     //  $("#key_val").keydown(function(event) {  
-     //     if (event.keyCode == 13) { 
-     //         find();
-     //     }  
-     // })
-      // alert('FUCK');
     })
 
     // 添加按钮
     function add_btn() {
-        var btn = "<button class=\"btn btn-info btn-sm\" data-toggle=\"modal\" data-target=\"#myModal\">选择</button>";
+        var btn = "<a class=\"btn btn-info btn-sm\" href=\"javascript:open()\">选择</a>";
         $("#user_id_selector").append(btn);
     }
 
@@ -63,6 +56,11 @@
     function pre() {
         var input = "<input type=\"text\" class=\"form-control\" id=\"key_val\" placeholder=\"请输入工号,手机号,姓名..\">";
         $("#modal_input").html(input);
+    }
+
+    // 打开
+    function open() {
+        $('#myModal').modal();
     }
 
     // 选择器
@@ -112,7 +110,7 @@
     // 设定
     function set(work_id) {
         $("#user_id").val(work_id);
-        $('#myModal').modal('hide')
+        $('#myModal').modal('hide');
     }
 
 </script>

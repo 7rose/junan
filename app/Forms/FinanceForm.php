@@ -63,7 +63,7 @@ class FinanceForm extends Form
                 'label' => '推荐人工号',
                 'label_attr' => ['id' => 'user_id_selector'],
                 'attr' =>['readonly' => 'readonly', 'id'=>'user_id'],
-                'rules' => 'min:2|max:16'
+                'rules' => 'required'
             ])
             // ->add('user_id', 'text', [
             //     'label' => '推荐人工号或手机号',
