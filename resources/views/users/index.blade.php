@@ -18,15 +18,20 @@
     </ul>
     <div id="myTabContent" class="tab-content">
     <div class="tab-pane fade in active" id="list">
-        @if(count($records))
-        <table class="table table-hover">
-        <caption>
-            <a href="/user/create" class="btn btn-sm btn-default">+ 新成员</a>&nbsp&nbsp
+        <div style="height: 20px"></div>
+        <a href="/user/create" class="btn btn-sm btn-default">+ 新成员</a>&nbsp&nbsp
+
+            @if(count(records))
             <a href="/user/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-th-list"></span>&nbsp&nbsp导出excel</a>&nbsp&nbsp
+            @endif
 
             @if($seek->seeking('user_seek_array', 'key') || $seek->seeking('user_seek_array', 'branch'))
                 <a href="/user/seek/reset" class="btn btn-sm btn-warning">重置查询条件</a>&nbsp&nbsp
             @endif
+        @if(count($records))
+        <table class="table table-hover">
+        <caption>
+            
         </caption>
         <thead>
             <tr>
