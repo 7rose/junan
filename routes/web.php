@@ -51,6 +51,9 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/user/download/excel', 'UserController@seekToExcel');
     Route::get('/branch/set/{id}', 'UserController@setBranch');
 
+    Route::post('/user/ajax/selector', 'UserController@selector');
+
+
     // 业务
     Route::post('/biz/claim', 'BizController@claim');
     Route::get('/customer/biz/{id?}', 'BizController@create');
@@ -126,11 +129,6 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 });
 
-
-Route::get('/test', function() {
-    $a = new App\Helpers\Date;
-    $a->dateRange('today');
-});
 
 
 

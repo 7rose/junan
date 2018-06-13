@@ -119,7 +119,7 @@ class FinanceController extends Controller
         $title = '收付款 - '.$record->name;
         $icon = 'credit-card';
 
-        return view('form', compact('form'))->with('custom',['title'=>$title, 'icon'=>$icon]);
+        return view('form_with_selector', compact('form'))->with('custom',['title'=>$title, 'icon'=>$icon]);
     }
 
     // 存储

@@ -27,6 +27,7 @@ class UserController extends Controller
     use FormBuilderTrait;
 
     private $auth;
+    private $ajax_key;
 
     private function prepare() 
     {
@@ -445,6 +446,29 @@ class UserController extends Controller
     public function doc()
     {
         return view('users.doc');
+    }
+
+    // ajax 选择器
+    public function selector(Request $request)
+    {
+        // $key = $request->input('key');
+        // $key = 10;
+        $this->ajax_key = $request->input('key');
+
+        $json = User::select('name', 'work_id', 'mobile')
+                    ->where(function ($query) {
+                            // 分支机构限制
+                            // if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
+                            //     $query->Where('branch', $this->auth->branchLimitId());
+                            // }
+                            $query->Where('work_id', 'LIKE', '%'.$this->ajax_key.'%');
+                            $query->orWhere('name', 'LIKE', '%'.$this->ajax_key.'%');
+                            $query->orWhere('mobile', 'LIKE', '%'.$this->ajax_key.'%');
+                        })
+                    ->get()
+                    ->toJson();
+
+        return $json;
     }
 
     // end

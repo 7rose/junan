@@ -18,6 +18,7 @@ class BizForm extends Form
             'label' => '证照类型', 
             'empty_value' => '-- 选择 --',
             'choices'=> $list->getBizList($list->idFromUrl()),
+            'rules' => 'required'
         ])
         ->add('class_type', 'choice', [
             'label' => '班类型', 
@@ -58,9 +59,10 @@ class BizForm extends Form
             'rules' => 'required'
         ]);
     }
-
         $this->add('user_id', 'text', [
-            'label' => '推荐人工号或手机号',
+            'label' => '推荐人工号',
+            'label_attr' => ['id' => 'user_id_selector'],
+            'attr' =>['readonly' => 'readonly', 'id'=>'user_id'],
             'rules' => 'min:2|max:16'
         ])
         ->add('customer_id', 'hidden', ['value' => $list->idFromUrl()])
