@@ -220,7 +220,7 @@ class FinanceController extends Controller
             ['收付', '驾校', '学员', '学员电话', '应收/付', '实收付', '日期', '经手人', '推荐人'],
         ];
 
-        $this->prepare()
+        $records = $this->prepare()
                 ->where('abandon', false)
                 ->orderBy('finance.date')
                 ->get();
