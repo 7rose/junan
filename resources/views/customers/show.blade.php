@@ -33,7 +33,9 @@
         </div>
         @endif
          <a href="/customer/biz/{{ $record->id }}" class="btn btn-success btn-sm">+ 新业务</a>&nbsp
+         @if(isset($biz) && count($biz))
         <a href="/finance/create/{{ $record->id }}" class="btn btn-warning btn-sm">$ 收付款</a>
+        @endif
         @if($auth->admin())
             <a href="/customer/edit/{{ $record->id }}" class="btn btn-danger btn-sm">修改</a>&nbsp
         @endif
