@@ -22,20 +22,20 @@
                     </button>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                         <li role="presentation">
-                            <a role="menuitem" tabindex="-1" href="/counter/set/today">今天 - {{ $carbon->now()->day }}日</a>
+                            <a role="menuitem" tabindex="-1" href="/counter/set/today-finance">今天 - {{ $carbon->now()->day }}日</a>
                         </li>
                         <li role="presentation">
-                            <a role="menuitem" tabindex="-1" href="/counter/set/week">本周</a>
+                            <a role="menuitem" tabindex="-1" href="/counter/set/week-finance">本周</a>
                         </li>
                         <li role="presentation">
-                            <a role="menuitem" tabindex="-1" href="/counter/set/month">本月 - {{ $carbon->now()->month }}月份</a>
+                            <a role="menuitem" tabindex="-1" href="/counter/set/month-finance">本月 - {{ $carbon->now()->month }}月份</a>
                         </li>
                         <li role="presentation">
-                            <a role="menuitem" tabindex="-1" href="/counter/set/year">本年度 - {{ $carbon->now()->year }}年</a>
+                            <a role="menuitem" tabindex="-1" href="/counter/set/year-finance">本年度 - {{ $carbon->now()->year }}年</a>
                         </li>
                         <li role="presentation" class="divider"></li>
                         <li role="presentation">
-                            <a role="menuitem" tabindex="-1" href="/counter/set/pre_month">上个月</a>
+                            <a role="menuitem" tabindex="-1" href="/counter/set/pre_month-finance">上个月</a>
                         </li>
 
                     </ul>

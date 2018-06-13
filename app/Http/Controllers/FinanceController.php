@@ -217,7 +217,7 @@ class FinanceController extends Controller
     public function seekToExcel()
     {
         $cellData = [
-            ['收付', '驾校', '学员', '学员电话', '应收/付', '实收付', '日期', '经手人', '推荐人'],
+            ['收付', '驾校', '学员', '学员电话', '项目', '应收/付', '实收付', '日期', '经手人', '推荐人'],
         ];
 
         $records = $this->prepare()
@@ -232,6 +232,7 @@ class FinanceController extends Controller
                                         $record->branch_text, 
                                         $record->customer_id_text, 
                                         $record->customer_mobile, 
+                                        $record->item_text, 
                                         $record->price,$record->real_price,
                                         date('Y-m-d', $record->date),
                                         $record->created_by_text,

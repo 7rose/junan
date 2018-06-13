@@ -116,16 +116,21 @@ class CounterController extends Controller
     }
 
     // 按月和按年统计
-    public function set($date)
+    public function set($string)
     {
         $d = new Date;
+        $str = explode('-', $string);
+
+        $date = $str[0];
+        $path = isset($str[1]) && $str[1] == 'biz' ? '/counter/biz' : '/counter/finance';
+
         $range = $d->dateRange($date);
 
         if($range) Session::put('date_range', $range);
 
-        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'统计周期已成功切换!']);
+        // return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'统计周期已成功切换!']);
 
-        // return redirect('/counter/finance');
+        return redirect($path);
     }
 
     // 下载excel
