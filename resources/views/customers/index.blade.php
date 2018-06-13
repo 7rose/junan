@@ -20,7 +20,7 @@
     </ul>
     <div id="myTabContent" class="tab-content">
     <div class="tab-pane fade in active" id="list">
-        @if(isset($records) && count($records))
+        @if(isset($records))
         <table class="table table-hover">
         <caption>
             <a href="/customer/create" class="btn btn-sm btn-default">+ 新学员</a>&nbsp&nbsp
@@ -30,6 +30,7 @@
             @endif
 
         </caption>
+            @if(count($records))
         <thead>
             <tr>
                 <th>#</th>
@@ -57,13 +58,17 @@
             </tr>
             @endforeach
         </tbody>
-        </table>
-            <div style="text-align:center;">{{ $records->links() }}</div>
         @else
-            <!-- 顶部间距 -->
+        <!-- 顶部间距 -->
             <div style="height: 20px"></div>
             <div class="alert alert-warning"><strong>无记录:</strong> 数据库尚无记录, 或者是没有符合查询条件记录.&nbsp&nbsp
                 <a href="/customer/seek/reset" class="btn btn-sm btn-warning">重置查询条件</a></div>
+        @endif
+        
+        </table>
+            <div style="text-align:center;">{{ $records->links() }}</div>
+        
+            
         @endif
     </div>
     <div class="tab-pane" id="seek">
