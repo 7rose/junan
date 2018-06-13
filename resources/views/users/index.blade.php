@@ -21,7 +21,7 @@
         <div style="height: 20px"></div>
         <a href="/user/create" class="btn btn-sm btn-default">+ 新成员</a>&nbsp&nbsp
 
-            @if(count(records))
+            @if(count($records))
             <a href="/user/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-th-list"></span>&nbsp&nbsp导出excel</a>&nbsp&nbsp
             @endif
 
