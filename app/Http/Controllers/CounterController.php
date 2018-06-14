@@ -188,6 +188,7 @@ class CounterController extends Controller
                         ->leftJoin('biz', 'lessons.biz_id', '=', 'biz.id')
                         ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
                         ->where('lessons.order_date', '>', 0) 
+                        ->where('biz.branch', '>', 1) 
                         ->select(
                             'lessons.id',
                             'lessons.lesson',
@@ -335,7 +336,7 @@ class CounterController extends Controller
     public function biz()
     {
         $records = $this->bizPre()
-                        ->whereNotNull('biz.branch')
+                        ->where('biz.branch', '>', 1) 
                         ->whereNotNull('biz.licence_type')
                         ->groupBy('biz.branch')
                         ->groupBy('biz.licence_type')

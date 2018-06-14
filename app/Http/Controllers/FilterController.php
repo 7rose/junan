@@ -81,7 +81,7 @@ class FilterController extends Controller
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->where('biz.next', '1.0'); 
                                             
                 return $next;
@@ -91,7 +91,7 @@ class FilterController extends Controller
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->where('biz.next', '1.1'); 
                                             
                 return $next;
@@ -106,7 +106,7 @@ class FilterController extends Controller
                 $fail = $this->prepare()
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->where('lessons.lesson', 1)
                             ->where('lessons.end', false)   
                             ->where('lessons.doing', false);
@@ -118,7 +118,7 @@ class FilterController extends Controller
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
                             ->where('biz.next2', '2.0'); 
@@ -130,7 +130,7 @@ class FilterController extends Controller
                  $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
                             ->where('biz.next2', '2.1'); 
@@ -144,7 +144,7 @@ class FilterController extends Controller
                             ->where('biz.next2', '2.0')
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.user_id')
                             ->where('lessons.lesson', 2)
                             ->where('lessons.end', false)   
@@ -156,7 +156,7 @@ class FilterController extends Controller
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
                             ->where('biz.next3', '3.0'); 
@@ -168,7 +168,7 @@ class FilterController extends Controller
                  $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
                             ->where('biz.next3', '3.1'); 
@@ -187,7 +187,7 @@ class FilterController extends Controller
                             ->where('biz.next3', '3.0')
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.user_id')
                             ->where('lessons.lesson', 3)
                             ->where('lessons.end', false)   
@@ -200,7 +200,7 @@ class FilterController extends Controller
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->where('biz.next', '4.0'); 
                                             
                 return $next;
@@ -210,7 +210,7 @@ class FilterController extends Controller
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->where('biz.next', '4.1'); 
                                             
                 return $next;
@@ -226,7 +226,7 @@ class FilterController extends Controller
                             ->where('biz.next', '4.0')
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
-                            ->whereNotNull('biz.branch')
+                            ->where('biz.branch', '>', 1)
                             ->where('lessons.lesson', 4)
                             ->where('lessons.end', false)   
                             ->where('lessons.doing', false);

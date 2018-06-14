@@ -106,6 +106,34 @@ class Pre
         }
     }
 
+    // 获取驾校信息
+    public function getBiz($record)
+    {
+        $array_branch = explode(',', $record->biz_branch);
+        $array_branch_text = explode(',', $record->biz_branch_text);
+        $array_licence_type_text = explode(',', $record->licence_type_text);
+
+        if(!count($array_licence_type_text)) return '<span class="label label-default">无业务</span>';
+
+        $text = '';
+
+        for ($i=0; $i < count($array_licence_type_text); $i++) { 
+            if(intval($array_branch[$i]) > 1){
+                $color = $record->biz_user_id ? 'success' : 'warning';
+                $text .= '<span class="label label-'.$color.'">'.explode(':', $array_licence_type_text[$i])[0].':'.explode('(', $array_branch_text[$i])[0].'</span>';
+            }else{
+                $auth = new Auth;
+                if($auth->branchLimit()){
+                    $text .= '<button onClick="javascript:claim('.$record->id.')" class="btn btn-xs btn-danger">'.explode(':', $array_licence_type_text[$i])[0].' - 本校认领'.'</button>';
+                }else{
+                    $text .= '<span class="label label-danger">'.explode(':', $array_licence_type_text[$i])[0].' - 无驾校!'.'</span>';
+                }
+            }
+        }
+
+        return $text;
+    }
+
     // 驾校认领
     public function customerBranch($record)
     {

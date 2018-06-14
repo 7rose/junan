@@ -21,7 +21,7 @@ class CreateBizTable extends Migration
             $table->integer('date')->default(0); // 报名日期
             $table->integer('class_id')->nullable(); // 交管局开班档案号
             $table->integer('file_id')->nullable(); // 交管局开班档案号
-            $table->integer('branch')->nullable(); // 报名日期
+            $table->integer('branch')->default(1); // 分支机构, 默认军安集团
             $table->integer('ad_user_id')->nullable(); // 推荐人
             $table->integer('user_id')->nullable(); // 教练
             $table->integer('created_by')->nullable(); // 创建人
@@ -47,4 +47,5 @@ class CreateBizTable extends Migration
         Schema::dropIfExists('biz');
     }
 }
+
 

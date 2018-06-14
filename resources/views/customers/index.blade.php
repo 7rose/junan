@@ -57,7 +57,7 @@
                 <td>{{ $record->created_at }}</td>
                 <td>{!! '¥'.$seek->seekLabel('seek_array', 'key', $record->finance_info) !!}</td>
                
-                <td id="claim_msg{{ $record->id }}">{!! $pre->customerBranch($record) !!}</td>
+                <td id="claim_msg{{ $record->id }}">{!! $pre->getBiz($record) !!}</td>
             </tr>
             @endforeach
         </tbody>

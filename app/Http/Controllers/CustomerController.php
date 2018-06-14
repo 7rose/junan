@@ -47,6 +47,7 @@ class CustomerController extends Controller
                      DB::raw('
                         group_concat(biz.branch) as biz_branch, 
                         group_concat(biz.user_id) as biz_user_id, 
+                        group_concat(biz.licence_type) as licence_type, 
                         group_concat(bc.text) as licence_type_text, 
                         group_concat(branches.text) as biz_branch_text
                         '))
@@ -67,7 +68,7 @@ class CustomerController extends Controller
                     $query->where('biz.branch', $this->auth->branchLimitId());
                     // $query->where('biz.finished', false);
                     // $query->orWhere('finance.branch', '=', $this->auth->branchLimitId());
-                    if(!Session::has('seek_array')) $query->orWhere('biz.branch', null); # 认领
+                    if(!Session::has('seek_array')) $query->orWhere('biz.branch', 1); # 认领
                 }
                 
             });
@@ -84,10 +85,10 @@ class CustomerController extends Controller
         ]);
 
         $records = $this->prepare()
+                        ->groupBy('customers.id')
                         ->orderBy('biz.branch')
                         // ->orderBy('customers.finance_info', 'desc')
                         ->orderBy('customers.created_at', 'desc')
-                        ->groupBy('customers.id')
                         ->paginate(50);
         // Session::put('customer_list', $records);
 
@@ -196,7 +197,7 @@ class CustomerController extends Controller
                                     ')
                         )
                     // ->orderBy('lessons.pass')
-                    ->groupBy('lessons.biz_id')
+                    ->groupBy('biz.id')
                     ->orderByRaw('lessons.lesson - lessons.lesson DESC')
                     ->orderBy('lessons.lesson', 'desc')
                     // ->orderBy('lessons.lesson')

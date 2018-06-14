@@ -49,11 +49,9 @@ class BizController extends Controller
         
         // $all['checked_by_time'] = time();
 
-
-
-        // 'checked' => true, 'checked_by'=>Session::get('id'), 'checked_by_time'=>time(), 'ticket_no'=>$ticket_no
-
         // 财务表
+        // 推荐人机构
+        $count_branch = 0;
         // 推荐人
         if($all['user_id'] != '' || $all['user_id'] != null){
             $exists = User::where('work_id', $all['user_id'])->orWhere('mobile', $all['user_id'])->first();
@@ -62,6 +60,7 @@ class BizController extends Controller
                 return redirect()->back()->withErrors(['user_id'=>$message])->withInput();
             }else{
                 $all['user_id'] = $exists->id;
+                $count_branch = $exists->branch;
             }
         }
 
@@ -70,10 +69,15 @@ class BizController extends Controller
         $finance['checked'] = true;
         $finance['checked_by'] = Session::get('id');
         $finance['checked_by_time'] = time();
+
+        // 若有推荐人, 则财务记录归属推荐人所在机构
+        if($count_branch != 0) $finance['branch'] = $count_branch;
+
         Finance::create($finance);
          // 存储业务表
         $biz = array_except($all, ['price', 'real_price', 'user_id', 'ticket_no']);
         Biz::create($biz);
+        // print_r($biz);
 
         return redirect('/customer/'.$all['customer_id']);
     }

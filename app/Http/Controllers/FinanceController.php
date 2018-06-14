@@ -136,6 +136,9 @@ class FinanceController extends Controller
                 return redirect()->back()->withErrors(['user_id'=>$message])->withInput();
             }else{
                 $all['user_id'] = $exists->id;
+
+                // 若有推荐人, 则财务记录归属推荐人所在机构
+                $all['branch'] = $exists->branch;
             }
         }
 
