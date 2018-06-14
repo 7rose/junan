@@ -45,6 +45,11 @@
       add_btn();
       pre();
     })
+    function enter_down(){   
+      if(event.keyCode == 13){   
+        find();
+      }   
+    }
 
     // 添加按钮
     function add_btn() {
@@ -54,7 +59,7 @@
 
     // 准备
     function pre() {
-        var input = "<input type=\"text\" class=\"form-control\" id=\"key_val\" placeholder=\"请输入工号,手机号,姓名..\">";
+        var input = "<input onkeydown=\"enter_down()\" type=\"text\" class=\"form-control\" id=\"key_val\" placeholder=\"请输入工号,手机号,姓名..\">";
         $("#modal_input").html(input);
     }
 
