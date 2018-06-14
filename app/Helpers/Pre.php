@@ -203,7 +203,7 @@ class Pre
     // 教练列表
     private function userList($branch, $text, $id)
     {
-        if(!$branch) return '';
+        if(!$branch || $branch == 1) return '';
 
         $teacher_id = 49;
         $teachers = DB::table('users')->where('branch', $branch)->where('user_type', $teacher_id)->get();
