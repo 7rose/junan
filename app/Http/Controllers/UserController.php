@@ -73,9 +73,10 @@ class UserController extends Controller
         ]);
 
         $records = $this->prepare()
+                    ->orderBy('users.branch')
                     ->orderBy('users.user_type')
                     ->orderBy('users.work_id')
-                    // ->orderBy('users.auth_type')
+                    ->orderBy('users.auth_type')
                     // ->orderBy('users.created_at', 'desc')
                     ->paginate(40);
 

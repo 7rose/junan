@@ -283,7 +283,6 @@ class CounterController extends Controller
 
         $file_name = '考务统计'.date('Y-m-d', time());
 
-
         Excel::create($file_name,function($excel) use ($cellData, $cellData2){
             $excel->sheet('各驾校', function($sheet) use ($cellData){
                 $sheet->rows($cellData);
@@ -353,7 +352,6 @@ class CounterController extends Controller
     // 下载excel
     public function bizExcel()
     {
-
         $error = new Error;
         if(!Session::has('counter_biz')) return $error->paramLost();
 
@@ -379,7 +377,6 @@ class CounterController extends Controller
 
         $file_name = '业务统计'.date('Y-m-d', time());
 
-
         Excel::create($file_name,function($excel) use ($cellData){
             $excel->sheet('各驾校', function($sheet) use ($cellData){
                 $sheet->rows($cellData);
@@ -388,6 +385,7 @@ class CounterController extends Controller
             });
         })->export('xlsx');
     }
+
 }
 
 
