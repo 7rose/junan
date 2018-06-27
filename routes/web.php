@@ -22,6 +22,14 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/doc', function() {
         return view('users.doc');
     });
+
+    // 系统参数
+    Route::get('/config/{key}', 'ConfigController@index');
+    Route::get('/config/set/{key}', 'ConfigController@set');
+    Route::post('/config/add/post', 'ConfigController@add');
+    // Route::get('/config/finance_item', 'ConfigController@finance_item');
+    // Route::get('/config/lesson_fall_item', 'ConfigController@lesson_fall_item');
+
     // 学员
     Route::get('/customer', 'CustomerController@index');
     Route::get('/customer/create', 'CustomerController@create');

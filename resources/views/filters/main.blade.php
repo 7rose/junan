@@ -186,15 +186,13 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
             <div class="modal-body">
                 <ol>
                     <li>注意: 批处理操作无法被批量撤销, 只能由管理员手工逐条处理, 务必谨慎操作!!</li>
-                    <li>若需批处理除标记记录以外的其他记录, 请选择"批处理: 排除法"</li>
-                    <li>若只需批处理标记的记录, 请选择"批处理: 仅标记"</li>
                 </ol>
                 
             </div>
             <div class="modal-footer">
                 <button class="btn btn-sm btn-default" data-dismiss="modal">关闭</button>
-                <a href="/filter/ex1/{{ $part->actionFromUrl() }}" class="btn btn-sm btn-danger">批处理: 排除法</a>
-                <a href="/filter/ex2/{{ $part->actionFromUrl() }}" class="btn btn-sm btn-warning">批处理: 仅标记</a>
+                <a href="/filter/ex1/{{ $part->actionFromUrl() }}" class="btn btn-sm btn-danger">未标记的处理, 标记的忽略</a>
+                <a href="/filter/ex2/{{ $part->actionFromUrl() }}" class="btn btn-sm btn-warning">标记的处理, 未标记的忽略</a>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal -->

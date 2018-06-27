@@ -4,6 +4,7 @@
     if(Session::has('id')) {
         $auth = new App\Helpers\Auth;
         $pre = new App\Helpers\Pre;
+        $conf = new App\Helpers\Config;
 
         $id = Session::get('id');
         $record = DB::table('users')
@@ -14,6 +15,12 @@
         if(!$record){
             Session::flush();
             return redirect('/');
+        }
+
+        $config = '';
+
+        if($auth->root()) {
+            $config = $conf->confMenu();
         }
         
         $me = '<li class="dropdown">
@@ -58,21 +65,7 @@
         </div>
         <div class="collapse navbar-collapse pull-right" id="example-navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="{{ $seek->navClick('customer') ? 'active' : '' }}"><a href="/customer">学员</a></li>
-                <li class="{{ $seek->navClick('user') ? 'active' : '' }}"><a href="/user">成员</a></li>
-                <li class="{{ $seek->navClick('finance') ? 'active' : '' }}"><a href="/finance">财务</a></li>
-                <li class="{{ $seek->navClick('filter') ? 'active' : '' }}"><a href="/filter">考务</a></li>
-
-                <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        统计 <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="/counter/finance"><span class="glyphicon glyphicon-usd"></span> 财务</a></li>
-                        <li><a href="/counter/biz"><span class="glyphicon glyphicon-stats"></span> 业务</a></li>
-                        <li><a href="/counter/lesson"><span class="glyphicon glyphicon-edit"></span> 考务</a></li>
-                    </ul>
-                </li>
+                
                 @if(isset($auth) && $auth->admin())
                     <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -81,6 +74,16 @@
                         <ul class="dropdown-menu">
                             <li><a href="/import/user"><span class="glyphicon glyphicon-user"></span> 成员</a></li>
                             <li><a href="/import/class"><span class="glyphicon glyphicon-list-alt"></span> 开班花名册</a></li>
+                        </ul>
+                    </li>
+                @endif
+                @if(isset($auth) && $auth->root())
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            系统参数 <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            {!! $conf->confMenu() !!}
                         </ul>
                     </li>
                 @endif
@@ -94,13 +97,57 @@
         </div>
     </nav>
     <!-- 顶部间距 -->
-    <div style="height: 70px"></div>
+    <div style="height: 50px"></div>
 
     <!-- 全屏 -->
     @yield('content')
+    <div id="side_nav" class="container col-sm-1 side_nav_hight">
+        <div class="wel-grid text-center side_ico">
+            <a href="/customer">
+              <img src="{{ URL::asset('images/ico/customer.svg') }}" class="img-circle panel-icon">
+            </a>
+              <h5>学员</h5>
+        </div>
 
+        <div class="wel-grid text-center side_ico">
+            <a href="/user">
+              <img src="{{ URL::asset('images/ico/user.svg') }}" class="img-circle panel-icon">
+            </a>
+              <h5>成员</h5>
+        </div>
+
+        <div class="wel-grid text-center side_ico">
+            <a href="/finance">
+              <img src="{{ URL::asset('images/ico/finance.svg') }}" class="img-circle panel-icon">
+            </a>
+              <h5>财务</h5>
+        </div>
+
+        <div class="wel-grid text-center side_ico">
+            <a href="/filter">
+              <img src="{{ URL::asset('images/ico/filter.svg') }}" class="img-circle panel-icon">
+            </a>
+              <h5>考务</h5>
+        </div>
+
+        <div class="wel-grid text-center side_ico">
+            <div class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <img src="{{ URL::asset('images/ico/counter.svg') }}" class="img-circle panel-icon">
+                        <ul class="dropdown-menu go_right">
+                            <li><a href="/counter/finance"><span class="glyphicon glyphicon-usd"></span> 财务</a></li>
+                            <li><a href="/counter/biz"><span class="glyphicon glyphicon-stats"></span> 业务</a></li>
+                            <li><a href="/counter/lesson"><span class="glyphicon glyphicon-edit"></span> 考务</a></li>
+                        </ul>
+                </a>
+            </div>
+              <h5>统计</h5>
+        </div>
+
+    </div>
     <!-- 容器 -->
-    <div class="container">
+    <div class="container col-sm-11">
+        <div style="height: 15px"></div>
         @yield("container")
     </div>
 </body>

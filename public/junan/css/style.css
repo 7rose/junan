@@ -25,3 +25,27 @@
 .li-pad{
     padding-top: 5px;
 }
+
+#side_nav {
+    background: #f8f8f8;
+}
+
+.side_nav_hight {
+    height: 120%;
+}
+
+.panel-icon {
+  width: 70px;
+  height: 70px;
+  border: 0.5px solid #efefef;
+}
+
+.side_ico {
+    padding-top:15px;
+}
+
+.go_right {
+    margin-left:4px;
+    top: 0;
+    left:100%;
+}

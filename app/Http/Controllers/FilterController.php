@@ -583,7 +583,7 @@ class FilterController extends Controller
         }else{
             DB::table('biz')->whereIn('id', $array_resault)->update(['next' => $request->lesson.'.2']);
         }
-        // 清除选择
+        // 清除选择 
         $this->clearSelect();
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);

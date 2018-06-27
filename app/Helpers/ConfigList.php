@@ -17,7 +17,9 @@ class ConfigList
     // 配置类型
     public function getList($val)
     {
-        $records = Config::where('type', $val)->get();
+        $records = Config::where('type', $val)
+                    ->where('show', true)
+                    ->get();
         return $this->out($records);      
     }
 
