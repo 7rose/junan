@@ -102,7 +102,7 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
             </div>
             @if(count($records))
             <div class="btn-group left-cell">
-                <a href="/filter/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-save"></span> 导出Excel</a>
+                <a href="/filter/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-list"></span> 导出Excel</a>
             </div>
             @endif
         </div>
