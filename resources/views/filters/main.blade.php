@@ -19,7 +19,7 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
         <div class="alert alert-info">
             <div class="col-sm-3">
                 @if($part->actionFromUrl())
-                    <strong>{{ $part->actionText() ? $part->actionText() : $lesson_info }}</strong>
+                    <strong>{{ $part->actionText() ? $part->actionText() : $lesson_info }} : {{ count($records) }}人</strong>
                 @endif
             </div>
 
@@ -45,46 +45,70 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
             </form>
         </div>
 
-        <div class="dropdown pull-right">
-            
+        <div class="alert alert-default">
+            <div class="btn-group">
+                <a  class="btn  btn-sm btn-default dropdown-toggle" id="selector" 
+                        data-toggle="dropdown">
+                    科目1 <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="selector">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_1">具备预约条件的</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_1">提交预约申请的</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_1">不合格的</a></li>
+                </ul>
+            </div>
 
+            <div class="btn-group">
+                <a  class="btn  btn-sm btn-success dropdown-toggle" id="selector" 
+                        data-toggle="dropdown">
+                    科目 2 <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="selector">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_2">具备预约条件的</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_2">提交预约申请的</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_2">不合格的</a></li>
+                </ul>
+            </div>
+
+            <div class="btn-group">
+                <a  class="btn  btn-sm btn-warning dropdown-toggle" id="selector" 
+                        data-toggle="dropdown">
+                    科目 3 <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="selector">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_3">具备预约条件的</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_3">提交预约申请的</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_3">不合格的</a></li>
+                </ul>
+            </div>
+
+            <div class="btn-group">
+                <a  class="btn  btn-sm btn-danger dropdown-toggle" id="selector" 
+                        data-toggle="dropdown">
+                    科目 4 <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="selector">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_4">具备预约条件的</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_4">提交预约申请的</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_4">不合格的</a></li>
+                </ul>
+            </div>
+
+            <div class="btn-group left-cell">
+                <a  class="btn  btn-sm btn-info" href="/filter/no_class"> <span class="glyphicon glyphicon-ban-circle"></span> 未开班的</a>
+            </div>
+            <div class="btn-group">
+                <a  class="btn  btn-sm btn-primary" href="/counter/lesson"><span class="glyphicon glyphicon-edit"></span> 成绩和考务流水</a>
+            </div>
             @if(count($records))
-            <a href="/filter/download/excel" class="btn btn-sm btn-success">导出Excel</a>
+            <div class="btn-group left-cell">
+                <a href="/filter/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-save"></span> 导出Excel</a>
+            </div>
             @endif
-            
-            <button type="button" class="btn  btn-sm btn-info dropdown-toggle" id="selector" 
-                    data-toggle="dropdown">
-                筛选结果: 共{{ count($records) }}条记录<span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="selector">
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/no_class">未开班的</a></li>
-                <li role="presentation" class="divider"></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/counter/lesson"><span class="glyphicon glyphicon-edit"></span> 成绩处理和考务流水</a></li>
-                <li role="presentation" class="divider"></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_1">科目1: 具备预约条件的</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_1">科目1: 提交预约申请的</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_1">科目1: 不合格的</a></li>
-                <li role="presentation" class="divider"></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_2">科目2: 具备预约条件的</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_2">科目2: 提交预约申请的</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_2">科目2: 不合格的</a></li>
-                <li role="presentation" class="divider"></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_3">科目3: 具备预约条件的</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_3">科目3: 提交预约申请的</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_3">科目3: 不合格的</a></li>
-                <li role="presentation" class="divider"></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_4">科目4: 具备预约条件的</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_4">科目4: 提交预约申请的</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_4">科目4: 不合格的</a></li>
-            </ul>
         </div>
-        {{-- 下拉列表 --}}
         
     @if(count($records))
         <table class="table table-hover">
-            <caption>
-                
-            </caption>
             <thead>
                 <tr>
                     <th>姓名</th>
