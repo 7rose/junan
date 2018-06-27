@@ -396,7 +396,7 @@ class UserController extends Controller
     public function seekToExcel()
     {
         $cellData = [
-            ['工号', '姓名', '手机', '备注'],
+            ['工号', '驾校', '姓名', '手机', '备注'],
         ];
 
         $records = $this->prepare()
@@ -408,6 +408,7 @@ class UserController extends Controller
         if(count($records)) {
             foreach ($records as $record) {
                 array_push($cellData, [
+                                        $record->work_id,
                                         $record->branch_text, 
                                         $record->name, 
                                         $record->mobile, 
