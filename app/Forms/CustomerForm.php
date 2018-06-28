@@ -21,12 +21,12 @@ class CustomerForm extends Form
             'label' => '姓名',
             'rules' => 'required|min:2|max:16'
         ])
-        ->add('gender', 'choice', [
-            'label' => '性别', 
-            'empty_value' => '-- 选择 --',
-            'choices'=> ['1'=>'男', '2'=>'女'],
-            'rules' => 'required'
-        ])
+        // ->add('gender', 'choice', [
+        //     'label' => '性别', 
+        //     'empty_value' => '-- 选择 --',
+        //     'choices'=> ['1'=>'男', '2'=>'女'],
+        //     'rules' => 'required'
+        // ])
         ->add('address', 'text', [
             'label' => '身份证地址',
             'rules' => 'required|min:10|max:60'

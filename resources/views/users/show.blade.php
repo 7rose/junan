@@ -37,10 +37,11 @@
         @if($auth->self($record->id) || ($auth->master($record->id) && $auth->admin()))
             <a href="/user/edit/{{ $record->id }}" class="btn btn-danger  btn-sm">信息修改</a>
         @endif
-
     </div>
 </div>
+
 </div>
+
 <div class="col-sm-9">
     <div class="panel panel-default">
     <div class="panel-heading">

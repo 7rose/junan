@@ -144,4 +144,3 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 
 
-

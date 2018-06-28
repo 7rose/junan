@@ -150,6 +150,10 @@ class CustomerController extends Controller
         $all['created_by'] = Session::get('id');
         $all['id_number'] = strtoupper($all['id_number']);
 
+        // 自动判断性别
+        $gender_flag = substr($all['id_number'], 16, 1);
+        $all['gender'] = intval($gender_flag)%2 == 1 ? 1 : 2;
+
         $id = Customer::create($all);
         return redirect('/customer/'.$id->id);
     }
