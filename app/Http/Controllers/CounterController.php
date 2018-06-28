@@ -15,6 +15,10 @@ use App\Helpers\Auth;
 
 class CounterController extends Controller
 {
+    private $auth;
+
+
+
     // 财务准备
     private function financePre()
     {
@@ -301,6 +305,8 @@ class CounterController extends Controller
     // 业务预处理
     public function bizPre()
     {
+        $this->auth = new Auth;
+        
         if(!Session::has('date_range')){
             $date = new Date;
             $range = $date->dateRange('month');
@@ -319,6 +325,12 @@ class CounterController extends Controller
                     ->leftJoin('branches as cb', 'classes.branch', '=', 'cb.id')
                     ->leftJoin('config', 'biz.licence_type', '=', 'config.id')
                     ->leftJoin('users', 'biz.user_id', '=', 'users.id')
+                    ->where(function ($query) {
+                                // 分支机构限制
+                                if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
+                                    $query->Where('biz.branch', $this->auth->branchLimitId());
+                                }
+                            })
                     ->select(
                             'biz.branch',
                             'branches.text as branch_text',
