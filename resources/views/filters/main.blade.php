@@ -82,6 +82,9 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
                     <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/ready_for_3">具备预约条件的</a></li>
                     <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/date_for_3">提交预约申请的</a></li>
                     <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_3">不合格的</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/3/pdf"><span class="text text-danger"><span class="glyphicon glyphicon-paperclip"></span> 打印成绩单</span></a></li>
+                    
                 </ul>
             </div>
 

@@ -26,7 +26,8 @@ class CreateBizTable extends Migration
             $table->integer('user_id')->nullable(); // 教练
             $table->integer('created_by')->nullable(); // 创建人
             $table->integer('state')->nullable(); // 状态
-            $table->integer('finished')->default(false); // 状态
+            $table->boolean('printed')->default(false); // 状态
+            $table->boolean('finished')->default(false); // 状态
             $table->integer('finish_time')->default(0); // 完成时间
             $table->string('next')->default('1.0'); // 状态
             $table->string('next2')->default('2.0'); // 状态
