@@ -395,6 +395,11 @@ class UserController extends Controller
     // 输出Execl
     public function seekToExcel()
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+        
         $cellData = [
             ['工号', '驾校', '姓名', '手机', '备注'],
         ];

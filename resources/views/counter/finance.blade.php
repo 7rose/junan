@@ -1,6 +1,7 @@
 <?php
 
     $counter = new App\Helpers\Counter;
+    $auth = new App\Helpers\Auth;
     $carbon = new Carbon\Carbon;
 ?>
 
@@ -14,7 +15,9 @@
             <div class="alert alert-info">
                 军安集团: {{ Session::has('date_range') ? Session::get('date_range')['text'] : '' }}财务记录:{{ $all['total_num'] }}, 总营收: ¥{{ $all['total'] }}
                 @if(count($records))
+                    @if($auth->admin())
                 <a href="/counter/finance/download/excel/all" class="btn btn-success btn-sm">导出Excel</a>
+                    @endif
                 @endif
                 <div class="dropdown pull-right">
                     <button type="button" class="btn btn-sm dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">{{ Session::has('date_range') ? Session::get('date_range')['text'] : '选择' }}

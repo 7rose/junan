@@ -21,7 +21,10 @@
         @if(isset($records) && count($records))
         <table class="table table-hover">
         <caption>
+            @if($auth->admin())
             <a href="/finance/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-th-list"></span>&nbsp&nbsp导出excel</a>&nbsp&nbsp
+            @endif
+            
             @if($seek->seeking('finance_seek_array', 'key') || $seek->seeking('finance_seek_array', 'branch') || $seek->seeking('finance_seek_array', 'date_begin') || $seek->seeking('finance_seek_array', 'date_end'))
                 <a href="/finance/seek/reset" class="btn btn-sm btn-warning">重置查询条件</a>&nbsp&nbsp
             @endif

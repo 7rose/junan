@@ -307,6 +307,11 @@ class CustomerController extends Controller
     // 输出Execl
     public function seekToExcel()
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+        
         $cellData = [
             ['姓名', '电话', '学身份证', '财务统计', '业务统计', '身份证地址', '现居地'],
         ];

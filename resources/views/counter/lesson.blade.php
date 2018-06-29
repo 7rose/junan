@@ -1,6 +1,7 @@
 <?php
 
     $counter = new App\Helpers\Counter;
+    $auth = new App\Helpers\Auth;
     //$carbon = new Carbon\Carbon;
 ?>
 
@@ -80,7 +81,9 @@
         @if(isset($records_sum) && count($records_sum))
             <table class="table table-hover">
                 <caption>
+                    @if($auth->admin())
                     <a href="/counter/lesson/download/excel" class="btn btn-success btn-sm">下载Excel</a>
+                    @endif
                 </caption>
                 <thead>
                     <tr>

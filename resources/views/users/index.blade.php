@@ -22,7 +22,9 @@
         <a href="/user/create" class="btn btn-sm btn-default">+ 新成员</a>&nbsp&nbsp
 
             @if(count($records))
+                @if($auth->admin())
             <a href="/user/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-th-list"></span>&nbsp&nbsp导出excel</a>&nbsp&nbsp
+                @endif
             @endif
 
             @if($seek->seeking('user_seek_array', 'key') || $seek->seeking('user_seek_array', 'branch'))

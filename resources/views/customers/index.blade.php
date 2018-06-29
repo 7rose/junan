@@ -25,7 +25,9 @@
         <a href="/customer/create" class="btn btn-sm btn-default">+ 新学员</a>&nbsp&nbsp
             @endif
         @if(count($records))
+            @if($auth->admin())
         <a href="/customer/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-th-list"></span>&nbsp&nbsp导出excel</a>&nbsp&nbsp
+            @endif
         @endif
         @if($seek->seeking('seek_array', 'key'))
             <a href="/customer/seek/reset" class="btn btn-sm btn-warning">重置查询条件</a>&nbsp&nbsp

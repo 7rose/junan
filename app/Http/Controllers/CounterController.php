@@ -140,6 +140,11 @@ class CounterController extends Controller
     // 下载excel
     public function getExcel($key)
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
         $cell_1_text = $key=='all' ? '驾校' : '员工';
         // $cell_1_text = $key=='all' ? '驾校' : '员工';
 
@@ -244,6 +249,10 @@ class CounterController extends Controller
     // 下载excel
     public function lessonExcel()
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
 
         $error = new Error;
         if(!Session::has('counter_lesson_sum')) return $error->paramLost();
@@ -364,6 +373,11 @@ class CounterController extends Controller
     // 下载excel
     public function bizExcel()
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+        
         $error = new Error;
         if(!Session::has('counter_biz')) return $error->paramLost();
 
