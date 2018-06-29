@@ -189,7 +189,7 @@ class Pre
         $close = $auth->admin() ? '<a href="/biz/close/'.$record->id.'" class="btn btn-sm btn-default">关闭业务!</a>' : '';
         $open = $auth->root() ? '<a href="/biz/open/'.$record->id.'" class="btn btn-sm btn-danger">重新打开业务!</a>' : '';
 
-        $cancel = $auth->admin() && $record->file_id ? '<a href="/filter/cancel/'.$record->id.'" class="btn btn-sm btn-default">撤销准考证号</a>' : '';
+        $cancel = $auth->admin() && $record->file_id ? '<a href="/biz/file_id/cancel/'.$record->id.'" class="btn btn-sm btn-default">撤销准考证号</a>' : '';
 
         $file_id = $record->file_id ? $record->file_id : '无';
 
