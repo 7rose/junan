@@ -64,6 +64,9 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
     // 业务
     Route::post('/biz/claim', 'BizController@claim');
+    Route::post('/biz/set_file_id', 'BizController@setFileId');
+    Route::get('/biz/file_id/cancel/{id}', 'BizController@cancelFileId');
+    
     Route::get('/customer/biz/{id?}', 'BizController@create');
     Route::post('/customer/biz/store', ['as'=>'biz.store', 'uses'=>'BizController@store']);
     Route::get('/biz/edit/{id}', 'BizController@edit');

@@ -146,10 +146,16 @@ class BizController extends Controller
     // 设置教练
     public function teacher($key)
     {
-        $key_array = explode('-', $key);
+        $key_array = explode(',', $key);
         $record = Biz::find($key_array[0]);
         $record->update(['user_id'=>$key_array[1]]);
-        return redirect('/customer/'.$record->customer_id);
+
+        // $path = $key_array[2];
+        $path = str_replace(";","/",$key_array[2]);
+
+        return redirect('/'.$path);
+
+        // return redirect('/customer/'.$record->customer_id);
     }
 
     // 关闭业务
@@ -176,6 +182,32 @@ class BizController extends Controller
         $record = Biz::find($id);
         $record->update(['finished'=>false]);
         return redirect('/customer/'.$record->customer_id);
+    }
+
+    // 设置准考证号
+    public function setFileId(Request $request)
+    {
+        $id = $request->input('id');
+        $file_id = $request->input('file_id');
+
+        $record = Biz::find($id);
+        $record->update(['file_id'=>$file_id]);
+
+        return $file_id;
+    }
+
+    // 清除准考证号
+    public function cancelFileId($id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        $record = Biz::find($id);
+        $record->update(['file_id'=>null]);
+
+        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'该学员准考证记录已经撤销!']);
     }
 
     // end

@@ -19,6 +19,14 @@ class Part
         $action = $this->actionFromUrl();
 
         switch ($action) {
+            case 'user_id_fail':
+                return "未分配教练的";
+                break;
+
+            case 'file_id_fail':
+                return "未录入准考证号的";
+                break;
+
             case 'no_class':
                 return "未开班的";
                 break;
@@ -73,7 +81,7 @@ class Part
                     break;
 
             case 'fail_for_4':
-                    return "科目1不合格的";
+                    return "科目4不合格的";
                     break;
             
             default:

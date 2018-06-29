@@ -1,11 +1,14 @@
 <?php
 
+$auth = new App\Helpers\Auth;
 $part = new App\Helpers\Part;
 $seek = new App\Helpers\Seek;
+$pre = new App\Helpers\Pre;
 $key = Session::has('filter_key') ? Session::get('filter_key') : null;
 
 $lesson_info = Session::has('score_date') ? date('Y-m-d', Session::get('score_date')) : '';
 $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score_lesson') : '';
+
 
 ?>
 @extends('../nav')
@@ -14,12 +17,12 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
 
 <div class="row">
     {{-- 主表 --}}
-    <div class="col-sm-9">
+    <div class="col-sm-10">
         {{-- 查询 --}}
         <div class="alert alert-info">
             <div class="col-sm-3">
                 @if($part->actionFromUrl())
-                    <strong>{{ $part->actionText() ? $part->actionText() : $lesson_info }} : {{ count($records) }}人</strong>
+                    <strong>{{ $part->actionText() ? $part->actionText() : $lesson_info }}</strong>
                 @endif
             </div>
 
@@ -93,13 +96,23 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
                     <li role="presentation"><a role="menuitem" tabindex="-1" href="/filter/fail_for_4">不合格的</a></li>
                 </ul>
             </div>
-
-            <div class="btn-group left-cell">
-                <a  class="btn  btn-sm btn-info" href="/filter/no_class"> <span class="glyphicon glyphicon-ban-circle"></span> 未开班的</a>
-            </div>
             <div class="btn-group">
                 <a  class="btn  btn-sm btn-primary" href="/counter/lesson"><span class="glyphicon glyphicon-edit"></span> 成绩和考务流水</a>
             </div>
+
+            <div class="btn-group left-cell">
+                <a  class="btn  btn-sm btn-info" href="/filter/no_class"> <span class="glyphicon glyphicon-warning-sign"></span> 未开班的</a>
+            </div>
+
+            <div class="btn-group">
+                <a  class="btn  btn-sm btn-info" href="/filter/user_id_fail"><span class="glyphicon glyphicon-warning-sign"></span> 无教练的</a>
+            </div>
+
+            <div class="btn-group">
+                <a  class="btn  btn-sm btn-info" href="/filter/file_id_fail"> <span class="glyphicon glyphicon-warning-sign"></span> 无准考证号的</a>
+            </div>
+
+            
             @if(count($records))
             <div class="btn-group left-cell">
                 <a href="/filter/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-list"></span> 导出Excel</a>
@@ -114,10 +127,11 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
                     <th>姓名</th>
                     <th>电话</th>
                     <th>身份证</th>
+                    <th>准考证号</th>
                     <th>驾校</th>
                     <th>教练</th>
                     <th>开班信息</th>
-                    <th>证照类型</th>
+                    <th>证照</th>
                     <th>批处理标记</th>
                 </tr>
             </thead>
@@ -131,12 +145,36 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
                         <td>{!! $seek->seekKey($record->customer_name, $key) !!}</td>
                         <td>{!! $seek->seekKey($record->customer_mobile, $key) !!}</td>
                         <td>{!! $seek->seekKey($record->customer_id_number, $key) !!}</td>
+                        <td id="file_id_td{{ $record->id }}">
+                        @if($record->branch && $record->class_id)
+                            @if($record->file_id)
+                                {{ $record->file_id }} 
+                                @if($auth->admin())
+                                <a href="/biz/file_id/cancel/{{ $record->id }}" class="btn btn-xs btn-warning"><span class="glyphicon glyphicon-remove"></span> 撤销</a>
+                                @endif
+                            @else
+                                
+                                <div class="input-group input-group-sm">
+                                    <input id="file_id{{ $record->id }}" name="file_id" type="number" class="form-control">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-success" type="button" onclick="javascript:set_file_id({{ $record->id }})">+</button>
+                                    </span>
+                                </div><!-- /input-group -->
+                    
+                            @endif
+                        @endif
+                        </td>
                         <td>{!! $seek->seekKey($record->branch_text, $key) !!}</td>
-                        <td>{!! $seek->seekKey($record->user_name, $key) !!}</td>
-                        <td>{!! explode('(', $record->class_branch_text)[0].$seek->seekKey($record->class_no, $key) !!}</td>
-                        <td>{{ $record->licence_type_text }}</td>
                         <td>
-                    @if($part->actionFromUrl() != 'no_class')
+                        @if($record->branch && $record->class_id)
+                            {!! $pre->userList($record->branch, $record->user_name ? $record->user_name: '无', $record->id) !!}
+                        @endif
+                        </td>
+
+                        <td>{!! explode('(', $record->class_branch_text)[0].$seek->seekKey($record->class_no, $key) !!}</td>
+                        <td>{{ explode(':', $record->licence_type_text)[0] }}</td>
+                        <td>
+                    @if($part->actionFromUrl() != 'no_class' && $part->actionFromUrl() != 'user_id_fail' && $part->actionFromUrl() != 'file_id_fail')
                         @if(isset($record->selected) && $record->selected)
                             <form method="POST" action="/filter/cancel/{{ $record->id }}">
                                 {{ csrf_field() }}
@@ -167,7 +205,8 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
     </div>
 
     {{-- 标记列表 --}}
-    <div class="alert alert-danger col-sm-3">
+    <div class="alert alert-danger col-sm-2">
+    @if($part->actionFromUrl() != 'user_id_fail' && $part->actionFromUrl() != 'file_id_fail')
         @if(count($records))
             @if($part->actionFromUrl() != 'no_class')
             <button  class="btn btn-sm btn-block btn-danger" data-toggle="modal" data-target="#myModal">批处理</button>
@@ -192,6 +231,9 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
         @else
             没有标记记录
         @endif
+    @else
+        没有可以批处理的内容
+    @endif
     </div>
 </div>
 
@@ -220,6 +262,30 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal -->
+
+
+<script>
+    function set_file_id(id) {
+        var val = $("#file_id"+id).val();
+        if(val < 1000) {
+            alert('准考证号错误！');
+            return false;
+        }
+
+        var post_url = "/biz/set_file_id";
+        var post_data = {id:id, file_id:val};
+
+        $.post(
+            post_url,
+            post_data,
+            function(message){
+                // $("#modal-msg").html(message);
+                $("#file_id_td"+id).html("<span class=\"label label-info\">"+message+"</span>");
+           }
+        );
+
+    }
+</script>
 
 @endsection
 

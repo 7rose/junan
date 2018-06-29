@@ -3,6 +3,7 @@ namespace App\Helpers;
 
 use DB;
 use Session;
+use Request;
 use App\Helpers\Auth;
 use App\Helpers\ConfigList;
 
@@ -201,9 +202,12 @@ class Pre
     }
 
     // 教练列表
-    private function userList($branch, $text, $id)
+    public function userList($branch, $text, $id)
     {
         if(!$branch || $branch == 1) return '';
+
+        // $path = Request::path();
+        $path = str_replace("/",";",Request::path());
 
         $teacher_id = 49;
         $teachers = DB::table('users')->where('branch', $branch)->where('user_type', $teacher_id)->get();
@@ -211,7 +215,7 @@ class Pre
         $list = '';
 
         foreach ($teachers as $teacher) {
-            $list .= '<li role="presentation"><a role="menuitem" tabindex="-1" href="/biz/teacher/'.$id.'-'.$teacher->id.'">'.$teacher->name.'</a></li>';
+            $list .= '<li role="presentation"><a role="menuitem" tabindex="-1" href="/biz/teacher/'.$id.','.$teacher->id.','.$path.'">'.$teacher->name.'</a></li>';
         }
 
         $menu = '<div class="dropdown pull-right">
@@ -224,6 +228,8 @@ class Pre
                 </div>';
         return $menu;
     }
+
+    // 
 
     // 科目列表
     public function lessonList($record)

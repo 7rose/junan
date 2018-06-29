@@ -36,7 +36,7 @@ class FilterController extends Controller
                         ->where('biz.finished', false)
                         ->whereNotNull('customers.id_number')
                         ->select(
-                            'biz.id',
+                            'biz.*',
                             'customers.name as customer_name',
                             'customers.mobile as customer_mobile',
                             'customers.id_number as customer_id_number',
@@ -50,6 +50,7 @@ class FilterController extends Controller
                         ->where(function ($query) {
                             if(Session::has('filter_key')){
                                 $query->where('customers.name', 'LIKE', '%'.Session::get('filter_key').'%');
+                                // $query->orWhere('biz.file_id', 'LIKE', '%'.Session::get('filter_key').'%');
                                 $query->orWhere('customers.mobile', 'LIKE', '%'.Session::get('filter_key').'%');
                                 $query->orWhere('customers.id_number', 'LIKE', '%'.Session::get('filter_key').'%');
                                 $query->orWhere('branches.text', 'LIKE', '%'.Session::get('filter_key').'%');
@@ -70,6 +71,26 @@ class FilterController extends Controller
     private function router($key)
     {
         switch ($key) {
+            case 'file_id_fail':
+                $tmp = $this->prepare()
+                        ->whereNotNull('biz.class_id')
+                        ->where('biz.finished', false)
+                        ->where('biz.branch', '>', 1)
+                        // ->whereNull('biz.user_id');
+                        ->whereNull('biz.file_id');
+                return $tmp;
+                break;
+
+            case 'user_id_fail':
+                $tmp = $this->prepare()
+                        ->whereNotNull('biz.class_id')
+                        ->where('biz.finished', false)
+                        ->where('biz.branch', '>', 1)
+                        ->whereNull('biz.user_id');
+                        // ->orWhereNull('biz.file_id');
+                return $tmp;
+                break;
+
             case 'no_class':
                 $tmp = $this->prepare()
                         ->where('biz.finished', false)
@@ -157,6 +178,7 @@ class FilterController extends Controller
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
+                            ->whereNotNull('biz.file_id')
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
                             ->where('biz.next3', '3.0'); 
@@ -304,6 +326,7 @@ class FilterController extends Controller
         $records = $this->router($key)
                         ->groupBy('biz.id')
                         ->orderBy('biz.branch')
+                        ->orderBy('biz.file_id')
                         ->orderBy('biz.user_id')
                         ->get();
                         // ->toArray();
