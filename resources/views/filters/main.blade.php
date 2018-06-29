@@ -282,8 +282,9 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
             post_url,
             post_data,
             function(message){
+                location.reload();
                 // $("#modal-msg").html(message);
-                $("#file_id_td"+id).html("<span class=\"label label-info\">"+message+"</span>");
+                // $("#file_id_td"+id).html("<span class=\"label label-info\">"+message+"</span>");
            }
         );
 

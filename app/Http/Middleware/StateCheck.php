@@ -24,11 +24,8 @@ class StateCheck
                         ->find(Session::get('id'));
 
         $auth = new Auth;
-
         if($record->locked || !$auth->user() || !$record->branch_show){
-
             return redirect('/locked');
-
         }else{
             if($record->new && Request::path() != 'user/reset_password' && Request::path() != 'user/update_password'){
                 return redirect('/user/reset_password');

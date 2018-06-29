@@ -189,13 +189,17 @@ class Pre
         $close = $auth->admin() ? '<a href="/biz/close/'.$record->id.'" class="btn btn-sm btn-default">关闭业务!</a>' : '';
         $open = $auth->root() ? '<a href="/biz/open/'.$record->id.'" class="btn btn-sm btn-danger">重新打开业务!</a>' : '';
 
+        $cancel = $auth->admin() && $record->file_id ? '<a href="/filter/cancel/'.$record->id.'" class="btn btn-sm btn-default">撤销准考证号</a>' : '';
+
+        $file_id = $record->file_id ? $record->file_id : '无';
+
         $class_info = $record->class_id ? explode('(', $record->class_branch_text)[0].$record->class_no.'期' : '<span class="label label-warning">未开班</span>';
         $user_text = $record->user_id ? $record->user_id_text : '无教练';
 
         if($record->finished){
             $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.', '.$user_text.$open;
         }else{
-            $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.$this->userList($record->branch, $user_text, $record->id).', '.$user_text.' '.$edit.' '.$close;
+            $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.$this->userList($record->branch, $user_text, $record->id).', '.$user_text.', 准考证号:'.$file_id.' '.$edit.' '.$close.' '.$cancel;
         }
 
         return $txt;
