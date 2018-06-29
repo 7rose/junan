@@ -26,7 +26,7 @@ class ConfigList
     // 分支机构
     public function branchList()
     {
-        $records = Branch::all();
+        $records = Branch::where('show', true)->get();
         return $this->out($records);
     }
 

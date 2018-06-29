@@ -84,6 +84,8 @@
                         </a>
                         <ul class="dropdown-menu">
                             {!! $conf->confMenu() !!}
+                            <li class="divider"></li>
+                            <li><a href="/branch">分支机构</a></li>
                         </ul>
                     </li>
                 @endif

@@ -101,15 +101,15 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
             </div>
 
             <div class="btn-group left-cell">
-                <a  class="btn  btn-sm btn-info" href="/filter/no_class"> <span class="glyphicon glyphicon-warning-sign"></span> 未开班的</a>
+                <a  class="btn  btn-sm btn-warning" href="/filter/no_class"> <span class="glyphicon glyphicon-warning-sign"></span> 未开班的</a>
             </div>
 
             <div class="btn-group">
-                <a  class="btn  btn-sm btn-info" href="/filter/user_id_fail"><span class="glyphicon glyphicon-warning-sign"></span> 无教练的</a>
+                <a  class="btn  btn-sm btn-warning" href="/filter/user_id_fail"><span class="glyphicon glyphicon-warning-sign"></span> 无教练的</a>
             </div>
 
             <div class="btn-group">
-                <a  class="btn  btn-sm btn-info" href="/filter/file_id_fail"> <span class="glyphicon glyphicon-warning-sign"></span> 无准考证号的</a>
+                <a  class="btn  btn-sm btn-warning" href="/filter/file_id_fail"> <span class="glyphicon glyphicon-warning-sign"></span> 无准考证号的</a>
             </div>
 
             

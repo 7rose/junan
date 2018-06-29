@@ -23,7 +23,7 @@ class Config
 
         if(count($this->config_list)) {
             foreach ($this->config_list as $key => $value) {
-                $menus .= '<li><a href="/config/'.$key.'">&nbsp&nbsp'.$value.'</a></li>';
+                $menus .= '<li><a href="/config/'.$key.'">'.$value.'</a></li>';
             }
         }
 
