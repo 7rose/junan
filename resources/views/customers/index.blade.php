@@ -21,7 +21,9 @@
     <div id="myTabContent" class="tab-content">
     <div class="tab-pane fade in active" id="list">
         <div style="height: 20px"></div>
+            @if(!$auth->admin())
         <a href="/customer/create" class="btn btn-sm btn-default">+ 新学员</a>&nbsp&nbsp
+            @endif
         @if(count($records))
         <a href="/customer/download/excel" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-th-list"></span>&nbsp&nbsp导出excel</a>&nbsp&nbsp
         @endif

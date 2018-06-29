@@ -22,6 +22,11 @@ class BizController extends Controller
     // 新业务
     public function create($id=0)
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if($auth->admin())  return $auth_error->forbidden();
+
         $error = new Error;
 
         if($id == 0) return redirect('/customer');
@@ -42,6 +47,11 @@ class BizController extends Controller
     // 存储
     public function store(Request $request)
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if($auth->admin())  return $auth_error->forbidden();
+        
         $all = $request->all();
         $all['date'] =  time();
         // $all['date'] =  strtotime($all['date']);

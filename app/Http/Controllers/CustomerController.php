@@ -117,6 +117,11 @@ class CustomerController extends Controller
     // 新学员表单
     public function create()
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if($auth->admin())  return $auth_error->forbidden();
+
         $form = $this->form(CustomerForm::class, [
             'method' => 'POST',
             'url' => route('customer.store')
@@ -131,6 +136,11 @@ class CustomerController extends Controller
     // 存储
     public function store(Request $request)
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if($auth->admin())  return $auth_error->forbidden();
+        
         $all = $request->all();
         $form = $this->form(CustomerForm::class);
 
