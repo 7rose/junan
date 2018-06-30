@@ -7,8 +7,10 @@ use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\ScoreForm;
 
 use DB;
+use URL;
 use Session;
 use Excel;
+use PDF;
 use App\Helpers\Part;
 use App\Helpers\Auth;
 use App\Helpers\Error;
@@ -32,6 +34,7 @@ class FilterController extends Controller
                         ->leftJoin('classes', 'biz.class_id', '=', 'class_id')
                         ->leftJoin('branches as cb', 'classes.branch', '=', 'cb.id')
                         ->leftJoin('config', 'biz.licence_type', '=', 'config.id')
+                        ->leftJoin('config as g', 'customers.gender', '=', 'g.id')
                         ->leftJoin('users', 'biz.user_id', '=', 'users.id')
                         ->where('biz.finished', false)
                         ->whereNotNull('customers.id_number')
@@ -40,6 +43,7 @@ class FilterController extends Controller
                             'customers.name as customer_name',
                             'customers.mobile as customer_mobile',
                             'customers.id_number as customer_id_number',
+                            'g.text as customer_gender',
                             'branches.text as branch_text',
                             'config.text as licence_type_text',
                             'cb.text as class_branch_text',
@@ -191,6 +195,7 @@ class FilterController extends Controller
                             ->whereNotNull('biz.class_id')
                             ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
+                            ->whereNotNull('biz.file_id')
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
                             ->where('biz.next3', '3.1'); 
@@ -814,6 +819,210 @@ class FilterController extends Controller
             });
         })->export('xlsx');
     }
+
+    // 打印科目3, PDF
+    public function pdf()
+    {
+        $records = $this->prepare()
+                    ->whereNotNull('biz.class_id')
+                    ->where('biz.finished', false)
+                    ->where('biz.branch', '>', 1)
+                    ->whereNotNull('biz.file_id')
+                    ->whereNotNull('biz.user_id')
+                    ->where('biz.next', '1.3')
+                    ->where('biz.next3', '3.2')
+                    ->where('biz.printed', false)
+                    ->groupBy('biz.id')
+                    ->orderBy('biz.branch')
+                    ->orderBy('biz.user_id')
+                    ->orderBy('customers.gender')
+                    ->get();
+        if(!count($records)) {
+            return view('note')->with('custom', ['color'=>'warning', 'icon'=>'ok', 'content'=>'成绩单只能打印一次, 可能是已经打印或无符合条件的学员!']);
+        }
+
+        $print_ids = [];
+        $container = '';
+
+        if(count($records)) {
+            foreach ($records as $record) {
+                array_push($print_ids, $record->id);
+                $container .= '
+                    <div class="container">
+                        <p>约考凭证打印</p>
+                        <p class="title">科目三道路驾驶技能考试预约凭证</p>
+                        <div class="content">
+                            <table>
+                              <tbody>
+                                <tr>
+                                  <td class="info">
+                                    <p class="info_space">身份证明号码：'.$record->customer_id_number.'</p>
+                                    <p class="info_space">准考证明号码：'.$record->file_id.'</p>
+                                    <p class="info_space">姓名：'.$record->customer_name.'</p>
+                                    <p class="info_space">性别：'.$record->customer_gender.'</p>
+                                    <p class="info_space">准考车型：'.explode(':', $record->licence_type_text)[0].'</p>
+                                    <p class="info_space">考场名称：车管所考场</p>
+                                  </td>
+                                  <td>
+                                    <table border="1" cellspacing="0" class="img_table">
+                                    <tbody>
+                                      <tr>
+                                        <td><p class="img">照片</p></td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <p>科目三道路驾驶技能考试成绩单</p>
+                            <table border="1" cellspacing="0" class="scroe_table">
+                                <tbody>
+                                    <tr class="score">
+                                        <td colspan="4"><p>科目三道路驾驶技能考试</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>考试日期</p></td>
+                                        <td></td>
+                                        <td>考试成绩</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>扣分项</p></td>
+                                        <td colspan="3"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>考试员签名</p></td>
+                                        <td></td>
+                                        <td><p>考生签名</p></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4"><p>科目三道路驾驶技能补考</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>考试日期</p></td>
+                                        <td></td>
+                                        <td>考试成绩</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>扣分项</p></td>
+                                        <td colspan="3"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>考试员签名</p></td>
+                                        <td></td>
+                                        <td><p>考生签名</p></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="note">
+                            <p>注意事项：</p>
+                            <p>1、凭此证并带好有效身份证按预约时间参加考试。</p>
+                            <p>2、考试期间听从指挥，遵守考场纪律，文明待考。</p>
+                            <p>3、申请人在考试过程中有贿赂、舞弊行为的，取消考试资格，已经通过考试的其他科目成绩作废。</p>
+                            <p>4、办理增加准驾车型业务期间，不可到其他车管所办理转入业务。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-break"></div>';
+            }
+        }
+
+
+        $templet = '<!doctype html>
+                    <html>
+                    <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+                    <title>科目3成绩单</title>
+                    <style>
+                        @font-face {
+                            font-family: "simsun";
+                            font-style: normal;
+                            font-weight: normal;
+                            src: url('. URL::asset("junan/fonts/simsun.ttf").') format("truetype");
+                        }
+
+                        html, body {  
+                            height: 100%;  
+                        }
+
+                        p {
+                            padding-top: -5px;
+                            padding-bottom: -5px;
+                        }
+
+                        body {  
+                            margin: 0;  
+                            padding: 0;  
+                            width: 100%;
+                            font-size: 14px;
+                            font-weight: 100;  
+                            font-family: "simsun";  
+                        }
+
+                        .container {  
+                            /*display: table-cell; */
+                            vertical-align: middle;  
+                        }
+                        .content {  
+                            text-align: center;  
+                            display: inline-block; 
+                            padding-left: 30px; 
+                            padding-right: 30px; 
+                        }
+                        .title {  
+                            font-size: 22px;  
+                            text-align: center;
+                            padding-top: 30px;
+                            padding-bottom: 10px;
+                        }
+                        .info {
+                            width: 480px;
+                        }
+                        .info_space {
+                            padding-top: 5px;
+                        }
+                        .img_table {
+                            padding-top: 40px;
+                        }
+                        .img {
+                            padding-left: 40px;
+                            padding-right:40px;
+                            padding-top:40px;
+                            padding-bottom: 65px;
+                        }
+                        .scroe_table {
+                            width: 100%;
+                            text-align: center;
+                        }
+                        .note {
+                            text-align: left;
+                        }
+                        .page-break {
+                            page-break-after: always;
+                        }
+
+                    </style>
+                    </head>
+                    <body>'
+                    .$container.
+                    '</body>
+                    </html>';
+    // 标记已打印
+    DB::table('biz')
+        ->whereIn('id', $print_ids)
+        ->update(['printed'=>true]);
+
+    // 输出PDF
+    $pdf = PDF::loadHTML($templet);
+    return $pdf->download();
+
+    }
+
+    // end
 
 }
 

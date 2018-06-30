@@ -188,6 +188,7 @@ class Pre
         $edit = $auth->admin() ? '<a href="/biz/edit/'.$record->id.'" class="btn btn-sm btn-default">修改</a>' : '';
         $close = $auth->admin() ? '<a href="/biz/close/'.$record->id.'" class="btn btn-sm btn-default">关闭业务!</a>' : '';
         $open = $auth->root() ? '<a href="/biz/open/'.$record->id.'" class="btn btn-sm btn-danger">重新打开业务!</a>' : '';
+        $reprint = $auth->admin() && $record->printed ? '<a href="/biz/reprint/'.$record->id.'" class="btn btn-sm btn-default">重打成绩单</a>' : '';
 
         $cancel = $auth->admin() && $record->file_id ? '<a href="/biz/file_id/cancel/'.$record->id.'" class="btn btn-sm btn-default">撤销准考证号</a>' : '';
 
@@ -199,7 +200,7 @@ class Pre
         if($record->finished){
             $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.', '.$user_text.$open;
         }else{
-            $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.$this->userList($record->branch, $user_text, $record->id).', '.$user_text.', 准考证号:'.$file_id.' '.$edit.' '.$close.' '.$cancel;
+            $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.$this->userList($record->branch, $user_text, $record->id).', '.$user_text.', 准考证号:'.$file_id.' '.$edit.' '.$cancel.' '.$reprint.' '.$close;
         }
 
         return $txt;

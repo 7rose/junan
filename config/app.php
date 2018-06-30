@@ -164,6 +164,7 @@ return [
         // 手动
         Kris\LaravelFormBuilder\FormBuilderServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
 
     ],
 
@@ -218,6 +219,8 @@ return [
         'Input' => Illuminate\Support\Facades\Input::class,
         'FormBuilder' => Kris\LaravelFormBuilder\Facades\FormBuilder::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'PDF' => Barryvdh\DomPDF\Facade::class,
+
 
     ],
 

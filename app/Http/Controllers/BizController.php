@@ -210,6 +210,20 @@ class BizController extends Controller
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'该学员准考证记录已经撤销!']);
     }
 
+    // 重打成绩单
+    public function reprint($id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        $record = Biz::find($id);
+        $record->update(['printed'=>false]);
+        return redirect('/customer/'.$record->customer_id);
+        // print_r($record);
+    }
+
     // end
 }
 

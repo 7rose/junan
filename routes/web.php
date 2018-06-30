@@ -69,6 +69,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     // 业务
     Route::post('/biz/claim', 'BizController@claim');
     Route::post('/biz/set_file_id', 'BizController@setFileId');
+    Route::get('/biz/reprint/{id}', 'BizController@reprint');
     Route::get('/biz/file_id/cancel/{id}', 'BizController@cancelFileId');
 
     Route::get('/customer/biz/{id?}', 'BizController@create');
@@ -121,6 +122,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/filter/save/score', 'FilterController@saveScore');
 
     Route::get('/filter/score_ex/{key}', 'FilterController@exScore');
+    Route::get('/filter/3/pdf', 'FilterController@pdf');
 
 
     // Route::post('/filter/part', 'FilterController@ex');
