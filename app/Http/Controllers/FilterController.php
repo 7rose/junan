@@ -840,7 +840,7 @@ class FilterController extends Controller
                     ->groupBy('biz.id')
                     ->orderBy('biz.branch')
                     ->orderBy('biz.user_id')
-                    ->orderBy('customers.gender')
+                    ->orderBy('customers.gender', 'desc')
                     ->get();
         if(!count($records)) {
             return view('note')->with('custom', ['color'=>'warning', 'icon'=>'ok', 'content'=>'成绩单每个学员只能打印一次, 可能是已经打印或无符合条件的学员!']);
