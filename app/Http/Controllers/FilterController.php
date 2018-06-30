@@ -845,6 +845,8 @@ class FilterController extends Controller
         if(!count($records)) {
             return view('note')->with('custom', ['color'=>'warning', 'icon'=>'ok', 'content'=>'成绩单每个学员只能打印一次, 可能是已经打印或无符合条件的学员!']);
         }
+        $num = count($records);
+        $name = date('Y-m-d', time()).'_'.$num.'人';
 
         $print_ids = [];
         $container = '';
@@ -927,7 +929,7 @@ class FilterController extends Controller
                             <p>注意事项：</p>
                             <p>1、凭此证并带好有效身份证按预约时间参加考试。</p>
                             <p>2、考试期间听从指挥，遵守考场纪律，文明待考。</p>
-                            <p>3、申请人在考试过程中有贿赂、舞弊行为的，取消考试资格，已经通过考试的其他科目成绩作废。</p>
+                            <p>3、申请人在考试过程中有贿赂、舞弊行为的，取消考试资格，已经通过考试的其他科目成<br/>绩无效。申请人在一年内不得申领机动车驾驶证。</p>
                             <p>4、办理增加准驾车型业务期间，不可到其他车管所办理转入业务。</p>
                             </div>
                         </div>
@@ -1004,6 +1006,7 @@ class FilterController extends Controller
                             text-align: center;
                         }
                         .note {
+                            width: 100%;
                             text-align: left;
                         }
                         .page-break {
@@ -1023,7 +1026,7 @@ class FilterController extends Controller
 
     // 输出PDF
     $pdf = PDF::loadHTML($templet);
-    return $pdf->download();
+    return $pdf->download($name.'.pdf');
 
     }
 
