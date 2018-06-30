@@ -823,6 +823,11 @@ class FilterController extends Controller
     // 打印科目3, PDF
     public function pdf()
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->info())  return $auth_error->forbidden();
+
         $records = $this->prepare()
                     ->whereNotNull('biz.class_id')
                     ->where('biz.finished', false)
@@ -838,7 +843,7 @@ class FilterController extends Controller
                     ->orderBy('customers.gender')
                     ->get();
         if(!count($records)) {
-            return view('note')->with('custom', ['color'=>'warning', 'icon'=>'ok', 'content'=>'成绩单只能打印一次, 可能是已经打印或无符合条件的学员!']);
+            return view('note')->with('custom', ['color'=>'warning', 'icon'=>'ok', 'content'=>'成绩单每个学员只能打印一次, 可能是已经打印或无符合条件的学员!']);
         }
 
         $print_ids = [];
