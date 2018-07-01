@@ -57,7 +57,8 @@ class BizController extends Controller
         // $all['date'] =  strtotime($all['date']);
         $all['created_by'] = Session::get('id');
 
-        $biz_check = Biz::where('licence_type', $all['licence_type'])
+        $biz_check = Biz::where('customer_id', $all['customer_id'])
+            ->where('licence_type', $all['licence_type'])
             ->where('finished', false)
             ->get();
 
