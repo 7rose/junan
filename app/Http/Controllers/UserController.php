@@ -334,6 +334,11 @@ class UserController extends Controller
     // 个人
     public function show($id=0)
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin() && ($id != 0 && !$auth->sameBranch($id)))  return $auth_error->forbidden();
+
         if($id===0) return redirect('/user');
         $record = User::leftJoin('config as g', 'users.gender', '=', 'g.id')
                     ->leftJoin('config as ut', 'users.user_type', '=', 'ut.id')

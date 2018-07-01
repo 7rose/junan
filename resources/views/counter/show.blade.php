@@ -64,7 +64,12 @@
         <tbody>
             @foreach($records as $record)
             <tr>
+                @if($auth->sameBranch($record->user_id))
                 <td><a href="/user/{{ $record->user_id }}" class="btn btn-block btn-info btn-xs">{{ $record->user_id_text }}</a></td>
+                @else
+                <td>{{ $record->user_id_text }}</td>
+                @endif
+                
                 <td>{{ $counter->percent($counter->fllow($record)['all'][2], $all['total']).'%' }}</td>
                 <td>{{ $counter->fllow($record)['total'] }}</td>
                 <td>{{ '¥'.$counter->fllow($record)['all'][2] }}</td>

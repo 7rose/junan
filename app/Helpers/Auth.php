@@ -49,6 +49,13 @@ class Auth
         return $this->my_id == $target_id ? true : false;
     }
 
+    // 同机构
+    public function sameBranch($target_id)
+    {
+        $target_branch = User::find($target_id)->branch;
+        return $this->me->branch == $target_branch ? true : false;
+    }
+
     // root - 超级管理员
     public function root($target_id=0)
     {
