@@ -977,8 +977,8 @@ class FilterController extends Controller
                         .content {  
                             text-align: center;  
                             display: inline-block; 
-                            padding-left: 30px; 
-                            padding-right: 30px; 
+                            padding-left: 40px; 
+                            padding-right: 40px; 
                         }
                         .title {  
                             font-size: 22px;  

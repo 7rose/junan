@@ -64,7 +64,7 @@ class UserController extends Controller
         return $records;
     }
 
-    // index 
+    // index  
     public function index()
     {
         $form = $this->form(UserSeekForm::class, [
@@ -135,7 +135,14 @@ class UserController extends Controller
         if (!Hash::check($request->password, $record->password)) return redirect()->back()->withErrors(['password'=>'密码错误!'])->withInput();
         Session::put('id', $record->id);
         // return redirect($request->path);
-        return redirect('/doc');
+        
+        if(Session::has('target_url')) {
+            $target_url = Session::get('target_url');
+            Session::forget('target_url');
+            return redirect($target_url);
+        }else{
+            return redirect('/doc');
+        }
     }
 
     // 锁定

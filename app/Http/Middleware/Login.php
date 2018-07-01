@@ -4,8 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Session;
-use Kris\LaravelFormBuilder\FormBuilderTrait;
-use App\Forms\UserLoginForm;
+use Request;
 
 class Login
 {
@@ -16,14 +15,16 @@ class Login
      * @param  \Closure  $next
      * @return mixed
      */
-    use FormBuilderTrait;
 
     public function handle($request, Closure $next)
     {
         if(Session::has('id')) {
             return $next($request);
         }else{
-            return redirect('/login');
+            $url = Request::fullUrl();
+            Session::put('target_url', $url);
+
+            return redirect()->action('UserController@login');
         }
     }
 }

@@ -200,7 +200,7 @@ class Pre
         if($record->finished){
             $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.', '.$user_text.$open;
         }else{
-            $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.$this->userList($record->branch, $user_text, $record->id).', '.$user_text.', 准考证号:'.$file_id.' '.$edit.' '.$cancel.' '.$reprint.' '.$close;
+            $txt = $record->licence_type_text.', '.$record->branch_text.', '.$record->class_type_text.', '.$class_info.$this->userList($record->branch, $user_text, $record->id).', '.$user_text.', 准考证号:'.$file_id.' '.$close.' '.$edit.' '.$cancel.' '.$reprint;
         }
 
         return $txt;
