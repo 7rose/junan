@@ -269,7 +269,7 @@ class FilterController extends Controller
     // 默认跳转
     public function index()
     {
-        return redirect('/filter/no_class');
+        return redirect('/filter/file_id_fail');
     }
 
     // 查询
