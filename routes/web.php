@@ -27,12 +27,17 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/branch', 'BranchController@index');
     Route::get('/branch/close/{id}', 'BranchController@set');
     Route::post('/branch/add', 'BranchController@add');
-
     Route::get('/config/{key}', 'ConfigController@index');
     Route::get('/config/set/{key}', 'ConfigController@set');
     Route::post('/config/add/post', 'ConfigController@add');
-    // Route::get('/config/finance_item', 'ConfigController@finance_item');
-    // Route::get('/config/lesson_fall_item', 'ConfigController@lesson_fall_item');
+
+    // 导入excel
+    Route::get('/import/user', 'ImportController@userImport');
+    Route::post('/import/user/store', ['as'=>'import.user_store', 'uses'=>'ImportController@userStore']);
+    Route::get('/import/user/save', 'ImportController@userSave');
+    Route::get('/import/class', 'ImportController@classImport');
+    Route::post('/import/class/store', ['as'=>'import.class_store', 'uses'=>'ImportController@classStore']);
+    Route::get('/import/class/save', 'ImportController@classSave');
 
     // 学员
     Route::get('/customer', 'CustomerController@index');
@@ -62,16 +67,13 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/user/update/{id}', ['as'=>'user.update', 'uses'=>'UserController@update']);
     Route::get('/user/download/excel', 'UserController@seekToExcel');
     Route::get('/branch/set/{id}', 'UserController@setBranch');
-
     Route::post('/user/ajax/selector', 'UserController@selector');
-
 
     // 业务
     Route::post('/biz/claim', 'BizController@claim');
     Route::post('/biz/set_file_id', 'BizController@setFileId');
     Route::get('/biz/reprint/{id}', 'BizController@reprint');
     Route::get('/biz/file_id/cancel/{id}', 'BizController@cancelFileId');
-
     Route::get('/customer/biz/{id?}', 'BizController@create');
     Route::post('/customer/biz/store', ['as'=>'biz.store', 'uses'=>'BizController@store']);
     Route::get('/biz/edit/{id}', 'BizController@edit');
@@ -79,7 +81,6 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/biz/teacher/{key}', 'BizController@teacher');
     Route::get('/biz/close/{id}', 'BizController@close');
     Route::get('/biz/open/{id}', 'BizController@open');
-    // Route::post('/biz/update/{id}', ['as'=>'biz.update', 'uses'=>'BizController@update']);
 
     // 财务
     Route::get('/finance', 'FinanceController@index');
@@ -93,54 +94,30 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/finance/cancel', 'FinanceController@cancel');
     Route::post('/finance/abandon', 'FinanceController@abandon');
 
-    // 导入 -用户
-    Route::get('/import/user', 'ImportController@userImport');
-    Route::post('/import/user/store', ['as'=>'import.user_store', 'uses'=>'ImportController@userStore']);
-    Route::get('/import/user/save', 'ImportController@userSave');
-    // 导入 -开班花名册
-    Route::get('/import/class', 'ImportController@classImport');
-    Route::post('/import/class/store', ['as'=>'import.class_store', 'uses'=>'ImportController@classStore']);
-    Route::get('/import/class/save', 'ImportController@classSave');
-
-    // 过滤器
+    // 考务过滤器
     Route::post('/filter/seek/set', 'FilterController@seek');
     Route::post('/filter/seek/reset', 'FilterController@seekReset');
-
     Route::post('/filter/select/{id}', 'FilterController@select');
     Route::post('/filter/cancel/{id}', 'FilterController@cancel');
-
     Route::get('/filter', 'FilterController@index');
     Route::any('/filter/{key}', 'FilterController@filter');
     Route::any('/filter/ex1/{key}', 'FilterController@ex1');
     Route::any('/filter/ex2/{key}', 'FilterController@ex2');
     Route::post('/filter/do/ready', 'FilterController@doReady');
     Route::post('/filter/do/date', 'FilterController@doDate');
-    // Route::post('/filter/do/score', 'FilterController@doScore');
-    // Route::get('/filter/score/choose', 'FilterController@scoreChoose');
-    // Route::post('/filter/do/score', ['as'=>'score.do', 'uses'=>'FilterController@doScore']);
     Route::get('/filter/do/score', 'FilterController@doScoreList');
     Route::post('/filter/save/score', 'FilterController@saveScore');
-
     Route::get('/filter/score_ex/{key}', 'FilterController@exScore');
     Route::get('/filter/3/pdf', 'FilterController@pdf');
-
-
-    // Route::post('/filter/part', 'FilterController@ex');
-    // Route::post('/filter/score/ex', ['as'=>'score.ex', 'uses'=>'FilterController@score_ex']);
-    // Route::post('/filter/score_ex/save', 'FilterController@score_save');
-    // Route::post('/filter/ready/ex', 'FilterController@readyEx');
-    // Route::post('/filter/date/ex', 'FilterController@dateEx');
     Route::get('/filter/download/excel', 'FilterController@filterToExcel');
 
     // 统计
     Route::get('/counter/set/{date}', 'CounterController@set');
-
     Route::get('/counter/finance', 'CounterController@finance');
     Route::get('/counter/finance/{id}', 'CounterController@financeShow');
     Route::get('/counter/finance/download/excel/{key}', 'CounterController@getExcel');
     Route::get('/counter/lesson/download/excel', 'CounterController@lessonExcel');
     Route::get('/counter/lesson', 'CounterController@lesson');
-
     Route::get('/counter/biz', 'CounterController@biz');
     Route::get('/counter/biz/download/excel', 'CounterController@bizExcel');
 
