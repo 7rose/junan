@@ -113,7 +113,6 @@ class FinanceController extends Controller
 
         $record = Customer::find($id);
         $error = new Error;
-
         if(!$record) return $error->notFound();
 
         $form = $this->form(FinanceForm::class, [

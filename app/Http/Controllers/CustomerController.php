@@ -298,12 +298,6 @@ class CustomerController extends Controller
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'学员信息修改成功!']);
     }
 
-    // 导入开班花名册
-    public function importClass()
-    {
-        # code...
-    }
-
     // 输出Execl
     public function seekToExcel()
     {

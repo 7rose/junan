@@ -106,15 +106,15 @@ class ConfigSeeder extends Seeder
                 'extra'   => NULL,
             ],[
                 'type'    => 'class_type',
-                'text'    => '高级班',
+                'text'    => '特色班',
                 'extra'   => NULL,
             ],[
                 'type'    => 'class_type',
-                'text'    => 'VIP',
+                'text'    => 'VIP5888',
                 'extra'   => NULL,
             ],[
                 'type'    => 'class_type',
-                'text'    => '至尊VIP',
+                'text'    => '至尊9888',
                 'extra'   => NULL,
             ],[
                 'type'    => 'finance_item',

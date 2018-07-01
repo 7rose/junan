@@ -56,6 +56,12 @@ class BizController extends Controller
         $all['date'] =  time();
         // $all['date'] =  strtotime($all['date']);
         $all['created_by'] = Session::get('id');
+
+        $biz_check = Biz::where('licence_type', $all['licence_type'])
+            ->where('finished', false)
+            ->get();
+
+        if(count($biz_check)) return view('note')->with('custom', ['color'=>'danger', 'icon'=>'ok', 'content'=>'该学员在本集团内有未完成的相关业务!']);
         
         // $all['checked_by_time'] = time();
 
@@ -83,11 +89,13 @@ class BizController extends Controller
         // 若有推荐人, 则财务记录归属推荐人所在机构
         // if($count_branch != 0) $finance['branch'] = $count_branch;
 
-        Finance::create($finance);
          // 存储业务表
         $biz = array_except($all, ['price', 'real_price', 'user_id', 'ticket_no']);
-        Biz::create($biz);
-        // print_r($biz);
+
+        $biz_id = Biz::create($biz)->id;
+        $finance['biz_id'] =  $biz_id;
+
+        Finance::create($finance);
 
         return redirect('/customer/'.$all['customer_id']);
     }

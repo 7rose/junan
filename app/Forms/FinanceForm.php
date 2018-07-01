@@ -6,6 +6,7 @@ use Session;
 use Kris\LaravelFormBuilder\Form;
 use App\Helpers\ConfigList;
 use App\Helpers\Auth;
+use App\Biz;
 
 class FinanceForm extends Form
 {
@@ -13,6 +14,14 @@ class FinanceForm extends Form
     {
         $list = new ConfigList;
         $auth = new Auth;
+
+        $pre = Biz::where('biz.customer_id', $list->idFromUrl())
+                        ->where('biz.finished', false)
+                        ->leftJoin('config', 'biz.licence_type', 'config.id')
+                        ->select('biz.id', 'config.text as licence_type_text');
+
+        $records = $pre->get();   
+        $first = $pre->first();   
         
         $this
             ->add('in', 'choice', [
@@ -27,6 +36,22 @@ class FinanceForm extends Form
                 'choices'=> $list->getList('finance_item'),
                 'rules' => 'required'
             ]);
+
+        if(count($records) == 1) {
+            $this->add('biz_id', 'hidden', ['value' => $first->id]);
+        } elseif(count($records) > 1) {
+            $tmp_list = [];
+            foreach ($records as $record) {
+                $tmp_list = array_add($tmp_list, $record->id, $record->licence_type_text);
+            }
+
+            $this->add('biz_id', 'choice', [
+                'label' => '对应业务', 
+                'empty_value' => '-- 选择 --',
+                'choices'=> $tmp_list,
+                'rules' => 'required'
+            ]);
+        }
 
         if($auth->branchLimit() || ($auth->admin() && Session::has('branch_set'))) {
 
