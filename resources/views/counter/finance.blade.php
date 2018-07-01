@@ -3,6 +3,8 @@
     $counter = new App\Helpers\Counter;
     $auth = new App\Helpers\Auth;
     $carbon = new Carbon\Carbon;
+
+    $mode = !Session::has('counter_finance_mode') || Session::get('counter_finance_mode') != 'real' ? 'normal' : 'real';
 ?>
 
 @extends('../nav')
@@ -12,8 +14,13 @@
     <table class="table table-hover">
         <caption>
             @if(isset($all))
-            <div class="alert alert-info">
+            <div class="alert alert-info">{{ $mode == 'normal' ? '对账 - ' : '贡献 - ' }}
                 军安集团: {{ Session::has('date_range') ? Session::get('date_range')['text'] : '' }}财务记录:{{ $all['total_num'] }}, 总营收: ¥{{ $all['total'] }}
+                    @if($mode == 'normal')
+                <a href="/filter/counter_finance_mode/real" class="btn btn-sm btn-info">切换为: 贡献模式</a>
+                    @elseif($mode == 'real')
+                <a href="/filter/counter_finance_mode/normal" class="btn btn-sm btn-warning">切换为: 对账模式</a>
+                    @endif
                 @if(count($records))
                     @if($auth->admin())
                 <a href="/counter/finance/download/excel/all" class="btn btn-success btn-sm">导出Excel</a>
@@ -63,7 +70,16 @@
         <tbody>
             @foreach($records as $record)
             <tr>
+                @if($mode == 'normal')
                 <td><a href="/counter/finance/{{ $record->branch }}" class="btn btn-block btn-info btn-xs">{{ $record->branch_text }}</a></td>
+                @else
+                    @if($record->real_branch)
+                <td><a href="/counter/finance/{{ $record->real_branch }}" class="btn btn-block btn-info btn-xs">{{ $record->real_branch_text }}</a></td>
+                    @else
+                <td>其他(无推荐人项)</td>
+                    @endif
+                @endif
+
                 <td>{{ $counter->percent($counter->fllow($record)['all'][2], $all['total']).'%' }}</td>
                 <td>{{ $counter->fllow($record)['total'] }}</td>
                 <td>{{ '¥'.$counter->fllow($record)['all'][2] }}</td>

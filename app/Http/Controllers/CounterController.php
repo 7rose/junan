@@ -39,9 +39,23 @@ class CounterController extends Controller
                     ->leftJoin('customers', 'finance.customer_id', '=', 'customers.id')
                     ->leftJoin('users as c', 'finance.created_by', '=', 'c.id')
                     ->leftJoin('users as a', 'finance.user_id', '=', 'a.id')
-                    ->leftJoin('branches', 'finance.branch', '=', 'branches.id');
+                    ->leftJoin('branches', 'finance.branch', '=', 'branches.id')
+                    ->leftJoin('branches as r', 'a.branch', '=', 'r.id');
 
         return $pre;
+    }
+
+    // 财务统计模式
+    public function financeMode($key)
+    {
+         // 授权
+        // $auth = new Auth;
+        // $auth_error = new Error;
+        // if(!$auth->admin())  return $auth_error->forbidden();
+        $error = new Error;
+        if($key != 'normal' && $key !='real') return $error->paramLost();
+        Session::put('counter_finance_mode', $key);
+        return redirect('/counter/finance');
     }
 
     // 财务
@@ -50,18 +64,25 @@ class CounterController extends Controller
         $auth = new Auth;
         if($auth->branchLimit()) return redirect('/counter/finance/'.$auth->me->branch);
 
-        $records = $this->financePre()
+        $pre2 = $this->financePre()
                         ->select(
                             'finance.branch', 
                             'branches.text as branch_text',
+                            'r.id as real_branch', 
+                            'r.text as real_branch_text',
                             DB::raw('
                                 group_concat(finance.in) as finance_in, 
                                 group_concat(finance.price) as finance_price, 
                                 group_concat(finance.real_price) as finance_real_price, 
                                 group_concat(finance.item) as finance_item 
-                            '))
-                        ->groupBy('finance.branch')
-                        ->get();
+                            '));
+
+        if(!Session::has('counter_finance_mode') || Session::get('counter_finance_mode') != 'real'){
+            $records = $pre2->groupBy('finance.branch')->get();
+        }else {
+            $records = $pre2->groupBy('r.id')->get();
+        }
+
         $counter = new Counter;
 
         $total = $this->financePre()
@@ -84,13 +105,16 @@ class CounterController extends Controller
         $auth = new Auth;
         if($auth->branchLimit() && $id != $auth->me->branch) return redirect('/counter/finance/'.$auth->me->branch);
 
-        $records = $this->financePre()
+        $records = [];
+
+        if(!Session::has('counter_finance_mode') || Session::get('counter_finance_mode') != 'real'){
+            $records = $this->financePre()
                         ->where('finance.branch', $id)
-                        ->whereNotNull('finance.user_id')
+                        // ->whereNotNull('finance.user_id')
                         ->select(
                             'finance.user_id',
                             'a.name as user_id_text', 
-                            'branches.text as branch_text',
+                            // 'branches.text as branch_text',
                             DB::raw('
                                 group_concat(finance.in) as finance_in, 
                                 group_concat(finance.price) as finance_price, 
@@ -99,13 +123,41 @@ class CounterController extends Controller
                             '))
                         ->groupBy('finance.user_id')
                         ->get();
+        }else{
+            $records = $this->financePre()
+                        ->where('r.id', $id)
+                        // ->whereNotNull('finance.user_id')
+                        ->select(
+                            'finance.user_id',
+                            'a.name as user_id_text', 
+                            // 'branches.text as branch_text',
+                            DB::raw('
+                                group_concat(finance.in) as finance_in, 
+                                group_concat(finance.price) as finance_price, 
+                                group_concat(finance.real_price) as finance_real_price, 
+                                group_concat(finance.item) as finance_item 
+                            '))
+                        ->groupBy('finance.user_id')
+                        ->get();
+        }
 
-                $counter = new Counter;
+        // print_r($records);
 
-        $total = $this->financePre()
-                    ->where('finance.branch', $id)
-                    ->select('finance.in', 'finance.real_price')
-                    ->get();
+        $counter = new Counter;
+        $total = '';
+        if(!Session::has('counter_finance_mode') || Session::get('counter_finance_mode') != 'real'){
+            $total = $this->financePre()
+                        ->whereNotNull('finance.user_id')
+                        ->where('finance.branch', $id)
+                        ->select('finance.in', 'finance.real_price')
+                        ->get();
+        }else{
+            $total = $this->financePre()
+                        ->whereNotNull('finance.user_id')
+                        ->where('r.id', $id)
+                        ->select('finance.in', 'finance.real_price')
+                        ->get();
+        }
 
         $branch = DB::table('branches')->find($id)->text;
 

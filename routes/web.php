@@ -120,6 +120,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/counter/lesson', 'CounterController@lesson');
     Route::get('/counter/biz', 'CounterController@biz');
     Route::get('/counter/biz/download/excel', 'CounterController@bizExcel');
+    Route::get('/filter/counter_finance_mode/{key}', 'CounterController@financeMode');
 
 });
 

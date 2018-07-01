@@ -52,6 +52,7 @@ class Auth
     // 同机构
     public function sameBranch($target_id)
     {
+        if($this->admin()) return true;
         $target_branch = User::find($target_id)->branch;
         return $this->me->branch == $target_branch ? true : false;
     }
