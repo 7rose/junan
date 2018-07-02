@@ -85,7 +85,7 @@ class Pre
             $branch = new ConfigList;
             $branch_list = $branch->branchList();
 
-            $root_branch_text = '军安集团';
+            $root_branch_text = config('ginkgo.name');
             if(Session::has('branch_set')) {
                 $root_branch_text = DB::table('branches')->find(Session::get('branch_set'))->text;
             }
