@@ -3,8 +3,12 @@
 @section('container')
 <div class="welcome">
     <img class="doc-img" src="{{ URL::asset('junan/images/junan.svg') }}">
-    <h3>军安集团综合管理系统</h3>
+    <h3>{{ Config::get('ginkgo')['name'] }}管理系统</h3>
+    @if(Config::get('ginkgo')['name'] == '军安集团')
     <p><a href="{{ URL::asset('junan/files/doc.pdf') }}" class="btn btn-sm btn-success">下载使用说明书</a></p>
+    @else
+    <p><a class="btn btn-sm btn-success" disabled="disabled">测试号无法下载使用说明书</a></p>
+    @endif
 
 <div class="well doc-well">
     <h4>用户示例</h4>
@@ -21,7 +25,7 @@
         </li>
     </ol>
 </div>
-    <span>2018&nbsp&copy&nbsp宿迁市军安驾培集团</span>
+    <span>2018&nbsp&copy&nbsp{{ Config::get('ginkgo')['copy_right'] }}</span>
 </div>
   
 @endsection

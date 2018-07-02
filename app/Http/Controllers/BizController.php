@@ -230,7 +230,6 @@ class BizController extends Controller
         $record = Biz::find($id);
         $record->update(['printed'=>false]);
         return redirect('/customer/'.$record->customer_id);
-        // print_r($record);
     }
 
     // end
