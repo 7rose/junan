@@ -42,7 +42,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ Config::get('ginkgo')['name'] }}</title>
+    <title>{{ config('ginkgo.name') }}</title>
     <link rel="stylesheet" href="{{ URL::asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
     <script src="{{ URL::asset('node_modules/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ URL::asset('node_modules/bootstrap/dist/js/bootstrap.min.js') }}"></script>
@@ -60,7 +60,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="/"><img class="logo" src="{{ URL::asset('images/'.Config::get('ginkgo')['logo_top'].'.svg') }}"></a>
+            <a href="/"><img class="logo" src="{{ URL::asset('images/'.config('ginkgo.logo_top').'.svg') }}"></a>
             <div class="btn-group">
     </div>
         </div>
