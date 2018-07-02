@@ -2,7 +2,7 @@
 
 @section('container')
 <div class="welcome">
-    <img class="doc-img" src="{{ URL::asset('junan/images/junan.svg') }}">
+    <img class="doc-img" src="{{ URL::asset('junan/images/'.config('ginkgo.logo').'.svg') }}">
     <h3>{{ Config::get('ginkgo')['name'] }}管理系统</h3>
     @if(config('ginkgo.name') == '军安集团')
     <p><a href="{{ URL::asset('junan/files/doc.pdf') }}" class="btn btn-sm btn-success">下载使用说明书</a></p>
