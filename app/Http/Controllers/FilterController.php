@@ -800,7 +800,7 @@ class FilterController extends Controller
                 array_push($cellData, [
                                         $record->customer_name, 
                                         $record->customer_mobile, 
-                                        '#'.$record->customer_id_number, 
+                                        $record->customer_id_number.' ', 
                                         $record->branch_text, 
                                         $record->user_name,
                                         explode('(', $record->class_branch_text)[0].$record->class_no, 

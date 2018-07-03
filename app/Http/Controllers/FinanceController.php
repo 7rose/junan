@@ -247,7 +247,7 @@ class FinanceController extends Controller
                                         $record->in ? '收' : '付', 
                                         $record->branch_text, 
                                         $record->customer_id_text, 
-                                        '#'.$record->customer_id_number, 
+                                        $record->customer_id_number.' ', 
                                         $record->customer_mobile, 
                                         $record->item_text, 
                                         $record->price,$record->real_price,
@@ -261,6 +261,7 @@ class FinanceController extends Controller
 
         Excel::create($file_name,function($excel) use ($cellData){
             $excel->sheet('列表', function($sheet) use ($cellData){
+                // $sheet->getStyle('D')->getNumberFormat()->setFormatCode('FORMAT_TEXT');
                 $sheet->rows($cellData);
                 $sheet->setAutoSize(true);
                 $sheet->freezeFirstRow();

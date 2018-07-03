@@ -324,7 +324,7 @@ class CustomerController extends Controller
                 array_push($cellData, [
                                         $record->name,
                                         $record->mobile, 
-                                        '#'.$record->id_number, 
+                                        $record->id_number.' ', 
                                         $record->finance_info, 
                                         $record->biz_info,
                                         $record->address,
