@@ -35,7 +35,7 @@ class FinanceController extends Controller
                           ->leftJoin('users as ck2', 'finance.checked_2_by', '=', 'ck2.id')
                           ->leftJoin('users as u', 'finance.user_id', '=', 'u.id')
                           ->leftJoin('branches', 'finance.branch', '=', 'branches.id')
-                          ->select('finance.*', 'i.text as item_text', 'customers.name as customer_id_text', 'c.name as created_by_text', 'u.name as user_id_text', 'branches.text as branch_text', 'customers.mobile as customer_mobile', 'ck.name as checked_by_text', 'ck2.name as checked_2_by_name')
+                          ->select('finance.*', 'i.text as item_text', 'customers.name as customer_id_text', 'customers.id_number as customer_id_number', 'c.name as created_by_text', 'u.name as user_id_text', 'branches.text as branch_text', 'customers.mobile as customer_mobile', 'ck.name as checked_by_text', 'ck2.name as checked_2_by_name')
                           ->where(function ($query) {
                                 // 分支机构限制
                                 if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
@@ -233,7 +233,7 @@ class FinanceController extends Controller
     public function seekToExcel()
     {
         $cellData = [
-            ['收付', '驾校', '学员', '学员电话', '项目', '应收/付', '实收付', '日期', '经手人', '推荐人'],
+            ['收付', '驾校', '学员', '身份证', '学员电话', '项目', '应收/付', '实收付', '日期', '经手人', '推荐人'],
         ];
 
         $records = $this->prepare()
@@ -247,6 +247,7 @@ class FinanceController extends Controller
                                         $record->in ? '收' : '付', 
                                         $record->branch_text, 
                                         $record->customer_id_text, 
+                                        '#'.$record->customer_id_number, 
                                         $record->customer_mobile, 
                                         $record->item_text, 
                                         $record->price,$record->real_price,
