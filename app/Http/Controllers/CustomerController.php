@@ -219,6 +219,7 @@ class CustomerController extends Controller
 
         $finance = DB::table('finance')
                             ->where('finance.customer_id', $id)
+                            ->where('finance.abandon', false)
                             ->leftJoin('config', 'finance.item', '=', 'config.id')
                             ->leftJoin('customers', 'finance.customer_id', '=', 'customers.id')
                             ->leftJoin('users as c', 'finance.created_by', '=', 'c.id')
