@@ -124,6 +124,10 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 });
 
+ Route::get('/test', function() {
+        echo "FUCK";
+    });
+
 
 
 
