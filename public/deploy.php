@@ -22,4 +22,3 @@ if($payload_hash == $signature){
 }else{
    return 'invalid key!'; 
 } 
-?>
