@@ -194,7 +194,7 @@ class Counter
         if(!count($pass_array) || !count($doing_array)) return false;
 
         // 成绩录入
-        $ex_score = '<a class="btn btn-xs btn-block btn-info" href="/filter/score_ex/'.$record->lesson.'-'.$record->order_date.'-'.$record->branch.'">成绩录入</a>';
+        $ex_score = '<a class="btn btn-xs btn-info" href="/filter/score_ex/'.$record->lesson.'-'.$record->order_date.'-'.$record->branch.'">成绩录入</a>';
 
         $all = count($pass_array);
         $pass = 0;
