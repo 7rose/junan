@@ -13,7 +13,7 @@
         <caption>
             @if(isset($records))
             <div class="alert alert-info">
-                军安集团: {{ Session::has('date_range') ? Session::get('date_range')['text'] : '' }}各驾校业务情况
+                {{ config('ginkgo.name') }}: {{ Session::has('date_range') ? Session::get('date_range')['text'] : '' }}各驾校业务情况
                 @if(count($records))
                     @if($auth->admin())
                 <a href="/counter/biz/download/excel" class="btn btn-success btn-sm">导出Excel</a>

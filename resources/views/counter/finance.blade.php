@@ -15,7 +15,7 @@
         <caption>
             @if(isset($all))
             <div class="alert alert-info">{{ $mode == 'normal' ? '对账 - ' : '贡献 - ' }}
-                军安集团: {{ Session::has('date_range') ? Session::get('date_range')['text'] : '' }}财务记录:{{ $all['total_num'] }}, 总营收: ¥{{ $all['total'] }}
+                {{ config('ginkgo.name') }}: {{ Session::has('date_range') ? Session::get('date_range')['text'] : '' }}财务记录:{{ $all['total_num'] }}, 总营收: ¥{{ $all['total'] }}
                     @if($mode == 'normal')
                 <a href="/filter/counter_finance_mode/real" class="btn btn-sm btn-info">切换为: 贡献模式</a>
                     @elseif($mode == 'real')
