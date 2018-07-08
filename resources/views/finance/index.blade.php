@@ -196,8 +196,9 @@
             post_url,
             post_data,
             function(message){
-                $("#modal-msg").html(message);
-                $("#checking"+id).html("<span class=\"label label-success\">"+message+"</span>");
+                location.reload();
+                // $("#modal-msg").html(message);
+                // $("#checking"+id).html("<span class=\"label label-success\">"+message+"</span>");
            }
         );
     }
@@ -224,8 +225,9 @@
             post_url,
             post_data,
             function(message){
-                $("#modal-msg").html(message);
-                $("#check_2_msg"+id).html("<span class=\"label label-info\">"+message+"</span>");
+                location.reload();
+                // $("#modal-msg").html(message);
+                // $("#check_2_msg"+id).html("<span class=\"label label-info\">"+message+"</span>");
            }
         );
     }
@@ -252,8 +254,9 @@
             post_url,
             post_data,
             function(message){
-                $("#modal-msg").html(message);
-                $("#check_2_msg"+id).html("<span class=\"label label-info\">"+message+"</span>");
+                location.reload();
+                // $("#modal-msg").html(message);
+                // $("#check_2_msg"+id).html("<span class=\"label label-info\">"+message+"</span>");
            }
         );
     }
@@ -280,8 +283,9 @@
             post_url,
             post_data,
             function(message){
-                $("#modal-msg").html(message);
-                $("#check_2_msg"+id).html("<span class=\"label label-info\">"+message+"</span>");
+                location.reload();
+                // $("#modal-msg").html(message);
+                // $("#check_2_msg"+id).html("<span class=\"label label-info\">"+message+"</span>");
            }
         );
     }
