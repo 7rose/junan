@@ -230,11 +230,11 @@ class CustomerController extends Controller
                             ->orderBy('finance.updated_at', 'desc')
                             ->get();
 
-        $to_out = Finance::where('customer_id', $id)->where('in', false)->sum('price');
-        $out = Finance::where('customer_id', $id)->where('in', false)->sum('real_price');
+        $to_out = Finance::where('customer_id', $id)->where('in', false)->where('abandon', false)->sum('price');
+        $out = Finance::where('customer_id', $id)->where('in', false)->where('abandon', false)->sum('real_price');
 
-        $to_in =Finance::where('customer_id', $id)->where('in', true)->sum('price');
-        $in =Finance::where('customer_id', $id)->where('in', true)->sum('real_price');
+        $to_in =Finance::where('customer_id', $id)->where('in', true)->where('abandon', false)->sum('price');
+        $in =Finance::where('customer_id', $id)->where('in', true)->where('abandon', false)->sum('real_price');
 
         $rest = $out - $to_out + $to_in - $in;
 
