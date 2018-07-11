@@ -85,8 +85,13 @@ class Date
         if($date == 'week') return ['text'=>'本周', 'range' =>[strtotime($week_start), strtotime($week_end)]];
         if($date == 'month') return ['text'=>'本月'.$this_month.'月份', 'range' =>[strtotime($month_start), strtotime($month_end)]];
         if($date == 'year') return ['text'=>$this_year.'全年', 'range' =>[strtotime($year_start), strtotime($year_end)]];
+
+        // 自定义时间段 $date: date_start,date_end
+        $manual = explode(',', $date);
+
+        return ['text'=>$manual[0].' 至 '.$manual[1], 'range' =>[strtotime($manual[0]), strtotime($manual[1])]];
     
-        // return false;
+        // return false; 
         echo $pre_month_year;
     }
 

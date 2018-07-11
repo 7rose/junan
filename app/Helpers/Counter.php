@@ -8,7 +8,7 @@ use Session;
  */
 class Counter
 {
-    // 学费id, 用于计算学费推荐业绩
+    // 学费id, 用于计算学费推荐业绩 
     private $recruit_id = 27;
 
     // 换班费id, 用于计算班型推荐业绩

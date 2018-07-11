@@ -112,6 +112,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/filter/download/excel', 'FilterController@filterToExcel');
 
     // 统计
+    Route::any('/counter/post_set', 'CounterController@postSet');
     Route::get('/counter/set/{date}', 'CounterController@set');
     Route::get('/counter/finance', 'CounterController@finance');
     Route::get('/counter/finance/{id}', 'CounterController@financeShow');

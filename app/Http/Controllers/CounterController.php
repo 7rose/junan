@@ -19,7 +19,7 @@ class CounterController extends Controller
 
 
 
-    // 财务准备
+    // 财务准备 
     private function financePre()
     {
         if(!Session::has('date_range')){
@@ -169,6 +169,18 @@ class CounterController extends Controller
         return view('counter.show')
                     ->with('all', $all)
                     ->with('records', $records);
+    }
+
+    // 自定义统计时间
+    public function postSet(Request $request)
+    {
+        $date = $request->input('date_start').','.$request->input('date_end');
+        $d = new Date;
+        // $date = '2018-7-1,2018-7-11';
+        $range = $d->dateRange($date);
+        if($range) Session::put('date_range', $range);
+
+        return 200;
     }
 
     // 按月和按年统计

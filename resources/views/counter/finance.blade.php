@@ -47,6 +47,10 @@
                         <li role="presentation">
                             <a role="menuitem" tabindex="-1" href="/counter/set/pre_month-finance">上个月</a>
                         </li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="javascript:manual()"><span class="glyphicon glyphicon-resize-horizontal"></span> 自定义时间段</a>
+                        </li>
 
                     </ul>
                 </div>
@@ -93,4 +97,71 @@
         @endif
     </table>
     @endif
+
+    {{-- 时间选择 --}}
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">自定时统计时间段</h4>
+            </div>
+            <div class="modal-body">
+                <input type="date" id="date_start" required="required"> 起(包含当日), 至
+                <input type="date" id="date_end" required="required">之前(不包含当日)
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn-sm" data-dismiss="modal">关闭</a>
+                <a class="btn btn-info btn-sm" href="javascript:post_set()">设定时间段</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function manual() {
+            $('#myModal').modal();
+        }
+
+        function post_set() {
+            var date_start = $("#date_start").val();
+            var date_end = $("#date_end").val();
+
+            if(date_start == '' || date_end == '') {
+                alert('起止时间均不得为空!');
+                return false;
+            }
+            if(date_start >= date_end) {
+                alert('截止时间不得小于或等于起始时间!');
+                return false;
+            }
+
+            var post_url = "/counter/post_set";
+            var post_data = {date_start:date_start, date_end:date_end};
+
+            $.post(
+                post_url,
+                post_data,
+                function(message){
+                    location.reload();
+                    // $("#modal-msg").html(message);
+                    // $("#checking"+id).html("<span class=\"label label-success\">"+message+"</span>");
+               }
+            );
+        }
+    </script>
+
 @endsection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
