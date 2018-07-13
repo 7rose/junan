@@ -15,7 +15,7 @@ use App\User;
     // 手机号
     public function checkMobile($val)
     {
-        $rule = '/^1[345789]{1}\d{9}$/';
+        $rule = '/^1[3456789]{1}\d{9}$/';
         return preg_match($rule,$val) ? true : false;
     }
 
