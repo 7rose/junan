@@ -210,7 +210,7 @@ class CustomerController extends Controller
                                 group_concat(lessons.end) as lesson_end
                                     ')
                         )
-                    // ->orderBy('lessons.pass')
+                    // ->orderBy('lessons.pass') 
                     ->groupBy('biz.id')
                     ->orderByRaw('lessons.lesson - lessons.lesson DESC')
                     ->orderBy('lessons.lesson', 'desc')

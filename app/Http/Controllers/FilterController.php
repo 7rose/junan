@@ -31,8 +31,8 @@ class FilterController extends Controller
                         ->leftJoin('lessons', 'biz.id', '=', 'lessons.biz_id')
                         ->leftJoin('customers', 'biz.customer_id', '=', 'customers.id')
                         ->leftJoin('branches', 'biz.branch', '=', 'branches.id')
-                        ->leftJoin('classes', 'biz.class_id', '=', 'class_id')
-                        ->leftJoin('branches as cb', 'classes.branch', '=', 'cb.id')
+                        ->leftJoin('classes', 'biz.class_id', '=', 'classes.id')
+                        ->leftJoin('branches as bb', 'classes.branch', '=', 'bb.id')
                         ->leftJoin('config', 'biz.licence_type', '=', 'config.id')
                         ->leftJoin('config as g', 'customers.gender', '=', 'g.id')
                         ->leftJoin('users', 'biz.user_id', '=', 'users.id')
@@ -46,7 +46,7 @@ class FilterController extends Controller
                             'g.text as customer_gender',
                             'branches.text as branch_text',
                             'config.text as licence_type_text',
-                            'cb.text as class_branch_text',
+                            'bb.text as class_branch_text',
                             'classes.class_no as class_no',
                             'users.name as user_name',
                             DB::raw('count(lessons.id) as lessons_num, max(lessons.lesson) as max_lesson')
@@ -78,7 +78,7 @@ class FilterController extends Controller
             case 'file_id_fail':
                 $tmp = $this->prepare()
                         ->whereNotNull('biz.class_id')
-                        ->where('biz.finished', false)
+                        // ->where('biz.finished', false)
                         ->where('biz.branch', '>', 1)
                         // ->whereNull('biz.user_id');
                         ->whereNull('biz.file_id');
@@ -88,7 +88,7 @@ class FilterController extends Controller
             case 'user_id_fail':
                 $tmp = $this->prepare()
                         ->whereNotNull('biz.class_id')
-                        ->where('biz.finished', false)
+                        // ->where('biz.finished', false)
                         ->where('biz.branch', '>', 1)
                         ->whereNull('biz.user_id');
                         // ->orWhereNull('biz.file_id');
@@ -97,7 +97,7 @@ class FilterController extends Controller
 
             case 'no_class':
                 $tmp = $this->prepare()
-                        ->where('biz.finished', false)
+                        // ->where('biz.finished', false)
                         ->whereNull('biz.class_id');
                 return $tmp;
                 break;
@@ -105,7 +105,7 @@ class FilterController extends Controller
             case 'ready_for_1': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->where('biz.next', '1.0'); 
                                             
@@ -115,7 +115,7 @@ class FilterController extends Controller
             case 'date_for_1': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->where('biz.next', '1.1'); 
                                             
@@ -130,7 +130,7 @@ class FilterController extends Controller
                  */
                 $fail = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->where('lessons.lesson', 1)
                             ->where('lessons.end', false)   
@@ -142,7 +142,7 @@ class FilterController extends Controller
             case 'ready_for_2':  
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
@@ -154,7 +154,7 @@ class FilterController extends Controller
             case 'date_for_2': 
                  $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.user_id')
                             ->where('biz.next', '1.3')
@@ -168,7 +168,7 @@ class FilterController extends Controller
                             ->where('biz.next', '1.3')
                             ->where('biz.next2', '2.0')
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.user_id')
                             ->where('lessons.lesson', 2)
@@ -180,7 +180,7 @@ class FilterController extends Controller
             case 'ready_for_3':  
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.file_id')
                             ->whereNotNull('biz.user_id')
@@ -193,7 +193,7 @@ class FilterController extends Controller
             case 'date_for_3': 
                  $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.file_id')
                             ->whereNotNull('biz.user_id')
@@ -213,7 +213,7 @@ class FilterController extends Controller
                             ->where('biz.next', '1.3')
                             ->where('biz.next3', '3.0')
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->whereNotNull('biz.user_id')
                             ->where('lessons.lesson', 3)
@@ -226,7 +226,7 @@ class FilterController extends Controller
             case 'ready_for_4': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->where('biz.next', '4.0'); 
                                             
@@ -236,7 +236,7 @@ class FilterController extends Controller
             case 'date_for_4': 
                 $next = $this->prepare()
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->where('biz.next', '4.1'); 
                                             
@@ -252,7 +252,7 @@ class FilterController extends Controller
                 $fail = $this->prepare()
                             ->where('biz.next', '4.0')
                             ->whereNotNull('biz.class_id')
-                            ->where('biz.finished', false)
+                            // ->where('biz.finished', false)
                             ->where('biz.branch', '>', 1)
                             ->where('lessons.lesson', 4)
                             ->where('lessons.end', false)   
