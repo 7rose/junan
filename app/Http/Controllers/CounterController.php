@@ -12,6 +12,7 @@ use App\Helpers\Counter;
 use App\Helpers\Date;
 use App\Helpers\Error;
 use App\Helpers\Auth;
+use App\Helpers\Logs;
 
 class CounterController extends Controller
 {
@@ -243,6 +244,11 @@ class CounterController extends Controller
         $date_text = Session::get('date_range')['text'];
 
         $file_name = $export['branch'].'-'.$date_text.'-'.$export['all']['total_num'].'/'.$export['all']['total'];
+        // 日志
+        $log_content = "统计: 下载财务统计Excel";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
 
         Excel::create($file_name,function($excel) use ($cellData){
@@ -360,6 +366,12 @@ class CounterController extends Controller
 
         $file_name = '考务统计'.date('Y-m-d', time());
 
+        // 日志
+        $log_content = "统计: 下载考务统计Excel";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         Excel::create($file_name,function($excel) use ($cellData, $cellData2){
             $excel->sheet('各驾校', function($sheet) use ($cellData){
                 $sheet->rows($cellData);
@@ -466,6 +478,12 @@ class CounterController extends Controller
         }
 
         $file_name = '业务统计'.date('Y-m-d', time());
+
+        // 日志
+        $log_content = "统计: 下载业务统计Excel";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         Excel::create($file_name,function($excel) use ($cellData){
             $excel->sheet('各驾校', function($sheet) use ($cellData){

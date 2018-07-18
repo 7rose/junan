@@ -14,6 +14,7 @@ use App\Helpers\Validator;
 use App\Helpers\Unique;
 use App\Helpers\Error;
 use App\Helpers\Auth;
+use App\Helpers\Logs;
 
 use App\User;
 use App\Customer;
@@ -159,6 +160,12 @@ class ImportController extends Controller
                 User::create($key);
             }
         }
+
+        // 日志
+        $log_content = "批量导入: 成员,共".count($ok_list).'项';
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         if(Session::has('ok_list')) Session::forget('ok_list');
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'Excel导入已成功!']);
@@ -369,6 +376,12 @@ class ImportController extends Controller
                 $has->update(['class_id'=>$class_id, 'licence_type'=>$licence_type_id]);
             }
         }
+
+        // 日志
+        $log_content = "批量导入: 开班花名册,共".count($all_id_number_list).'项';
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'Excel导入已成功!']);
     }

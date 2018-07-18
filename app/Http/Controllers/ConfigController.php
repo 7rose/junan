@@ -7,6 +7,7 @@ use App\Config;
 use App\Helpers\Config as Conf;
 use App\Helpers\Auth;
 use App\Helpers\Error;
+use App\Helpers\Logs;
 
 class ConfigController extends Controller
 {
@@ -47,6 +48,12 @@ class ConfigController extends Controller
         $target = Config::find($tmp[1]);
         $target->update(['show'=> $target->show ? false : true]);
 
+        // 日志
+        $log_content = "系统: 打开/关闭菜单选项";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/config/'.$tmp[0]);
 
     }
@@ -60,6 +67,11 @@ class ConfigController extends Controller
         if(!$auth->root())  return $auth_error->forbidden();
         
         $item = ['type' => $request->input('type'), 'text' => $request->input('text')];
+        // 日志
+        $log_content = "系统: 添加菜单选项 - ".$request->input('text');
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         Config::create($item);
         return 'ok';

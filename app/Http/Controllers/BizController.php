@@ -10,6 +10,7 @@ use App\Forms\BizForm;
 use App\Forms\BizEditForm;
 use App\Helpers\Error;
 use App\Helpers\Auth;
+use App\Helpers\Logs;
 // use App\Helpers\Unique;
 use App\Customer;
 use App\Finance;
@@ -98,6 +99,12 @@ class BizController extends Controller
 
         Finance::create($finance);
 
+        // 日志
+        $log_content = "业务: 新业务, 序号: ".$biz_id."; 同时收费".$finance['real_price'].'元, 票号'.$finance['ticket_no'];
+        $log_level = "warning";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/customer/'.$all['customer_id']);
     }
 
@@ -112,6 +119,12 @@ class BizController extends Controller
         $id = $request->input('id');
 
         Biz::where('customer_id', $id)->first()->update(['branch'=> $auth->branchLimit()]);
+
+        // 日志
+        $log_content = "业务: 认领学员, 序号: ".$id;
+        $log_level = "info";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
         
         return "认领成功!";
     }
@@ -155,6 +168,12 @@ class BizController extends Controller
         
         $record->update($all);
 
+        // 日志
+        $log_content = "业务: 修改业务信息, 序号:".$id;
+        $log_level = "warning";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         // $record->update(['class_type'=>$request->class_type, 'branch'=>$request->branch, 'user_id'=>null]);
         // if($request->branch != $record->branch) $record->update(['user_id'=>null]);
 
@@ -170,6 +189,11 @@ class BizController extends Controller
 
         // $path = $key_array[2];
         $path = str_replace(";","/",$key_array[2]);
+        // 日志
+        $log_content = "业务: 指定教练, 序号:".$key_array[0];
+        $log_level = "info";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         return redirect('/'.$path);
 
@@ -186,6 +210,12 @@ class BizController extends Controller
 
         $record = Biz::find($id);
         $record->update(['finished'=>true]);
+        // 日志
+        $log_content = "业务: 关闭, 序号:".$id;
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/customer/'.$record->customer_id);
     }
 
@@ -199,6 +229,13 @@ class BizController extends Controller
 
         $record = Biz::find($id);
         $record->update(['finished'=>false]);
+
+        // 日志
+        $log_content = "业务: 重新打开, 序号:".$id;
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/customer/'.$record->customer_id);
     }
 
@@ -210,6 +247,12 @@ class BizController extends Controller
 
         $record = Biz::find($id);
         $record->update(['file_id'=>$file_id]);
+
+        // 日志
+        $log_content = "业务: 登记准考证号:".$id.'/'.$file_id;
+        $log_level = "info";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         return $file_id;
     }
@@ -225,6 +268,12 @@ class BizController extends Controller
         $record = Biz::find($id);
         $record->update(['file_id'=>null]);
 
+        // 日志
+        $log_content = "业务: 撤销准考证号, 序号:".$id;
+        $log_level = "warning";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'该学员准考证记录已经撤销!']);
     }
 
@@ -238,6 +287,13 @@ class BizController extends Controller
 
         $record = Biz::find($id);
         $record->update(['printed'=>false]);
+
+        // 日志
+        $log_content = "考务: 重打科3准考证, 业务序号:".$id;
+        $log_level = "warning";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/customer/'.$record->customer_id);
     }
 

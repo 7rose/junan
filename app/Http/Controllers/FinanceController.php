@@ -17,6 +17,7 @@ use App\User;
 use App\Helpers\Error;
 use App\Helpers\ConfigList;
 use App\Helpers\Auth;
+use App\Helpers\Logs;
 
 class FinanceController extends Controller
 {
@@ -175,6 +176,12 @@ class FinanceController extends Controller
         // $all['date'] = strtotime($all['date']);
 
         $id = Finance::create($all);
+        // 日志
+        $log_content = "财务: 收付费, 序号:".$id;
+        $log_level = "info";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/customer/'.$all['customer_id']);
     }
 
@@ -234,6 +241,12 @@ class FinanceController extends Controller
         $all['in'] =  $all['in'] == 1 ? true : false; 
 
         Finance::find($id)->update($all);
+        // 日志
+        $log_content = "财务: 修改(审核前), 序号:".$id;
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'财务信息修改成功!']);
 
     }
@@ -268,6 +281,12 @@ class FinanceController extends Controller
 
         $target->update(['checked_2' => true, 'checked_2_by'=>Session::get('id'), 'checked_2_by_time'=>time()]); 
 
+        // 日志
+        $log_content = "财务: 审核通过票据, 序号:".$id;
+        $log_level = "info";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return "审核成功!!".date('Y-m-d h:m:s', $target->checked_2_by_time);
     }
 
@@ -284,6 +303,12 @@ class FinanceController extends Controller
         $target = Finance::find($id);
         $target = Finance::find($id)->update(['checked' => false, 'checked_by'=>null, 'checked_by_time'=>null, 'ticket_no'=>null]);
 
+        // 日志
+        $log_content = "财务: 撤销单据, 序号:".$id;
+        $log_level = "warning";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return "已撤销!!";
     }
 
@@ -299,6 +324,12 @@ class FinanceController extends Controller
 
         $target = Finance::find($id);
         $target = Finance::find($id)->update(['abandon' => true]);
+
+        // 日志
+        $log_content = "财务: 废弃单据, 序号:".$id;
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         return "已废弃!!";
     }
@@ -334,6 +365,12 @@ class FinanceController extends Controller
             }
         }
         $file_name = '财务'.date('Y-m-d', time());
+
+        // 日志
+        $log_content = "财务: 下载财务报表(可能为查询结果)";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         Excel::create($file_name,function($excel) use ($cellData){
             $excel->sheet('列表', function($sheet) use ($cellData){

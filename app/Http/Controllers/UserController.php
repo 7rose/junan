@@ -21,6 +21,7 @@ use App\Helpers\Validator;
 use App\Helpers\Error;
 use App\Helpers\Unique;
 use App\Helpers\Auth;
+use App\Helpers\Logs;
 
 class UserController extends Controller
 {
@@ -117,6 +118,12 @@ class UserController extends Controller
     // 退出
     public function logout()
     {
+
+        // 日志
+        $log_array = ['content'=>"成员: 退出"];
+        $log_put = new Logs;
+        $log_put->put($log_array);
+        
         Session::flush();
         // if (Cookie::has('id')) Cookie::queue('id', '', -1);
         return redirect('/');
@@ -135,6 +142,11 @@ class UserController extends Controller
         if (!Hash::check($request->password, $record->password)) return redirect()->back()->withErrors(['password'=>'密码错误!'])->withInput();
         Session::put('id', $record->id);
         // return redirect($request->path);
+
+        // 日志
+        $log_array = ['content'=>"登录"];
+        $log_put = new Logs;
+        $log_put->put($log_array);
         
         if(Session::has('target_url')) {
             $target_url = Session::get('target_url');
@@ -153,7 +165,15 @@ class UserController extends Controller
         $auth_error = new Error;
         if(!$auth->admin() || !$auth->master($id))  return $auth_error->forbidden();
 
-        $target = User::find($id)->update(['locked' => true]);
+        $target = User::find($id);
+        $target->update(['locked' => true]);
+
+        // 日志
+        $log_content = "成员: 锁定: ".$target->name.'/'.$target->work_id;
+        $log_level = "warning";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/user/'.$id);
     }
 
@@ -165,7 +185,15 @@ class UserController extends Controller
         $auth_error = new Error;
         if(!$auth->admin() || !$auth->master($id))  return $auth_error->forbidden();
         
-        $target = User::find($id)->update(['locked' => false]);
+        $target = User::find($id);
+        $target->update(['locked' => false]);
+
+        // 日志
+        $log_content = "成员: 解锁: ".$target->name.'/'.$target->work_id;
+        $log_level = "warning";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/user/'.$id);
     }
 
@@ -203,6 +231,7 @@ class UserController extends Controller
         $form = $this->form(UserPasswordForm::class);
         if($request->password != $request->password_confirmed) return redirect()->back()->withErrors(['password_confirmed'=>'2次输入不一致!'])->withInput();
         User::find(Session::get('id'))->update(['password'=>bcrypt($request->password), 'new'=>false]);
+
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'您的密码修改成功!']);
     }
 
@@ -219,6 +248,12 @@ class UserController extends Controller
 
         $password = $record->work_id.date("md");
         $record->update(['password'=>bcrypt($password), 'new'=>true]);
+
+        // 日志
+        $log_content = "成员: 重置用户密码: ".$record->name.'/'.$record->work_id;
+        $log_level = "warning";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>$record->name.'的密码修改成功!  格式为['.$record->name.'工号+本月+本日]']);
     }
@@ -268,6 +303,13 @@ class UserController extends Controller
         $all['password'] = bcrypt($all['work_id'].$all['work_id']);
 
         $id = User::create($all);
+
+        // 日志
+        $log_content = "成员: 新建: ".$all['work_id'].'/'.$all['name'];
+        $log_level = "warning";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/user/'.$id->id);
     }
 
@@ -324,6 +366,12 @@ class UserController extends Controller
             if(!$validate->checkMobile($all['mobile'])) return redirect()->back()->withErrors(['mobile'=>'手机号错误!'])->withInput();
 
             $target->update($all);
+
+            // 日志
+            $log_content = "成员: 修改: ".$target->work_id.'/'.$target->name;
+            $log_level = "warning";
+            $log_put = new Logs;
+            $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
             return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'用户信息修改成功!']);
         }else{
@@ -434,6 +482,12 @@ class UserController extends Controller
             }
         }
         $file_name = '成员'.date('Y-m-d', time());
+
+        // 日志
+        $log_content = "成员: 下载成员Excel文件(可能为查询结果)";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         Excel::create($file_name,function($excel) use ($cellData){
             $excel->sheet('列表', function($sheet) use ($cellData){

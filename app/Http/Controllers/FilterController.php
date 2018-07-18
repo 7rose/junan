@@ -14,6 +14,7 @@ use PDF;
 use App\Helpers\Part;
 use App\Helpers\Auth;
 use App\Helpers\Error;
+use App\Helpers\Logs;
 
 
 class FilterController extends Controller
@@ -583,6 +584,12 @@ class FilterController extends Controller
         // 清除选择
         $this->clearSelect();
 
+        // 日志
+        $log_content = "考务: 批量提交预约申请";
+        $log_level = "info";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
     }
 
@@ -613,6 +620,11 @@ class FilterController extends Controller
         }
         // 清除选择 
         $this->clearSelect();
+        // 日志
+        $log_content = "考务: 批量设置考试日期";
+        $log_level = "info";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
     }
@@ -779,6 +791,12 @@ class FilterController extends Controller
         if(Session::has('score_lesson')) Session::forget('score_lesson');
         if(Session::has('score_date')) Session::forget('score_date');
 
+        // 日志
+        $log_content = "考务: 批量处理成绩";
+        $log_level = "info";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'批处理已成功!']);
     }
 
@@ -810,6 +828,12 @@ class FilterController extends Controller
         }
 
         $file_name = '考务'.date('Y-m-d', time());
+
+        // 日志
+        $log_content = "考务: 下载学员Excel";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         Excel::create($file_name,function($excel) use ($cellData){
             $excel->sheet('列表', function($sheet) use ($cellData){
@@ -1023,6 +1047,12 @@ class FilterController extends Controller
     DB::table('biz')
         ->whereIn('id', $print_ids)
         ->update(['printed'=>true]);
+
+    // 日志
+    $log_content = "考务: 下载科目3打印文件";
+    $log_level = "danger";
+    $log_put = new Logs;
+    $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
     // 输出PDF
     $pdf = PDF::loadHTML($templet);

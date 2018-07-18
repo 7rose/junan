@@ -19,6 +19,7 @@ use App\Helpers\Error;
 use App\Helpers\Unique;
 use App\Helpers\Auth;
 use App\Helpers\Pre;
+use App\Helpers\Logs;
 
 class CustomerController extends Controller
 {
@@ -165,6 +166,12 @@ class CustomerController extends Controller
         $all['gender'] = intval($gender_flag)%2 == 1 ? 1 : 2;
 
         $id = Customer::create($all);
+        // 日志
+        $log_content = "学员: 新建: ".$all['id_number'].'/'.$all['name'];
+        $log_level = "info";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/customer/'.$id->id);
     }
 
@@ -296,6 +303,12 @@ class CustomerController extends Controller
 
         $target->update($all);
 
+        // 日志
+        $log_content = "学员: 修改: ".$target->id_number.'/'.$target->name;
+        $log_level = "warning";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'学员信息修改成功!']);
     }
 
@@ -333,6 +346,12 @@ class CustomerController extends Controller
             }
         }
         $file_name = '学员'.date('Y-m-d', time());
+
+        // 日志
+        $log_content = "学员: 下载Excel(可能为查询结果)";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         Excel::create($file_name,function($excel) use ($cellData){
             $excel->sheet('列表', function($sheet) use ($cellData){

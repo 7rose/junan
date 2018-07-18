@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Branch;
 use App\Helpers\Auth;
 use App\Helpers\Error;
+use App\Helpers\Logs;
 
 class BranchController extends Controller
 {
@@ -35,6 +36,12 @@ class BranchController extends Controller
         $target = Branch::find($id);
 
         $target->update(['show'=> $target->show ? false : true]);
+        // 日志
+        $log_content = "系统: 打开/关闭分支机构";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return redirect('/branch');
     }
 
@@ -50,6 +57,13 @@ class BranchController extends Controller
         $parent_id = 1;
 
         Branch::create(['parent_id'=>$parent_id, 'text'=>$text]);
+
+        // 日志
+        $log_content = "系统: 添加分支机构 - ".$request->input('text');
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
         return 200;
     }
 
