@@ -13,7 +13,7 @@ class CreateLogsTabel extends Migration
      */
     public function up()
     {
-        Schema::table('logs', function (Blueprint $table) {
+        Schema::create('logs', function (Blueprint $table) {
             $table->increments('id');
             $table->string('level');
             $table->integer('who');
@@ -31,7 +31,7 @@ class CreateLogsTabel extends Migration
     public function down()
     {
         Schema::table('logs', function (Blueprint $table) {
-            //
+            Schema::dropIfExists('logs');
         });
     }
 }
