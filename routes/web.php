@@ -120,10 +120,6 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 });
 
- Route::get('/test', function() {
-        $a = new App\Helpers\Logs;
-        $a->put(['content'=>"messagekakak"]);
-    });
 
 
 
