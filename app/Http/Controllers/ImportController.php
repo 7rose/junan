@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Session;
 use Excel;
+use DB;
 
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\UserImportForm;
@@ -201,6 +202,10 @@ class ImportController extends Controller
         $new_customer_list = [];
         $update_customer_list = [];
 
+        // 驾校列表
+        $branches_list = DB::table('branches')->where('id', '>', 1)->select(['id', 'text'])->get()->toArray();
+        if(!count($branches_list)) return $auth_error->paramLost();
+
         for ($i=0; $i < count($resaults); $i++) { 
 
             $item = $resaults[$i];
@@ -222,6 +227,26 @@ class ImportController extends Controller
                 return redirect()->back()->withErrors(['file'=>$error])->withInput();
             }
 
+            // 驾校
+            $branch_text_import = trim($item['content']);
+            $branch_import = 1;
+
+            if(isset($item['content']) && $branch_text_import != '' && $branch_text_import != null){
+
+                // 存在
+                foreach ($branches_list as $key) {
+                    if(str_contains($key->text, $branch_text_import)) {
+                        $branch_import = $key->id;
+                    }
+                }
+
+                // 不存在
+                if($branch_import == 1) {
+                    $error = '第'.($i+2).'行: '."驾校名称错误!";
+                    return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                }
+            }
+
 
             $item_to_import = [
                 'name'=>preg_replace('# #', '', $item['name']), 
@@ -230,6 +255,7 @@ class ImportController extends Controller
                 'address'=>$item['address'],
                 'gender'=>$item['gender'] == '女' ? 2 : 1,
                 'created_by'=>Session::get('id'),
+                // 'branch'=>$branch_import,
                 // 'created_at'=>time(),
                 // 'date'=>time(),
             ];
@@ -243,7 +269,7 @@ class ImportController extends Controller
 
             // 所有开班人员
             // array_push($all_id_number_list, $item['id_number']);
-            $all_id_number_list = array_add($all_id_number_list, $item['id_number'], $item['licence_type']);
+            $all_id_number_list = array_add($all_id_number_list, $item['id_number'], $item['licence_type'].','.$branch_import);
         }
 
         $unique_all_id_number_list = array_unique($all_id_number_list);
@@ -317,7 +343,12 @@ class ImportController extends Controller
             $class_id = Classes::create($class_info)->id;
         }
 
-        foreach ($all_id_number_list as $id_number => $licence_type) {
+        foreach ($all_id_number_list as $id_number => $mix) {
+            // 分解混合值
+            $tmp = explode(',', $mix);
+            $licence_type = $tmp[0];
+            $branch = $tmp[1];
+
             $customer = Customer::where('id_number', $id_number)->first();
             $customer_id = $customer->id;
 
@@ -333,7 +364,7 @@ class ImportController extends Controller
             // $customer = Customer::find()
 
             if(!$has){
-                Biz::insert(['customer_id'=>$customer_id, 'licence_type'=>$licence_type_id, 'created_by'=>Session::get('id'), 'class_id'=>$class_id, 'class_type'=>$default_class_type_id, 'date'=>time()]);
+                Biz::insert(['customer_id'=>$customer_id, 'licence_type'=>$licence_type_id, 'created_by'=>Session::get('id'), 'class_id'=>$class_id, 'class_type'=>$default_class_type_id, 'date'=>time(), 'branch'=>$branch]);
             }else{
                 $has->update(['class_id'=>$class_id, 'licence_type'=>$licence_type_id]);
             }
