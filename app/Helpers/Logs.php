@@ -34,7 +34,7 @@ class Logs
         $url = "http://ip.taobao.com/service/getIpInfo.php?ip=".$ip;
         $data = json_decode(file_get_contents($url), true)['data'];  
 
-        return $data['country'].'/'.$data['area'].'/'.$data['city']; 
+        return $data['country'].'/'.$data['region'].'/'.$data['city']; 
         // return $data;
     }
 }
