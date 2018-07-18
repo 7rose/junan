@@ -120,6 +120,11 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 });
 
+// 文档
+    Route::get('/test', function() {
+        return $view;
+    });
+
 
 
 
