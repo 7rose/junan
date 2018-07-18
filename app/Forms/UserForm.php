@@ -32,7 +32,7 @@ class UserForm extends Form
                 'rules'       => 'required'
             ]);
 
-        if($auth->branchLimit() || (!$auth->branchLimit() && Session::has('branch_set'))) {
+        if($auth->branchLimit() || (!$auth->branchLimit() && Session::has('branch_set') && Session::get('branch_set') != 1)) {
             $this->add('branch', 'hidden', [
                 'value' => $auth->branchLimitId()
             ]);
