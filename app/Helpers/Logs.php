@@ -18,10 +18,11 @@ class Logs
         if(!isset($array['content'])) {
             Log::emergency('业务日志错误!');
         }
+        $ip = Request::ip();
 
         if(!isset($array['level'])) $array['level'] = 'info';
         $array['who'] = Session::get('id');
-        $array['from'] = $this->ip2Address(Request::ip());
+        $array['from'] = $ip.'/'.$this->ip2Address($ip);
 
         print_r($array);
 
