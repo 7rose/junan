@@ -92,8 +92,14 @@ class CustomerController extends Controller
                         ->orderBy('customers.created_at', 'desc')
                         ->paginate(50);
         // Session::put('customer_list', $records);
+        $all = $this->prepare()
+                        ->groupBy('customers.id')
+                        ->get()
+                        ->count();
 
-        return view('customers.index', compact('form'))->with('records', $records);
+        return view('customers.index', compact('form'))
+                    ->with('all', $all)
+                    ->with('records', $records);
     }
 
     // 查询条件

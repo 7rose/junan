@@ -2,7 +2,7 @@
     $date = new App\Helpers\Date;
     $seek = new App\Helpers\Seek;
     $auth = new App\Helpers\Auth;
-    $pre = new App\Helpers\Pre;
+    $pre = new App\Helpers\Pre; 
 
 ?>
 @extends('../nav')
@@ -10,8 +10,8 @@
 @section('container')
     <ul id="myTab" class="nav nav-tabs">
         <li class="active">
-            @if(isset($records))
-            <a href="#list" data-toggle="tab">{{ $seek->seeking('seek_array', 'key') ? '查询结果 - '.count($records) : '全部 -'.count($records)}}</a>
+            @if(isset($all))
+            <a href="#list" data-toggle="tab">{{ $seek->seeking('seek_array', 'key') ? '查询结果 - '.$all : '全部 -'.$all}}</a>
             @endif
         </li>
         <li>

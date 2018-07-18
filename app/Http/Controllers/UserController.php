@@ -79,9 +79,15 @@ class UserController extends Controller
                     ->orderBy('users.work_id')
                     ->orderBy('users.auth_type')
                     // ->orderBy('users.created_at', 'desc')
-                    ->paginate(40);
+                    ->paginate(50);
 
-        return view('users.index', compact('form'))->with('records', $records);
+        $all = $this->prepare()
+                        ->get()
+                        ->count();
+
+        return view('users.index', compact('form'))
+                    ->with('all', $all)
+                    ->with('records', $records);
     }
 
     // 查询条件
