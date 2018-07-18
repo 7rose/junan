@@ -210,7 +210,13 @@ class ImportController extends Controller
         $update_customer_list = [];
 
         // 驾校列表
-        $branches_list = DB::table('branches')->where('id', '>', 1)->select(['id', 'text'])->get()->toArray();
+        $branches_list = DB::table('branches')
+                            ->where('id', '>', 1)
+                            ->where('show', true)
+                            ->select(['id', 'text'])
+                            ->get()
+                            ->toArray();
+                            
         if(!count($branches_list)) return $auth_error->paramLost();
 
         for ($i=0; $i < count($resaults); $i++) { 
