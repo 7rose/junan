@@ -12,7 +12,14 @@ class BizEditForm extends Form
     public function buildForm()
     {
         $list = new ConfigList;
-        $this
+        
+        $this->add('licence_type', 'choice', [
+            'label' => '证照类型', 
+            'empty_value' => '-- 选择 --',
+            // 'choices'=> $list->getBizList($list->idFromUrl()),
+            'choices'=> $list->getList('licence_type'),
+            'rules' => 'required'
+        ])
             ->add('class_type', 'choice', [
                 'label' => '班类型', 
                 'empty_value' => '-- 选择 --',

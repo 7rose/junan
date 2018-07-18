@@ -27,7 +27,7 @@ class FinanceForm extends Form
             ->add('in', 'choice', [
                 'label' => '收/付', 
                 'empty_value' => '-- 选择 --',
-                'choices'=> ['1'=>'收入+', '2'=>'支出-'],
+                'choices'=> ['1'=>'收入+', '0'=>'支出-'],
                 'rules' => 'required'
             ])
             ->add('item', 'choice', [
@@ -66,10 +66,12 @@ class FinanceForm extends Form
                 'rules' => 'required'
             ]);
         }
-            // $this->add('date', 'date', [
-            //     'label' => '日期',
-            //     'rules' => 'required'
-            // ])
+
+        if($auth->admin()) {
+            $this->add('date', 'date', [
+                'label' => '日期'
+            ]);
+        }
             $this->add('price', 'number', [
                     'label' => '应收/付',
                     'attr' =>['step' => 0.01],

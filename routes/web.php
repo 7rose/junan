@@ -18,7 +18,10 @@ Route::post('/user/check', ['as'=>'user.check', 'uses'=>'UserController@check'])
 Route::get('/locked', 'UserController@lockInfo');
 
 Route::group(['middleware' => ['login', 'state_check']], function () {
-    // doc
+    // 日志
+    Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+
+    // 文档
     Route::get('/doc', function() {
         return view('users.doc');
     });
@@ -87,6 +90,8 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/finance/seek', ['as'=>'finance.seek', 'uses'=>'FinanceController@seek']);
     Route::get('/finance/seek/reset', 'FinanceController@seekReset');
     Route::get('/finance/create/{id}', 'FinanceController@create');
+    Route::get('/finance/edit/{id}', 'FinanceController@edit');
+    Route::post('/finance/update/{id}', 'FinanceController@update');
     Route::post('/finance/store', ['as'=>'finance.store', 'uses'=>'FinanceController@store']);
     Route::get('/finance/download/excel', 'FinanceController@seekToExcel');
     Route::post('/finance/checking', 'FinanceController@checking');

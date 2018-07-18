@@ -54,6 +54,10 @@
             <tr class="{{ $record->in ? 'default' : 'warning' }}">
                 @endif
                 <td>
+                    @if($auth->admin() && !$record->abandon && !$record->checked_2)
+                        <a class="btn btn-warning btn-xs" href="/finance/edit/{{ $record->id }}">修改</a>
+                    @endif
+
                     @if($auth->root() && !$record->abandon)
                         <button class="btn btn-info btn-xs" type="button" onClick="javascript:abandon({{ $record->id }})">废弃!</button>
                     @endif

@@ -35,7 +35,21 @@ class FinanceController extends Controller
                           ->leftJoin('users as ck2', 'finance.checked_2_by', '=', 'ck2.id')
                           ->leftJoin('users as u', 'finance.user_id', '=', 'u.id')
                           ->leftJoin('branches', 'finance.branch', '=', 'branches.id')
-                          ->select('finance.*', 'i.text as item_text', 'customers.name as customer_id_text', 'customers.id_number as customer_id_number', 'c.name as created_by_text', 'u.name as user_id_text', 'branches.text as branch_text', 'customers.mobile as customer_mobile', 'ck.name as checked_by_text', 'ck2.name as checked_2_by_name')
+                          ->leftJoin('biz', 'finance.biz_id', '=', 'biz.id')
+                          ->leftJoin('config as ib', 'biz.licence_type', '=', 'ib.id')
+                          ->select(
+                                'finance.*', 
+                                'i.text as item_text', 
+                                'customers.name as customer_id_text', 
+                                'customers.id_number as customer_id_number', 
+                                'c.name as created_by_text', 
+                                'u.name as user_id_text', 
+                                'branches.text as branch_text', 
+                                'customers.mobile as customer_mobile', 
+                                'ck.name as checked_by_text', 
+                                'ck2.name as checked_2_by_name',
+                                'ib.text as licence_type_text'
+                            )
                           ->where(function ($query) {
                                 // 分支机构限制
                                 if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
@@ -164,6 +178,66 @@ class FinanceController extends Controller
         return redirect('/customer/'.$all['customer_id']);
     }
 
+    // 修改
+    public function edit($id)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+
+        $record = Finance::leftJoin('users', 'finance.user_id', '=', 'users.id')
+                        ->select(
+                            'finance.*', 
+                            'users.name as user_name', 
+                            'users.work_id as user_id'
+                        )
+                        ->find($id);
+
+        $form = $this->form(FinanceForm::class, [
+            'method' => 'POST',
+            'model' => $record,
+            'url' => '/finance/update/'.$id
+        ]);
+
+
+        if($auth->admin() && !$record->abandon && !$record->checked_2){
+            $title = ' 修改财务记录, 推荐人 - '.($record->user_id ? $record->user_name : '无').' - '.date('Y-m-d', $record->date);
+            $icon = 'warning-sign';
+
+            return view('form_with_selector', compact('form'))->with('custom',['title'=>$title, 'icon'=>$icon]);
+        }else{
+           return $auth_error->forbidden(); 
+        } 
+    }
+
+    // 修改
+    public function update(Request $request, $id)
+    {
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        $error = new Error;
+
+        $all = $request->all();
+        $user = User::where('work_id', $all['user_id'])->get();
+
+        if(count($user) != 1) return $error->paramLost();
+        $all['user_id'] = User::where('work_id', $all['user_id'])->first()->id;
+
+        if($all['date'] == '' || $all['date'] == null) {
+            array_forget($all, 'date');
+        }else{
+            $all['date'] = strtotime($all['date']);
+        }
+
+        $all['in'] =  $all['in'] == 1 ? true : false; 
+
+        Finance::find($id)->update($all);
+        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'财务信息修改成功!']);
+
+    }
+
     // 登记单据
     public function checking(Request $request)
     {
@@ -233,7 +307,7 @@ class FinanceController extends Controller
     public function seekToExcel()
     {
         $cellData = [
-            ['收付', '驾校', '学员', '身份证', '学员电话', '项目', '应收/付', '实收付', '日期', '经手人', '推荐人'],
+            ['收付', '驾校', '学员', '身份证', '学员电话', '项目', '应收/付', '实收付', '日期', '经手人', '推荐人', '票据号', '业务车型'],
         ];
 
         $records = $this->prepare()
@@ -253,7 +327,9 @@ class FinanceController extends Controller
                                         $record->price,$record->real_price,
                                         date('Y-m-d', $record->date),
                                         $record->created_by_text,
-                                        $record->user_id_text
+                                        $record->user_id_text,
+                                        $record->ticket_no,
+                                        $record->licence_type_text,
                                     ]);
             }
         }

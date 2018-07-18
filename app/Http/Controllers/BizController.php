@@ -144,9 +144,18 @@ class BizController extends Controller
         $auth_error = new Error;
         if(!$auth->admin())  return $auth_error->forbidden();
 
-        $record = Biz::find($id);
-        $record->update(['class_type'=>$request->class_type, 'branch'=>$request->branch, 'user_id'=>null]);
+        $all =$request->all();
 
+        $record = Biz::find($id);
+
+        if($record->class_id && $all['licence_type'] != $record->licence_type) {
+            return view('note')->with('custom', ['color'=>'danger', 'icon'=>'info', 'content'=>'该业务已开班, 不能修改证照类型!']);
+        }
+        $all['user_id'] = null;
+        
+        $record->update($all);
+
+        // $record->update(['class_type'=>$request->class_type, 'branch'=>$request->branch, 'user_id'=>null]);
         // if($request->branch != $record->branch) $record->update(['user_id'=>null]);
 
         return redirect('/customer/'.$record->customer_id);
