@@ -178,7 +178,7 @@ class FinanceController extends Controller
 
         $id = Finance::create($all);
         // 日志
-        $log_content = "财务: 收付费, 序号:".$id;
+        $log_content = "财务: 收付费, 序号:".$id->id;
         $log_level = "info";
         $log_put = new Logs;
         $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
