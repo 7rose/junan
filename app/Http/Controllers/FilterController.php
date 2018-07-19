@@ -21,7 +21,7 @@ class FilterController extends Controller
 {
     use FormBuilderTrait;
 
-    private $biz_part;
+    // private $biz_part;
     private $auth;
 
     private function prepare()

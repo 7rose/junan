@@ -7,9 +7,13 @@ Route::post('/user/check', ['as'=>'user.check', 'uses'=>'UserController@check'])
 Route::get('/locked', 'UserController@lockInfo');
 
 // 日志
-Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
 Route::group(['middleware' => ['login', 'state_check']], function () {
+    // 日志
+    Route::get('/biz_logs', 'LogsController@index');
+    Route::get('/biz_logs/download/excel', 'LogsController@logsExcel');
+    Route::post('/biz_logs/seek', 'LogsController@seek');
 
     // 文档
     Route::get('/doc', function() {

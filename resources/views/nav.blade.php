@@ -86,7 +86,9 @@
                         <ul class="dropdown-menu">
                             {!! $conf->confMenu() !!}
                             <li class="divider"></li>
-                            <li><a href="/branch">分支机构</a></li>
+                            <li><a href="/branch"><span class="glyphicon glyphicon-globe"></span> 分支机构</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/biz_logs"><span class="glyphicon glyphicon-calendar"></span> 系统日志</a></li>
                         </ul>
                     </li>
                 @endif
