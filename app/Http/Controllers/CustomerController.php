@@ -29,9 +29,9 @@ class CustomerController extends Controller
 
     private function prepare() 
     {
-        // 更新预处理财务结果数据
-        $pre = new Pre;
-        $pre->updateFinance();
+        // // 更新预处理财务结果数据
+        // $pre = new Pre;
+        // $pre->updateFinance();
 
         $this->auth = new Auth;
 

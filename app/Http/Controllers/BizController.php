@@ -11,6 +11,7 @@ use App\Forms\BizEditForm;
 use App\Helpers\Error;
 use App\Helpers\Auth;
 use App\Helpers\Logs;
+use App\Helpers\Pre;
 // use App\Helpers\Unique;
 use App\Customer;
 use App\Finance;
@@ -104,6 +105,10 @@ class BizController extends Controller
         $log_level = "warning";
         $log_put = new Logs;
         $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
+        // 更新预处理财务结果数据
+        $pre = new Pre;
+        $pre->updateFinance();
 
         return redirect('/customer/'.$all['customer_id']);
     }

@@ -18,6 +18,7 @@ use App\Helpers\Error;
 use App\Helpers\ConfigList;
 use App\Helpers\Auth;
 use App\Helpers\Logs;
+use App\Helpers\Pre;
 
 class FinanceController extends Controller
 {
@@ -182,6 +183,10 @@ class FinanceController extends Controller
         $log_put = new Logs;
         $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
+        // 更新预处理财务结果数据
+        $pre = new Pre;
+        $pre->updateFinance();
+
         return redirect('/customer/'.$all['customer_id']);
     }
 
@@ -246,6 +251,10 @@ class FinanceController extends Controller
         $log_level = "danger";
         $log_put = new Logs;
         $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
+        // 更新预处理财务结果数据
+        $pre = new Pre;
+        $pre->updateFinance();
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'财务信息修改成功!']);
 
