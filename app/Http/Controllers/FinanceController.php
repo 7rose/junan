@@ -245,6 +245,8 @@ class FinanceController extends Controller
 
         $all['in'] =  $all['in'] == 1 ? true : false; 
 
+        // print_r($all);
+
         Finance::find($id)->update($all);
         // 日志
         $log_content = "财务: 修改(审核前), 序号:".$id;

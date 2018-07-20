@@ -15,19 +15,19 @@ use Illuminate\Database\Schema\Blueprint;
  */
 class Logs
 {
-    function __construct()
-    {
-        if (!Schema::hasTable('logs')) {
-            Schema::create('logs', function (Blueprint $table) {
-                $table->increments('id');
-                $table->string('level');
-                $table->integer('who');
-                $table->string('from');
-                $table->string('content')->nullable();
-                $table->timestamps();
-            });
-        }
-    }
+    // function __construct()
+    // {
+    //     if (!Schema::hasTable('logs')) {
+    //         Schema::create('logs', function (Blueprint $table) {
+    //             $table->increments('id');
+    //             $table->string('level');
+    //             $table->integer('who');
+    //             $table->string('from');
+    //             $table->string('content')->nullable();
+    //             $table->timestamps();
+    //         });
+    //     }
+    // }
 
     // 写日志
     public function put($array)
