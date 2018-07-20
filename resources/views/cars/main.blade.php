@@ -1,7 +1,8 @@
 @extends('nav')
 
 @section('container')
-In Work
+<div class="alert alert-info">Workking: 车辆模块即将上线!</div>
+
 @endsection
 
 
