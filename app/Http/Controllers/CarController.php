@@ -72,8 +72,9 @@ class CarController extends Controller
         // $auth_error = new Error;
         // if(!$auth->root())  return $auth_error->forbidden();
 
-        $records = $this->pre()->latest('car_incomes.created_at')->paginate(50);
-        return view('cars.main', compact('records'));
+        // $records = $this->pre()->latest('car_incomes.created_at')->paginate(50);
+        // return view('cars.main', compact('records'));
+        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'车辆模块即将上线!']);
     }
 
     // ajax 选择器

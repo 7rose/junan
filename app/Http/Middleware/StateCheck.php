@@ -24,6 +24,7 @@ class StateCheck
         $record = User::leftJoin('branches', 'users.branch', '=', 'branches.id')
                         ->select('users.locked', 'users.new', 'branches.show as branch_show')
                         ->find(Session::get('id'));
+                        
         if(!$record) return redirect('/logout'); 
 
         $auth = new Auth;
