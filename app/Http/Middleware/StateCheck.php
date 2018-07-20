@@ -19,6 +19,8 @@ class StateCheck
      */
     public function handle($request, Closure $next)
     {
+        if(!Session::has('id') || Session::get('id') < 1) return redirect('/logout'); 
+
         $record = User::leftJoin('branches', 'users.branch', '=', 'branches.id')
                         ->select('users.locked', 'users.new', 'branches.show as branch_show')
                         ->find(Session::get('id'));

@@ -18,7 +18,7 @@ class Login
 
     public function handle($request, Closure $next)
     {
-        if(Session::has('id')) {
+        if(Session::has('id') && Session::get('id') >= 1) {
             return $next($request);
         }else{
             $url = Request::fullUrl();
