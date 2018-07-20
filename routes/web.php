@@ -20,10 +20,18 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
         return view('users.doc');
     });
 
+    // 车辆管理
+    Route::get('/cars', 'CarController@index');
+
     // 系统参数
+    Route::get('/car', 'CarSetController@index');
+    Route::get('/car/close/{id}', 'CarSetController@set');
+    Route::post('/car/add', 'CarSetController@add');
+
     Route::get('/branch', 'BranchController@index');
     Route::get('/branch/close/{id}', 'BranchController@set');
     Route::post('/branch/add', 'BranchController@add');
+
     Route::get('/config/{key}', 'ConfigController@index');
     Route::get('/config/set/{key}', 'ConfigController@set');
     Route::post('/config/add/post', 'ConfigController@add');

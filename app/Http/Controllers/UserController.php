@@ -126,7 +126,7 @@ class UserController extends Controller
     {
 
         // 日志
-        $log_array = ['content'=>"成员: 退出"];
+        $log_array = ['content'=>"退出"];
         $log_put = new Logs;
         $log_put->put($log_array);
         

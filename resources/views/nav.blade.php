@@ -86,6 +86,8 @@
                         <ul class="dropdown-menu">
                             {!! $conf->confMenu() !!}
                             <li class="divider"></li>
+                            <li><a href="/car">车辆管理</a></li>
+                            <li class="divider"></li>
                             <li><a href="/branch"><span class="glyphicon glyphicon-globe"></span> 分支机构</a></li>
                             <li class="divider"></li>
                             <li><a href="/biz_logs"><span class="glyphicon glyphicon-calendar"></span> 系统日志</a></li>
@@ -119,6 +121,13 @@
               <img src="{{ URL::asset('images/ico/user.svg') }}" class="img-circle panel-icon">
             </a>
               <h5>成员</h5>
+        </div>
+
+        <div class="wel-grid text-center side_ico">
+            <a href="/cars">
+              <img src="{{ URL::asset('images/ico/car.svg') }}" class="img-circle panel-icon">
+            </a>
+              <h5>车辆</h5>
         </div>
 
         <div class="wel-grid text-center side_ico">
