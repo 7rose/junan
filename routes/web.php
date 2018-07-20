@@ -22,6 +22,9 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
     // 车辆管理
     Route::get('/cars', 'CarController@index');
+    Route::get('/cars/income/create', 'CarController@income');
+    Route::post('/cars/income/store', 'CarController@store');
+    Route::post('/cars/ajax/selector', 'CarController@selector');
 
     // 系统参数
     Route::get('/car', 'CarSetController@index');

@@ -1,10 +1,10 @@
 <?php
 
-namespace App;
+namespace App\Forms;
 
 use Kris\LaravelFormBuilder\Form;
 
-class AppFormsCarForm extends Form
+class CarCostForm extends Form
 {
     public function buildForm()
     {
