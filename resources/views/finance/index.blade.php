@@ -54,6 +54,7 @@
             <tr class="{{ $record->in ? 'default' : 'warning' }}">
                 @endif
                 <td>
+                    {{ $record->id}}
                     @if($auth->admin() && !$record->abandon && !$record->checked_2)
                         <a class="btn btn-warning btn-xs" href="/finance/edit/{{ $record->id }}">修改</a>
                     @endif
@@ -64,7 +65,7 @@
                     @if($record->abandon)
                         <span class="label label-danger">已废弃</span>
                     @endif
-                    {{ $record->id}}
+                    
                 </td>
                 <td>{{ $record->in ? '+' : '-' }}</td>
                 <td>{!! $seek->seekLabel('finance_seek_array', 'key', $record->branch_text) !!}</td>
