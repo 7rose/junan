@@ -34,6 +34,7 @@ class CounterController extends Controller
         $pre = DB::table('finance')
                     ->whereBetween('finance.date', $date_range_int)
                     ->where('finance.abandon', false)
+                    ->whereNotNull('finance.customer_id')
                     // ->where('checked', true)
                     // ->where('checked_2', true)
                     ->leftJoin('config', 'finance.item', '=', 'config.id')

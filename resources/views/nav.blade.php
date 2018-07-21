@@ -124,9 +124,15 @@
         </div>
 
         <div class="wel-grid text-center side_ico">
-            <a href="/cars">
-              <img src="{{ URL::asset('images/ico/car.svg') }}" class="img-circle panel-icon">
-            </a>
+            <div class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <img src="{{ URL::asset('images/ico/car.svg') }}" class="img-circle panel-icon">
+                        <ul class="dropdown-menu go_right">
+                            <li><a href="/cars/incomes"><span class="glyphicon glyphicon-tag"></span> 加班车</a></li>
+                            <li><a href="/cars/costs"><span class="glyphicon glyphicon-wrench"></span> 维修和加油</a></li>
+                        </ul>
+                </a>
+            </div>
               <h5>车辆</h5>
         </div>
 

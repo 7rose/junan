@@ -7,13 +7,13 @@
     @if(isset($records))
         
         <table class="table table-striped">
-          <caption><h4>车辆: 加班车 <span class="glyphicon glyphicon-tag"></h4>
+          <caption><h4>车辆: 维修和加油 <span class="glyphicon glyphicon-wrench"></span></h4>
             <div class="btn-group">
-                <a href="/cars/income/create" class="btn btn-info btn-sm"> + 新业务</a>
+                <a href="/cars/cost/create" class="btn btn-default btn-sm"> + 新支出</a>
             </div>
             @if($auth->admin())
             <div class="btn-group">
-                <a href="/cars/incomes/excel" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-th-list"></span> 下载Excel </a>
+                <a href="/cars/costs/excel" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-th-list"></span> 下载Excel </a>
             </div>
             @endif
         </caption>
@@ -35,7 +35,7 @@
 
                   <button type="submit" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-search"></span> 查询 </button>
                 @if(Session::has('cars_date_start') || Session::has('cars_date_end') || Session::has('cars_key'))
-                    <a href="/cars/seek/reset/incomes" class="btn btn-warning btn-sm"> 重置查询条件</a>
+                    <a href="/cars/seek/reset/costs" class="btn btn-warning btn-sm"> 重置查询条件</a>
                 @endif
                 </form>
           </caption>
@@ -46,9 +46,9 @@
               <th>类型</th>
               <th>驾校</th>
               <th>教练员</th>
-              <th>开始时间</th>
-              <th>时长</th>
+              <th>支出类型</th>
               <th>价格</th>
+              <th>时间</th>
               <th>票号</th>
               <th>操作人</th>
               <th>时间</th>
@@ -62,9 +62,9 @@
               <td>{{ $record->type_text }}</td>
               <td>{{ $record->branch_text }}</td>
               <td>{{ $record->user_name }}</td>
-              <td>{{ date('Y-m-d H:i:s', $record->start) }}</td>
-              <td>{{ $record->hours }}</td>
+              <td>{{ $record->item_text }}</td>
               <td>{{ $record->real_price }}</td>
+              <td>{{ date('Y-m-d', $record->date) }}</td>
               <td>{{ $record->ticket_no }}</td>
               <td>{{ $record->created_by_name }}</td>
               <td>{{ $record->created_at }}</td>
@@ -73,7 +73,7 @@
             @endforeach
           </tbody>
           @else
-          <tr><td>无记录: 数据库为空或是没有符合查询条件的记录</td></tr>
+            <tr><td>无记录: 数据库为空或是没有符合查询条件的记录</td></tr>
           @endif
         </table>
         <div style="text-align:center;">{{ $records->links() }}</div>

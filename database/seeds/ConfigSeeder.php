@@ -118,39 +118,39 @@ class ConfigSeeder extends Seeder
                 'extra'   => NULL,
             ],[
                 'type'    => 'finance_item',
-                'text'    => '学费',
+                'text'    => '业务: 学费',
                 'extra'   => NULL,
             ],[
                 'type'    => 'finance_item',
-                'text'    => '补考费',
+                'text'    => '业务: 补考费',
                 'extra'   => NULL,
             ],[
                 'type'    => 'finance_item',
-                'text'    => '制卡费',
+                'text'    => '业务: 制卡费',
                 'extra'   => NULL,
             ],[
                 'type'    => 'finance_item',
-                'text'    => '租车费',
+                'text'    => '车辆: 加班费',
                 'extra'   => NULL,
             ],[
                 'type'    => 'finance_item',
-                'text'    => '换办证类型',
+                'text'    => '业务: 换办证类型',
                 'extra'   => NULL,
             ],[
                 'type'    => 'finance_item',
-                'text'    => '换班型',
+                'text'    => '业务: 换班型',
                 'extra'   => NULL,
             ],[
                 'type'    => 'finance_item',
-                'text'    => '陪练费',
+                'text'    => '车辆: 油费',
                 'extra'   => NULL,
             ],[
                 'type'    => 'finance_item',
-                'text'    => '保险',
+                'text'    => '车辆: 维修保养费',
                 'extra'   => NULL,
             ],[
                 'type'    => 'finance_item',
-                'text'    => '购车',
+                'text'    => '其他',
                 'extra'   => NULL,
             ],[
                 'type'    => 'lesson',

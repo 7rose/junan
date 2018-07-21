@@ -125,10 +125,10 @@ class UserController extends Controller
     public function logout()
     {
 
-        // 日志
-        $log_array = ['content'=>"退出"];
-        $log_put = new Logs;
-        $log_put->put($log_array);
+        // // 日志
+        // $log_array = ['content'=>"退出"];
+        // $log_put = new Logs;
+        // $log_put->put($log_array);
         
         Session::flush();
         // if (Cookie::has('id')) Cookie::queue('id', '', -1);

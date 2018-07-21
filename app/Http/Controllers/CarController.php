@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Session;
+use Excel;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 
 use App\Helpers\Auth;
@@ -14,9 +15,11 @@ use App\Helpers\Logs;
 
 use App\Car;
 use App\CarIncome;
+use App\Forms\CarIncomeForm;
+use App\CarCost;
+use App\Forms\CarCostForm;
 use App\Finance;
 use App\User;
-use App\Forms\CarIncomeForm;
 
 class CarController extends Controller
 {
@@ -33,35 +36,141 @@ class CarController extends Controller
         $pre =  CarIncome::leftJoin('branches', 'car_incomes.branch', 'branches.id')
                         ->leftJoin('finance', 'car_incomes.finance_id', 'finance.id')
                         ->leftJoin('users', 'finance.user_id', 'users.id')
+                        ->leftJoin('users as c', 'car_incomes.created_by', 'c.id')
                         ->leftJoin('cars', 'car_incomes.car_id', 'cars.id')
                         ->leftJoin('config', 'cars.type', 'config.id')
+                        ->select(
+                            'car_incomes.*',
+                            'branches.text as branch_text',
+                            'finance.real_price',
+                            'finance.abandon',
+                            'finance.ticket_no',
+                            'users.name as user_name',
+                            'c.name as created_by_name',
+                            'cars.car_no',
+                            'config.text as type_text'
+                        )
                         ->where(function ($query) {
+                                if(Session::has('cars_date_start')){
+                                    $query->where('car_incomes.start', '>=', strtotime(Session::get('cars_date_start')));
+                                }
+
+                                if(Session::has('cars_date_end')){
+                                    $query->where('car_incomes.start', '<', strtotime(Session::get('cars_date_end')));
+                                }
+
+                                if(Session::has('cars_key')){
+                                    $query->where('cars.car_no', 'LIKE', '%'.Session::get('cars_key').'%');
+                                    $query->orWhere('users.name', 'LIKE', '%'.Session::get('cars_key').'%');
+                                    $query->orWhere('car_incomes.content', 'LIKE', '%'.Session::get('cars_key').'%');
+                                }
+
                                 // 分支机构限制
                                 if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
                                     $query->Where('car_incomes.branch', $this->auth->branchLimitId());
                                 }
-                                 
-                                // // 起时间点
-                                // if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'date_begin') && Session::get('finance_seek_array')['date_begin'] != '') {
-                                //     $query->Where('finance.date', '>=', strtotime(Session::get('finance_seek_array')['date_begin']));
-                                // }
-
-                                // // 终时间点
-                                // if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'date_end') && Session::get('finance_seek_array')['date_end'] != '') {
-                                //     $query->Where('finance.date', '<=', strtotime(Session::get('finance_seek_array')['date_end']));
-                                // }
-
-                                // // 关键词
-                                // if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'key') && Session::get('finance_seek_array')['key'] != '') {
-                                //     $query->Where('finance.price', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                //     $query->orWhere('finance.real_price', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                //     $query->orWhere('customers.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                //     $query->orWhere('c.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                //     $query->orWhere('u.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                //     $query->orWhere('i.text', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                // }
                             });
         return $pre;
+    }
+
+    // 加油和维修列表
+    private function pre2() 
+    {
+        $this->auth = new Auth;
+
+        // 若财务中废弃,则支出中废弃
+        $pre =  CarCost::leftJoin('branches', 'car_costs.branch', 'branches.id')
+                        ->leftJoin('finance', 'car_costs.finance_id', 'finance.id')
+                        ->leftJoin('users', 'finance.user_id', 'users.id')
+                        ->leftJoin('users as c', 'car_costs.created_by', 'c.id')
+                        ->leftJoin('cars', 'car_costs.car_id', 'cars.id')
+                        ->leftJoin('config', 'cars.type', 'config.id')
+                        ->leftJoin('config as i', 'finance.item', 'i.id')
+                        ->select(
+                            'car_costs.*',
+                            'branches.text as branch_text',
+                            'finance.date',
+                            'finance.real_price',
+                            'finance.abandon',
+                            'finance.ticket_no',
+                            'users.name as user_name',
+                            'c.name as created_by_name',
+                            'cars.car_no',
+                            'config.text as type_text',
+                            'i.text as item_text'
+                        )
+                        ->where(function ($query) {
+                                if(Session::has('cars_date_start')){
+                                    $query->where('finance.date', '>=', strtotime(Session::get('cars_date_start')));
+                                }
+
+                                if(Session::has('cars_date_end')){
+                                    $query->where('finance.date', '<', strtotime(Session::get('cars_date_end')));
+                                }
+
+                                if(Session::has('cars_key')){
+                                    $query->where('cars.car_no', 'LIKE', '%'.Session::get('cars_key').'%');
+                                    $query->orWhere('users.name', 'LIKE', '%'.Session::get('cars_key').'%');
+                                    $query->orWhere('car_costs.content', 'LIKE', '%'.Session::get('cars_key').'%');
+                                }
+
+                                // 分支机构限制
+                                if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
+                                    $query->Where('car_costs.branch', $this->auth->branchLimitId());
+                                }
+                            });
+        return $pre;
+    }
+
+    // 查询
+    public function seek(Request $request)
+    {
+        $all = $request->all();
+
+        if($request->date_start != '') {
+            Session::put('cars_date_start', $request->date_start);
+        }else{
+            if(Session::has('cars_date_start')) Session::forget('cars_date_start');
+        }
+
+        if($request->date_end != '') {
+            Session::put('cars_date_end', $request->date_end);
+        }else{
+            if(Session::has('cars_date_end')) Session::forget('cars_date_end');
+        }
+
+        if($request->key != '') {
+            Session::put('cars_key', $request->key);
+        }else{
+            if(Session::has('cars_key')) Session::forget('cars_key');
+        }
+
+        // return $this->index();
+        return redirect('/'.$request->to_path);
+    }
+
+    // 重置查询条件
+    public function resetSeek($url)
+    {
+        if(Session::has('cars_date_start')) Session::forget('cars_date_start');
+        if(Session::has('cars_date_end')) Session::forget('cars_date_end');
+        if(Session::has('cars_key')) Session::forget('cars_key');
+
+        return redirect('/cars/'.$url);
+    }
+
+    // 加班车列表
+    public function incomeIndex()
+    {
+        $records = $this->pre()->latest('car_incomes.created_at')->paginate(50);
+        return view('cars.main', compact('records'));
+    }
+
+    // 加油修理列表
+    public function costIndex()
+    {
+        $records = $this->pre2()->latest('car_costs.created_at')->paginate(50);
+        return view('cars.main_costs', compact('records'));
     }
 
     // 列表
@@ -72,9 +181,9 @@ class CarController extends Controller
         // $auth_error = new Error;
         // if(!$auth->root())  return $auth_error->forbidden();
 
-        // $records = $this->pre()->latest('car_incomes.created_at')->paginate(50);
-        // return view('cars.main', compact('records'));
-        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'车辆模块即将上线!']);
+        $records = $this->pre()->latest('car_incomes.created_at')->paginate(50);
+        return view('cars.main', compact('records'));
+        // return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'车辆模块即将上线!']);
     }
 
     // ajax 选择器
@@ -103,10 +212,6 @@ class CarController extends Controller
         // $auth_error = new Error;
         // if($auth->admin())  return $auth_error->forbidden();
 
-        // $record = Customer::find($id);
-        // $error = new Error;
-        // if(!$record) return $error->notFound();
-
         $form = $this->form(CarIncomeForm::class, [
             'method' => 'POST',
             'url' => '/cars/income/store'
@@ -126,15 +231,18 @@ class CarController extends Controller
         if(!$request->user_id) return redirect()->back()->withErrors(['user_id'=>$error])->withInput();
 
         $all = $request->all();
-        $user_branch = User::where('work_id', $all['user_id'])->firstOrFail()->branch;
+        $user = User::where('work_id', $all['user_id'])->firstOrFail();
         $car_id = Car::where('car_no', $all['car_no'])->firstOrFail()->id;
 
         $all['created_by'] = session('id');
-        $all['branch'] = $user_branch;
+        $all['branch'] = $user->branch;
 
         $finance = array_except($all, ['car_no', 'start', 'hours']);
-        $finance['user_id'] = $all['user_id'];
+        $finance['user_id'] = $user->id;
         $finance['real_price'] = $all['price'];
+        $finance['checked'] = true;
+        $finance['checked_by'] = $all['created_by'];
+        $finance['checked_by_time'] = time();
         $finance['date'] = strtotime($all['start']);
         $finance['item'] = 30; // 加班费/租车费id
 
@@ -148,12 +256,163 @@ class CarController extends Controller
         CarIncome::create($car_income);
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'加班车业务已记录!']);
+
     }
 
     // 修理加油
     public function cost()
     {
-        # code...
+        // // 授权
+        // $auth = new Auth;
+        // $auth_error = new Error;
+        // if($auth->admin())  return $auth_error->forbidden();
+
+        $form = $this->form(CarCostForm::class, [
+            'method' => 'POST',
+            'url' => '/cars/cost/store'
+        ]);
+
+        $title = '车辆维修和加油';
+        $icon = 'wrench';
+
+        return view('form_with_selector', compact('form'))->with('custom',['title'=>$title, 'icon'=>$icon]);
+    }
+
+    // 保存修理加油
+    public function costStore(Request $request)
+    {
+        $error = "必选项!";
+        if(!$request->car_no) return redirect()->back()->withErrors(['car_no'=>$error])->withInput();
+        if(!$request->user_id) return redirect()->back()->withErrors(['user_id'=>$error])->withInput();
+
+        $all = $request->all();
+        $user = User::where('work_id', $all['user_id'])->firstOrFail();
+        $car_id = Car::where('car_no', $all['car_no'])->firstOrFail()->id;
+
+        $all['created_by'] = session('id');
+        $all['branch'] = $user->branch;
+
+        $finance = array_except($all, ['car_no']);
+        $finance['in'] = false;
+        $finance['user_id'] = $user->id;
+        $finance['real_price'] = $all['price'];
+        $finance['checked'] = true;
+        $finance['checked_by'] = $all['created_by'];
+        $finance['checked_by_time'] = time();
+        $finance['date'] = strtotime($all['date']);
+
+        $finance_id = Finance::create($finance)->id;
+
+        $car_cost = array_except($all, ['user_id', 'car_no', 'price', 'ticket_no', 'item', 'date']);
+        $car_cost['car_id'] = $car_id;
+        $car_cost['finance_id'] = $finance_id;
+
+        CarCost::create($car_cost);
+
+        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'车辆支出已记录!']);
+    }
+
+    // 加班车表格
+    public function incomesExcel()
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        
+        $cellData = [
+            ['牌号', '类型', '驾校', '教练员', '开始时间', '时长', '价格', '票号', '操作人', '时间', '备注'],
+        ];
+
+        $records = $this->pre()
+                        ->where('finance.abandon', false)
+                        ->latest('car_incomes.created_at')
+                        ->get();
+
+        if(count($records)) {
+            foreach ($records as $record) {
+                array_push($cellData, [
+                                        $record->car_no ,
+                                        $record->type_text ,
+                                        $record->branch_text ,
+                                        $record->user_name ,
+                                        date('Y-m-d H:i:s', $record->start) ,
+                                        $record->hours ,
+                                        $record->real_price ,
+                                        $record->ticket_no ,
+                                        $record->created_by_name ,
+                                        $record->created_at ,
+                                        $record->content 
+                                    ]);
+            }
+        }
+        $file_name = '车辆-加班'.date('Y-m-d', time());
+
+        // 日志
+        $log_content = "车辆: 下载加班车Excel文件(可能为查询结果)";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
+        Excel::create($file_name,function($excel) use ($cellData){
+            $excel->sheet('列表', function($sheet) use ($cellData){
+                $sheet->rows($cellData);
+                $sheet->setAutoSize(true);
+                $sheet->freezeFirstRow();
+            });
+        })->export('xlsx');
+    }
+
+    // 加油维修表格
+    public function costsExcel()
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        $cellData = [
+            ['牌号', '类型', '驾校', '教练员', '支出类型', '价格', '时间', '票号', '操作人', '时间', '备注'],
+        ];
+
+        $records = $this->pre2()
+                        ->where('finance.abandon', false)
+                        ->latest('car_costs.created_at')
+                        ->get();
+
+        if(count($records)) {
+            foreach ($records as $record) {
+                array_push($cellData, [
+                                        $record->car_no ,
+                                        $record->type_text ,
+                                        $record->branch_text ,
+                                        $record->user_name ,
+                                        $record->item_text ,
+                                        $record->real_price ,
+                                        date('Y-m-d', $record->date) ,
+                                        $record->ticket_no ,
+                                        $record->created_by_name ,
+                                        $record->created_at ,
+                                        $record->content
+                                    ]);
+            }
+        }
+        $file_name = '车辆-维修和加油'.date('Y-m-d', time());
+
+        // 日志
+        $log_content = "车辆: 下载加油和维修Excel文件(可能为查询结果)";
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
+
+        Excel::create($file_name,function($excel) use ($cellData){
+            $excel->sheet('列表', function($sheet) use ($cellData){
+                $sheet->rows($cellData);
+                $sheet->setAutoSize(true);
+                $sheet->freezeFirstRow();
+            });
+        })->export('xlsx');
     }
 
 

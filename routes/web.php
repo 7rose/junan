@@ -22,9 +22,17 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
     // 车辆管理
     Route::get('/cars', 'CarController@index');
+    Route::get('/cars/incomes', 'CarController@incomeIndex');
+    Route::get('/cars/incomes/excel', 'CarController@incomesExcel');
+    Route::get('/cars/costs', 'CarController@costIndex');
+    Route::get('/cars/costs/excel', 'CarController@costsExcel');
+    Route::post('/cars/seek', 'CarController@seek');
+    Route::get('/cars/seek/reset/{url}', 'CarController@resetSeek');
+    Route::post('/cars/ajax/selector', 'CarController@selector');
     Route::get('/cars/income/create', 'CarController@income');
     Route::post('/cars/income/store', 'CarController@store');
-    Route::post('/cars/ajax/selector', 'CarController@selector');
+    Route::get('/cars/cost/create', 'CarController@cost');
+    Route::post('/cars/cost/store', 'CarController@costStore');
 
     // 系统参数
     Route::get('/car', 'CarSetController@index');

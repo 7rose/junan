@@ -51,6 +51,8 @@ class Logs
     public function ip2Address($ip)
     {
         $url = "http://ip.taobao.com/service/getIpInfo.php?ip=".$ip;
+        if($file = @file_get_contents($url) === false) return "未成功获取";
+
         $data = json_decode(file_get_contents($url), true)['data'];  
         return $data['country'].'/'.$data['region'].'/'.$data['city']; 
     }

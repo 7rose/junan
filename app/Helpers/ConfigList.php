@@ -19,6 +19,7 @@ class ConfigList
     {
         $records = Config::where('type', $val)
                     ->where('show', true)
+                    ->orderBy('text')
                     ->get();
         return $this->out($records);      
     }
