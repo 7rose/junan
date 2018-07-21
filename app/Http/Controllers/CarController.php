@@ -257,7 +257,7 @@ class CarController extends Controller
 
         // 日志
         $log_content = "车辆: 新登记加班车. 序号:".$new->id;
-        $log_level = "danger";
+        $log_level = "info";
         $log_put = new Logs;
         $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
@@ -317,7 +317,7 @@ class CarController extends Controller
 
         // 日志
         $log_content = "车辆: 新登记加油或修理费. 序号:".$new->id;
-        $log_level = "danger";
+        $log_level = "info";
         $log_put = new Logs;
         $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
