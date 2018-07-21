@@ -253,7 +253,13 @@ class CarController extends Controller
         $car_income['start'] = strtotime($all['start']);
         $car_income['finance_id'] = $finance_id;
 
-        CarIncome::create($car_income);
+        $new = CarIncome::create($car_income);
+
+        // 日志
+        $log_content = "车辆: 新登记加班车. 序号:".$new->id;
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'加班车业务已记录!']);
 
@@ -307,7 +313,13 @@ class CarController extends Controller
         $car_cost['car_id'] = $car_id;
         $car_cost['finance_id'] = $finance_id;
 
-        CarCost::create($car_cost);
+        $new = CarCost::create($car_cost);
+
+        // 日志
+        $log_content = "车辆: 新登记加油或修理费. 序号:".$new->id;
+        $log_level = "danger";
+        $log_put = new Logs;
+        $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'车辆支出已记录!']);
     }

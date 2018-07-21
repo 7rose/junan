@@ -42,6 +42,7 @@
           @if(count($records))
           <thead>
             <tr>
+              <th>#</th>
               <th>牌号</th>
               <th>类型</th>
               <th>驾校</th>
@@ -58,6 +59,7 @@
           <tbody>
             @foreach($records as $record)
             <tr class="{{ $record->abandon ? 'danger' : 'default' }}">
+              <td>{{ $record->id }}</td>
               <td>{{ $record->car_no }}</td>
               <td>{{ $record->type_text }}</td>
               <td>{{ $record->branch_text }}</td>
