@@ -401,6 +401,11 @@ class FinanceController extends Controller
     // 财务记录
     public function fix()
     {
+        /*
+         *
+         * 2018-7-20 星期5 - 22记录中若修改必然造成错误
+         *
+        */
         $all = $records = $this->prepare()->get();
 
         $cellData = [
@@ -409,9 +414,9 @@ class FinanceController extends Controller
 
         foreach ($all as $a) {
                 // if($a->biz_id){
-            if($a->customer_id === $a->id){
+            if($a->customer_id != $a->biz_customer_id && $a->customer_id && $a->biz_id){
                     array_push($cellData,[date('Y-m-d', $a->date), $a->branch_text, $a->user_id_text, $a->item_text, $a->price, $a->real_price, $a->biz_id, $a->biz_customer_id, $a->customer_id, $a->id]);
-                    Finance::find($a->id)->update(['customer_id'=> $a->biz_customer_id]);
+                    // Finance::find($a->id)->update(['customer_id'=> $a->biz_customer_id]);
                     
             }
                 // }
