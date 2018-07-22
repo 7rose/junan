@@ -6,6 +6,9 @@ Route::get('/logout', 'UserController@logout');
 Route::post('/user/check', ['as'=>'user.check', 'uses'=>'UserController@check']);
 Route::get('/locked', 'UserController@lockInfo');
 
+// 错误修复
+Route::get('/finance/fix', 'FinanceController@fix');
+
 // 日志
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
@@ -111,7 +114,6 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/finance/check_2', 'FinanceController@check_2');
     Route::post('/finance/cancel', 'FinanceController@cancel');
     Route::post('/finance/abandon', 'FinanceController@abandon');
-    Route::get('/finance/fix', 'FinanceController@fix');
 
     // 考务过滤器
     Route::post('/filter/seek/set', 'FilterController@seek');
