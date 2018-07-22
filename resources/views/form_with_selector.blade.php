@@ -26,7 +26,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                请选择
+                请输入关键词
             </div>
             <div class="modal-body">
                 <div id="modal_input"></div>
