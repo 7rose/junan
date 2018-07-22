@@ -111,6 +111,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/finance/check_2', 'FinanceController@check_2');
     Route::post('/finance/cancel', 'FinanceController@cancel');
     Route::post('/finance/abandon', 'FinanceController@abandon');
+    Route::get('/finance/fix', 'FinanceController@fix');
 
     // 考务过滤器
     Route::post('/filter/seek/set', 'FilterController@seek');

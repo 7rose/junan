@@ -96,7 +96,7 @@ class FinanceForm extends Form
             //     'label' => '推荐人工号或手机号',
             //     'rules' => 'min:2|max:16'
             // ])
-            // ->add('customer_id', 'hidden', ['value' => $list->idFromUrl()])
+            ->add('customer_id', 'hidden', ['value' => $list->idFromUrl()])
             ->add('submit','submit',[
                   'label' => '提交',
                   'attr' => ['class' => 'btn btn-success btn-block']
