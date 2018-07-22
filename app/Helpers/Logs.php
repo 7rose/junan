@@ -41,7 +41,8 @@ class Logs
         $array['who'] = Session::get('id');
 
         $ip = Request::ip();
-        $array['from'] = $ip.'|'.$this->ip2Address($ip);
+        $array['from'] = $ip;
+        // $array['from'] = $ip.'|'.$this->ip2Address($ip);
 
         // DB::table('logs')->create($array);
         BizLog::create($array);

@@ -10,6 +10,7 @@ use Input;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\FinanceSeekForm;
 use App\Forms\FinanceForm;
+use App\Forms\FinanceEditForm;
 use App\Finance;
 use App\Customer;
 use App\User;
@@ -93,9 +94,10 @@ class FinanceController extends Controller
 
         // 查询预处理
         $records = $this->prepare()
-            ->orderBy('finance.date', 'desc')
-            ->orderBy('finance.created_at', 'desc')
-            ->paginate(30);
+            ->latest('finance.date')
+            ->latest('finance.updated_at')
+            ->latest('finance.created_at')
+            ->paginate(50);
 
         return view('finance.index', compact('form'))->with('records', $records);
     }
@@ -133,7 +135,8 @@ class FinanceController extends Controller
 
         $form = $this->form(FinanceForm::class, [
             'method' => 'POST',
-            'url' => route('finance.store')
+            // 'url' => route('finance.store')
+            'url' => '/finance/store/'.$id
         ]);
 
         $title = '收付款 - '.$record->name;
@@ -143,7 +146,7 @@ class FinanceController extends Controller
     }
 
     // 存储
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
         // 授权
         $auth = new Auth;
@@ -169,6 +172,7 @@ class FinanceController extends Controller
 
         $all['in'] =  $all['in'] == 1 ? true :false; 
 
+        $all['customer_id'] = $id;
         $all['created_by'] = Session::get('id');
         $all['date'] = time();
         $all['checked'] = true;
@@ -205,7 +209,7 @@ class FinanceController extends Controller
                         )
                         ->find($id);
 
-        $form = $this->form(FinanceForm::class, [
+        $form = $this->form(FinanceEditForm::class, [
             'method' => 'POST',
             'model' => $record,
             'url' => '/finance/update/'.$id

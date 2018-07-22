@@ -4,25 +4,17 @@ namespace App\Forms;
 
 use Session;
 use Kris\LaravelFormBuilder\Form;
-use App\Helpers\ConfigList;
 use App\Helpers\Auth;
-use App\Biz;
+use App\Helpers\ConfigList;
 
-class FinanceForm extends Form
+
+class FinanceEditForm extends Form
 {
     public function buildForm()
     {
         $list = new ConfigList;
         $auth = new Auth;
 
-        $pre = Biz::where('biz.customer_id', $list->idFromUrl())
-                        ->where('biz.finished', false)
-                        ->leftJoin('config', 'biz.licence_type', 'config.id')
-                        ->select('biz.id', 'config.text as licence_type_text');
-
-        $records = $pre->get();   
-        $first = $pre->first();   
-        
         $this
             ->add('in', 'choice', [
                 'label' => '收/付', 
@@ -36,22 +28,6 @@ class FinanceForm extends Form
                 'choices'=> $list->getList('finance_item'),
                 'rules' => 'required'
             ]);
-
-        if(count($records) == 1) {
-            $this->add('biz_id', 'hidden', ['value' => $first->id]);
-        } elseif(count($records) > 1) {
-            $tmp_list = [];
-            foreach ($records as $record) {
-                $tmp_list = array_add($tmp_list, $record->id, $record->licence_type_text);
-            }
-
-            $this->add('biz_id', 'choice', [
-                'label' => '对应业务', 
-                'empty_value' => '-- 选择 -- ',
-                'choices'=> $tmp_list,
-                'rules' => 'required'
-            ]);
-        }
 
         if($auth->branchLimit() || ($auth->admin() && Session::has('branch_set'))) {
 
@@ -92,11 +68,6 @@ class FinanceForm extends Form
                 'attr' =>['readonly' => 'readonly', 'id'=>'user_id'],
                 'rules' => 'required'
             ])
-            // ->add('user_id', 'text', [
-            //     'label' => '推荐人工号或手机号',
-            //     'rules' => 'min:2|max:16'
-            // ])
-            // ->add('customer_id', 'hidden', ['value' => $list->idFromUrl()])
             ->add('submit','submit',[
                   'label' => '提交',
                   'attr' => ['class' => 'btn btn-success btn-block']

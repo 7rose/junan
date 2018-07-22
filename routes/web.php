@@ -103,9 +103,9 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/finance/seek', ['as'=>'finance.seek', 'uses'=>'FinanceController@seek']);
     Route::get('/finance/seek/reset', 'FinanceController@seekReset');
     Route::get('/finance/create/{id}', 'FinanceController@create');
+    Route::post('/finance/store/{id}', 'FinanceController@store');
     Route::get('/finance/edit/{id}', 'FinanceController@edit');
     Route::post('/finance/update/{id}', 'FinanceController@update');
-    Route::post('/finance/store', ['as'=>'finance.store', 'uses'=>'FinanceController@store']);
     Route::get('/finance/download/excel', 'FinanceController@seekToExcel');
     Route::post('/finance/checking', 'FinanceController@checking');
     Route::post('/finance/check_2', 'FinanceController@check_2');
