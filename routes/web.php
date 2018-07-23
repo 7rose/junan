@@ -36,6 +36,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::post('/cars/income/store', 'CarController@store');
     Route::get('/cars/cost/create', 'CarController@cost');
     Route::post('/cars/cost/store', 'CarController@costStore');
+    Route::get('/cars/income_count/excel', 'CarController@countIncomesExcel');
 
     // 系统参数
     Route::get('/car', 'CarSetController@index');

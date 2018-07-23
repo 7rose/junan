@@ -162,7 +162,12 @@ class CarController extends Controller
     // 加班车列表
     public function incomeIndex()
     {
-        $records = $this->pre()->latest('car_incomes.created_at')->paginate(50);
+        $records = $this->pre()
+                        ->latest('car_incomes.created_at')
+                        ->paginate(50);
+
+        // print_r($records);
+
         return view('cars.main', compact('records'));
     }
 
@@ -182,7 +187,9 @@ class CarController extends Controller
         // if(!$auth->root())  return $auth_error->forbidden();
 
         $records = $this->pre()->latest('car_incomes.created_at')->paginate(50);
-        return view('cars.main', compact('records'));
+
+        print_r($records);
+        // return view('cars.main', compact('records'));
         // return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'车辆模块即将上线!']);
     }
 
@@ -207,10 +214,10 @@ class CarController extends Controller
     // 加班
     public function income()
     {
-        // // 授权
-        // $auth = new Auth;
-        // $auth_error = new Error;
-        // if($auth->admin())  return $auth_error->forbidden();
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->branchLimit())  return $auth_error->forbidden();
 
         $form = $this->form(CarIncomeForm::class, [
             'method' => 'POST',
@@ -226,6 +233,11 @@ class CarController extends Controller
     // 保存
     public function store(Request $request)
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->branchLimit())  return $auth_error->forbidden();
+
         $error = "必选项!";
         if(!$request->car_no) return redirect()->back()->withErrors(['car_no'=>$error])->withInput();
         if(!$request->user_id) return redirect()->back()->withErrors(['user_id'=>$error])->withInput();
@@ -235,7 +247,8 @@ class CarController extends Controller
         $car_id = Car::where('car_no', $all['car_no'])->firstOrFail()->id;
 
         $all['created_by'] = session('id');
-        $all['branch'] = $user->branch;
+        $all['branch'] = User::find(session('id'))->branch;
+        // $all['branch'] = $user->branch;
 
         $finance = array_except($all, ['car_no', 'start', 'hours']);
         $finance['user_id'] = $user->id;
@@ -261,17 +274,19 @@ class CarController extends Controller
         $log_put = new Logs;
         $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
-        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'加班车业务已记录!']);
+        return redirect('/cars/incomes');
+
+        // return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'加班车业务已记录!']);
 
     }
 
     // 修理加油
     public function cost()
     {
-        // // 授权
-        // $auth = new Auth;
-        // $auth_error = new Error;
-        // if($auth->admin())  return $auth_error->forbidden();
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->branchLimit())  return $auth_error->forbidden();
 
         $form = $this->form(CarCostForm::class, [
             'method' => 'POST',
@@ -287,6 +302,11 @@ class CarController extends Controller
     // 保存修理加油
     public function costStore(Request $request)
     {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->branchLimit())  return $auth_error->forbidden();
+
         $error = "必选项!";
         if(!$request->car_no) return redirect()->back()->withErrors(['car_no'=>$error])->withInput();
         if(!$request->user_id) return redirect()->back()->withErrors(['user_id'=>$error])->withInput();
@@ -296,7 +316,8 @@ class CarController extends Controller
         $car_id = Car::where('car_no', $all['car_no'])->firstOrFail()->id;
 
         $all['created_by'] = session('id');
-        $all['branch'] = $user->branch;
+        $all['branch'] = User::find(session('id'))->branch;
+        // $all['branch'] = $user->branch;
 
         $finance = array_except($all, ['car_no']);
         $finance['in'] = false;
@@ -321,7 +342,9 @@ class CarController extends Controller
         $log_put = new Logs;
         $log_put->put(['content'=>$log_content, 'level'=>$log_level]);
 
-        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'车辆支出已记录!']);
+        return redirect('/cars/costs');
+
+        // return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'车辆支出已记录!']);
     }
 
     // 加班车表格
@@ -426,8 +449,6 @@ class CarController extends Controller
             });
         })->export('xlsx');
     }
-
-
 
     // end
 }
