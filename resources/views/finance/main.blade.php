@@ -73,7 +73,7 @@
               @if(!$record->abandon)
 
                 @if($record->checked_2)
-                  已审核
+                  已审核({{ $record->checked_2_by_name }})
                 @endif
 
                 @if($auth->financeMaster() && !$record->checked_2)
