@@ -55,30 +55,51 @@ class FinanceController extends Controller
                                 'ib.text as licence_type_text'
                             )
                           ->where(function ($query) {
+                                if(Session::has('finance_date_start')){
+                                    $query->where('finance.date', '>=', strtotime(session('finance_date_start')));
+                                }
+
+                                if(Session::has('finance_date_end')){
+                                    $query->where('finance.date', '<', strtotime(session('finance_date_end')));
+                                }
+
+                                if(Session::has('finance_key')){
+                                    $query->Where('finance.price', 'LIKE', '%'.session('finance_key').'%');
+                                    $query->orWhere('finance.real_price', 'LIKE', '%'.session('finance_key').'%');
+                                    $query->orWhere('customers.name', 'LIKE', '%'.session('finance_key').'%');
+                                    $query->orWhere('c.name', 'LIKE', '%'.session('finance_key').'%');
+                                    $query->orWhere('u.name', 'LIKE', '%'.session('finance_key').'%');
+                                    $query->orWhere('i.text', 'LIKE', '%'.session('finance_key').'%');
+                                }
+
                                 // 分支机构限制
                                 if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
                                     $query->Where('finance.branch', $this->auth->branchLimitId());
                                 }
+                                // // 分支机构限制
+                                // if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
+                                //     $query->Where('finance.branch', $this->auth->branchLimitId());
+                                // }
                                  
-                                // 起时间点
-                                if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'date_begin') && Session::get('finance_seek_array')['date_begin'] != '') {
-                                    $query->Where('finance.date', '>=', strtotime(Session::get('finance_seek_array')['date_begin']));
-                                }
+                                // // 起时间点
+                                // if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'date_begin') && Session::get('finance_seek_array')['date_begin'] != '') {
+                                //     $query->Where('finance.date', '>=', strtotime(Session::get('finance_seek_array')['date_begin']));
+                                // }
 
-                                // 终时间点
-                                if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'date_end') && Session::get('finance_seek_array')['date_end'] != '') {
-                                    $query->Where('finance.date', '<=', strtotime(Session::get('finance_seek_array')['date_end']));
-                                }
+                                // // 终时间点
+                                // if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'date_end') && Session::get('finance_seek_array')['date_end'] != '') {
+                                //     $query->Where('finance.date', '<=', strtotime(Session::get('finance_seek_array')['date_end']));
+                                // }
 
-                                // 关键词
-                                if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'key') && Session::get('finance_seek_array')['key'] != '') {
-                                    $query->Where('finance.price', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                    $query->orWhere('finance.real_price', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                    $query->orWhere('customers.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                    $query->orWhere('c.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                    $query->orWhere('u.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                    $query->orWhere('i.text', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
-                                }
+                                // // 关键词
+                                // if(Session::has('finance_seek_array') && array_has(Session::get('finance_seek_array'), 'key') && Session::get('finance_seek_array')['key'] != '') {
+                                //     $query->Where('finance.price', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
+                                //     $query->orWhere('finance.real_price', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
+                                //     $query->orWhere('customers.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
+                                //     $query->orWhere('c.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
+                                //     $query->orWhere('u.name', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
+                                //     $query->orWhere('i.text', 'LIKE', '%'.Session::get('finance_seek_array')['key'].'%');
+                                // }
                             });
                           // ->orderBy('finance.created_by', 'desc')
                           // ->orderBy('finance.date', 'desc')
@@ -88,10 +109,10 @@ class FinanceController extends Controller
     // index 
     public function index()
     {
-        $form = $this->form(FinanceSeekForm::class, [
-            'method' => 'POST',
-            'url' => route('finance.seek')
-        ]);
+        // $form = $this->form(FinanceSeekForm::class, [
+        //     'method' => 'POST',
+        //     'url' => route('finance.seek')
+        // ]);
 
         // 查询预处理
         $records = $this->prepare()
@@ -100,26 +121,56 @@ class FinanceController extends Controller
             ->latest('finance.created_at')
             ->paginate(50);
 
-        return view('finance.index', compact('form'))->with('records', $records);
+        return view('finance.main', compact('records'));
+
+        // return view('finance.index', compact('form'))->with('records', $records);
     }
 
         // 查询条件
     public function seek(Request $request)
     {
-        $finance_seek_array = [];
-        if($request->has('key') && trim($request->key) != '') $finance_seek_array = array_add($finance_seek_array, 'key', trim($request->key));
-        if($request->has('branch')) $finance_seek_array = array_add($finance_seek_array, 'branch', $request->branch);
-        if($request->has('date_begin')) $finance_seek_array = array_add($finance_seek_array, 'date_begin', $request->date_begin);
-        if($request->has('date_end')) $finance_seek_array = array_add($finance_seek_array, 'date_end', $request->date_end);
-        Session::put('finance_seek_array', $finance_seek_array);
+        $all = $request->all();
+
+        if($request->date_start != '') {
+            Session::put('finance_date_start', $request->date_start);
+        }else{
+            if(Session::has('finance_date_start')) Session::forget('finance_date_start');
+        }
+
+        if($request->date_end != '') {
+            Session::put('finance_date_end', $request->date_end);
+        }else{
+            if(Session::has('finance_date_end')) Session::forget('finance_date_end');
+        }
+
+        if($request->key != '') {
+            Session::put('finance_key', $request->key);
+        }else{
+            if(Session::has('finance_key')) Session::forget('finance_key');
+        }
+
         return redirect('/finance');
+
+        // $finance_seek_array = [];
+        // if($request->has('key') && trim($request->key) != '') $finance_seek_array = array_add($finance_seek_array, 'key', trim($request->key));
+        // if($request->has('branch')) $finance_seek_array = array_add($finance_seek_array, 'branch', $request->branch);
+        // if($request->has('date_begin')) $finance_seek_array = array_add($finance_seek_array, 'date_begin', $request->date_begin);
+        // if($request->has('date_end')) $finance_seek_array = array_add($finance_seek_array, 'date_end', $request->date_end);
+        // Session::put('finance_seek_array', $finance_seek_array);
+        // return redirect('/finance');
     }
 
     // 查询重置
     public function seekReset()
     {
-        if(Session::has('finance_seek_array')) Session::forget('finance_seek_array');
-        return redirect('/finance');
+        if(Session::has('finance_date_start')) Session::forget('finance_date_start');
+        if(Session::has('finance_date_end')) Session::forget('finance_date_end');
+        if(Session::has('finance_key')) Session::forget('finance_key');
+
+         return redirect('/finance');
+
+        // if(Session::has('finance_seek_array')) Session::forget('finance_seek_array');
+        // return redirect('/finance');
     }
 
     // 新收费

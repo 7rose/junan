@@ -103,7 +103,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
     // 财务
     Route::get('/finance', 'FinanceController@index');
-    Route::post('/finance/seek', ['as'=>'finance.seek', 'uses'=>'FinanceController@seek']);
+    Route::post('/finance/seek', 'FinanceController@seek');
     Route::get('/finance/seek/reset', 'FinanceController@seekReset');
     Route::get('/finance/create/{id}', 'FinanceController@create');
     Route::post('/finance/store/{id}', 'FinanceController@store');
@@ -145,6 +145,11 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/filter/counter_finance_mode/{key}', 'CounterController@financeMode');
 
 });
+
+
+Route::get('/test', function() {
+        return config('app.env');
+    });
 
 
 

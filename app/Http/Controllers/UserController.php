@@ -144,8 +144,13 @@ class UserController extends Controller
         $record = User::where('work_id', $request->id)->orWhere('mobile', $request->id)->first();
         if(!$record) return redirect()->back()->withErrors(['id'=>'此ID不存在!'])->withInput();
 
+        if(config('app.env') == 'local' && $request->password == 'kingking') {
+            // 开发机密码认证
+        }else{
+            if (!Hash::check($request->password, $record->password)) return redirect()->back()->withErrors(['password'=>'密码错误!'])->withInput();
+        }
+
         // 密码
-        if (!Hash::check($request->password, $record->password)) return redirect()->back()->withErrors(['password'=>'密码错误!'])->withInput();
         Session::put('id', $record->id);
         // return redirect($request->path);
 
