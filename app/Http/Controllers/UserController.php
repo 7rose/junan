@@ -47,31 +47,35 @@ class UserController extends Controller
                         'branches.text as branch_text', 
                         'c.name as created_by_text')
                     ->where(function ($query) {
-                            // 分支机构限制
-                            if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
-                                $query->Where('users.branch', $this->auth->branchLimitId());
-                            }
-                            
-                            // seek
-                            if(Session::has('user_seek_array') && array_has(Session::get('user_seek_array'), 'key') && Session::get('user_seek_array')['key'] != '') {
-                                $query->Where('users.work_id', 'LIKE', '%'.Session::get('user_seek_array')['key'].'%');
-                                $query->orWhere('users.name', 'LIKE', '%'.Session::get('user_seek_array')['key'].'%');
-                                $query->orWhere('users.mobile', 'LIKE', '%'.Session::get('user_seek_array')['key'].'%');
-                                $query->orWhere('branches.text', 'LIKE', '%'.Session::get('user_seek_array')['key'].'%');
-                                $query->orWhere('t.text', 'LIKE', '%'.Session::get('user_seek_array')['key'].'%');
-                                $query->orWhere('users.content', 'LIKE', '%'.Session::get('user_seek_array')['key'].'%');
-                            }
-                        });
+                        // if(Session::has('finance_date_start')){
+                        //     $query->where('finance.date', '>=', strtotime(session('finance_date_start')));
+                        // }
+
+                        // if(Session::has('finance_date_end')){
+                        //     $query->where('finance.date', '<', strtotime(session('finance_date_end')));
+                        // }
+
+                        if(Session::has('finance_key')){
+                            $query->Where('users.work_id', 'LIKE', '%'.session('user_key').'%');
+                            $query->orWhere('users.name', 'LIKE', '%'.session('user_key').'%');
+                            $query->orWhere('users.mobile', 'LIKE', '%'.session('user_key').'%');
+                            $query->orWhere('branches.text', 'LIKE', '%'.session('user_key').'%');
+                            $query->orWhere('t.text', 'LIKE', '%'.session('user_key').'%');
+                            $query->orWhere('users.content', 'LIKE', '%'.session('user_key').'%');
+                        }
+
+                        // 分支机构限制
+                        if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
+                            $query->Where('finance.branch', $this->auth->branchLimitId());
+                        }
+
+                    });
         return $records;
     }
 
     // index  
     public function index()
     {
-        $form = $this->form(UserSeekForm::class, [
-            'method' => 'POST',
-            'url' => route('user.seek')
-        ]);
 
         $records = $this->prepare()
                     ->orderBy('users.branch')
@@ -84,26 +88,31 @@ class UserController extends Controller
         $all = $this->prepare()
                         ->get()
                         ->count();
+        return view('users.main', compact('records', 'all'));
 
-        return view('users.index', compact('form'))
-                    ->with('all', $all)
-                    ->with('records', $records);
+        // return view('users.index', compact('form'))
+        //             ->with('all', $all)
+        //             ->with('records', $records);
     }
 
     // 查询条件
     public function seek(Request $request)
     {
-        $user_seek_array = [];
-        if($request->has('key')) $user_seek_array = array_add($user_seek_array, 'key', $request->key);
-        if($request->has('branch')) $user_seek_array = array_add($user_seek_array, 'branch', $request->branch);
-        Session::put('user_seek_array', $user_seek_array);
+        $all = $request->all();
+
+        if($request->key != '') {
+            Session::put('user_key', $request->key);
+        }else{
+            if(Session::has('user_key')) Session::forget('user_key');
+        }
+
         return redirect('/user');
     }
 
     // 查询重置
     public function seekReset()
     {
-        if(Session::has('user_seek_array')) Session::forget('user_seek_array');
+        if(Session::has('user_key')) Session::forget('user_key');
         return redirect('/user');
     }
 

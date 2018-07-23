@@ -78,7 +78,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/user/reset_password', 'UserController@resetPassword');
     Route::post('/user/update_password', ['as'=>'password.store', 'uses'=>'UserController@updatePassword']);
     Route::get('/user/{id}', 'UserController@show');
-    Route::post('/user/seek', ['as'=>'user.seek', 'uses'=>'UserController@seek']);
+    Route::post('/user/seek', 'UserController@seek');
     Route::get('/user/seek/reset', 'UserController@seekReset');
     Route::get('/user/lock/{id}', 'UserController@lock');
     Route::get('/user/unlock/{id}', 'UserController@unlock');
