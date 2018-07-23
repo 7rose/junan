@@ -55,7 +55,7 @@ class UserController extends Controller
                         //     $query->where('finance.date', '<', strtotime(session('finance_date_end')));
                         // }
 
-                        if(Session::has('finance_key')){
+                        if(Session::has('user_key')){
                             $query->Where('users.work_id', 'LIKE', '%'.session('user_key').'%');
                             $query->orWhere('users.name', 'LIKE', '%'.session('user_key').'%');
                             $query->orWhere('users.mobile', 'LIKE', '%'.session('user_key').'%');

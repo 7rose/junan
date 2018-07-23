@@ -53,8 +53,15 @@ class CustomerController extends Controller
                         group_concat(branches.text) as biz_branch_text
                         '))
             ->where(function ($query) { 
-                // 关键词
-                if(Session::has('seek_array') && array_has(Session::get('seek_array'), 'key') && Session::get('seek_array')['key'] != '') {
+                // if(Session::has('finance_date_start')){
+                //     $query->where('finance.date', '>=', strtotime(session('finance_date_start')));
+                // }
+
+                // if(Session::has('finance_date_end')){
+                //     $query->where('finance.date', '<', strtotime(session('finance_date_end')));
+                // }
+
+                if(Session::has('finance_key')){
                     $query->Where('customers.name', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
                     $query->orWhere('customers.mobile', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
                     $query->orWhere('customers.id_number', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
@@ -66,11 +73,26 @@ class CustomerController extends Controller
 
                 // 分支机构限制
                 if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
-                    $query->where('biz.branch', $this->auth->branchLimitId());
-                    // $query->where('biz.finished', false);
-                    // $query->orWhere('finance.branch', '=', $this->auth->branchLimitId());
-                    if(!Session::has('seek_array')) $query->orWhere('biz.branch', 1); # 认领
+                    $query->Where('finance.branch', $this->auth->branchLimitId());
                 }
+                // // 关键词
+                // if(Session::has('seek_array') && array_has(Session::get('seek_array'), 'key') && Session::get('seek_array')['key'] != '') {
+                //     $query->Where('customers.name', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                //     $query->orWhere('customers.mobile', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                //     $query->orWhere('customers.id_number', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                //     // $query->orWhere('customers.finance_info', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                //     $query->orWhere('customers.address', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                //     $query->orWhere('customers.location', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                //     $query->orWhere('customers.content', 'LIKE', '%'.Session::get('seek_array')['key'].'%');
+                // }
+
+                // // 分支机构限制
+                // if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
+                //     $query->where('biz.branch', $this->auth->branchLimitId());
+                //     // $query->where('biz.finished', false);
+                //     // $query->orWhere('finance.branch', '=', $this->auth->branchLimitId());
+                //     if(!Session::has('seek_array')) $query->orWhere('biz.branch', 1); # 认领
+                // }
                 
             });
         return $records;
