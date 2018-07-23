@@ -124,7 +124,7 @@ class Pre
                 $text .= '<span class="label label-'.$color.'">'.explode(':', $array_licence_type_text[$i])[0].':'.explode('(', $array_branch_text[$i])[0].'</span>';
             }else{
                 $auth = new Auth;
-                if($auth->branchLimit()){
+                if($auth->branchLimit() && $auth->forCliam($record->id)){
                     $text .= '<button onClick="javascript:claim('.$record->id.')" class="btn btn-xs btn-danger">'.explode(':', $array_licence_type_text[$i])[0].' - 本校认领'.'</button>';
                 }else{
                     $text .= '<span class="label label-danger">'.explode(':', $array_licence_type_text[$i])[0].' - 无驾校!'.'</span>';

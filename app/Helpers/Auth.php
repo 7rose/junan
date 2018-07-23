@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\User;
 use Session;
+use DB;
 
 /**
  *  授权
@@ -47,6 +48,30 @@ class Auth
     public function self($target_id)
     {
         return $this->my_id == $target_id ? true : false;
+    }
+
+    // 有待认领业务
+    public function forCliam($target_id)
+    {
+        $has = DB::table('biz')
+                    ->where('customer_id', $target_id)
+                    ->where('branch',1)
+                    ->where('finished', false)
+                    ->get();
+                    
+        return count($has) ? true : false;
+    }
+
+    // 本机构有业务
+    public function hasBiz($target_id)
+    {
+        $has_biz = DB::table('biz')
+                    ->where('customer_id', $target_id)
+                    ->where('branch',$this->me->branch)
+                    ->where('finished', false)
+                    ->get();
+                    
+        return count($has_biz) ? true : false;
     }
 
     // 同机构

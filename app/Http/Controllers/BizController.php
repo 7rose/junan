@@ -24,6 +24,7 @@ class BizController extends Controller
     // 新业务
     public function create($id=0)
     {
+        if($id == 0) return redirect('/customer');
         // 授权
         $auth = new Auth;
         $auth_error = new Error;
@@ -31,7 +32,6 @@ class BizController extends Controller
 
         $error = new Error;
 
-        if($id == 0) return redirect('/customer');
         $record = Customer::find($id);
         if(!$record) return $error->notFound();
 

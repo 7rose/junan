@@ -63,7 +63,7 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/customer/create', 'CustomerController@create');
     Route::get('/customer/{id}', 'CustomerController@show');
     Route::post('/customer/store', ['as'=>'customer.store', 'uses'=>'CustomerController@store']);
-    Route::post('/customer/seek', ['as'=>'customer.seek', 'uses'=>'CustomerController@seek']);
+    Route::post('/customer/seek', 'CustomerController@seek');
     Route::get('/customer/seek/reset', 'CustomerController@seekReset');
     Route::get('/customer/edit/{id}', 'CustomerController@edit');
     Route::post('/customer/update/{id}', ['as'=>'customer.update', 'uses'=>'CustomerController@update']);

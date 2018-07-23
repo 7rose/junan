@@ -66,7 +66,7 @@ class UserController extends Controller
 
                         // 分支机构限制
                         if($this->auth->branchLimit() || (!$this->auth->branchLimit() && Session::has('branch_set')  && Session::get('branch_set') != 1)) {
-                            $query->Where('finance.branch', $this->auth->branchLimitId());
+                            $query->Where('users.branch', $this->auth->branchLimitId());
                         }
 
                     });

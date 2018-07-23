@@ -9,9 +9,10 @@
         
         <table class="table table-striped table-hover">
           <caption><h4>成员 <span class="glyphicon glyphicon-user"></h4>
+            <a href="/user/create" class="btn btn-sm btn-success">+ 新成员</a>&nbsp&nbsp
             @if($auth->admin())
             <div class="btn-group">
-                <a href="/finance/download/excel" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-th-list"></span> 下载Excel </a>
+                <a href="/user/download/excel" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-th-list"></span> 下载Excel </a>
             </div>
             @endif
         </caption>

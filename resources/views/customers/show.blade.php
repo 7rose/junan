@@ -36,7 +36,7 @@
          <a href="/customer/biz/{{ $record->id }}" class="btn btn-success btn-sm">+ 新业务</a>&nbsp
             @endif
         @if(isset($biz) && count($biz))
-            @if(!$auth->admin())
+            @if(!$auth->admin() && $auth->hasBiz($record->id))
         <a href="/finance/create/{{ $record->id }}" class="btn btn-warning btn-sm">$ 收付款</a>
             @endif
         @endif

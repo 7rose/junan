@@ -139,7 +139,7 @@ class FinanceController extends Controller
         // 授权
         $auth = new Auth;
         $auth_error = new Error;
-        if($auth->admin())  return $auth_error->forbidden();
+        if($auth->admin() ||  !$auth->hasBiz($id))  return $auth_error->forbidden();
 
         $record = Customer::find($id);
         $error = new Error;
@@ -163,7 +163,7 @@ class FinanceController extends Controller
         // 授权
         $auth = new Auth;
         $auth_error = new Error;
-        if($auth->admin())  return $auth_error->forbidden();
+        if($auth->admin() ||  !$auth->hasBiz($id))  return $auth_error->forbidden();
         
         $all = $request->all();
         $form = $this->form(FinanceForm::class);
