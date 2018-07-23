@@ -43,13 +43,13 @@
                 <th>收/付</th>
                 <th>驾校</th>
                 <th>项目</th>
+                <th>时间</th>
                 <th>学员</th>
+                <th>推荐人</th>
                 <th>应收(付)</th>
                 <th>实收(付)</th>
                 <th>结果</th>
                 <th>经手人</th>
-                <th>推荐人</th>
-                <th>时间</th>
                 <th>票号</th>
                 <th>操作</th>
             </tr>
@@ -61,13 +61,13 @@
               <td>{{ $record->in ? '+' : '-' }}</td>
               <td>{!! $show->seekString('finance_key', $record->branch_text) !!}</td>
               <td>{!! $show->seekString('finance_key', $record->item_text) !!}</td>
+              <td>{{ date('Y-m-d', $record->date) }}</td>
               <td>{!! $show->seekString('finance_key', $record->customer_id_text) !!}</td>
+              <td>{!! $show->seekString('finance_key', $record->user_id_text) !!}</td>
               <td>{!! $show->seekString('finance_key', $record->price) !!}</td>
               <td>{{ $record->real_price }}</td>
               <td>{{ $record->price - $record->real_price }}</td>
               <td>{{ $record->created_by_text }}</td>
-              <td>{!! $show->seekString('finance_key', $record->user_id_text) !!}</td>
-              <td>{{ date('Y-m-d', $record->date) }}</td>
               <td>{{ $record->ticket_no }}</td>
               <td>
               @if(!$record->abandon)
