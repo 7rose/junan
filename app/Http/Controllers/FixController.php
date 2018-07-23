@@ -7,5 +7,8 @@ use DB;
 
 class FixController extends Controller
 {
-    //
+    public function index()
+    {
+        # code...
+    }
 }

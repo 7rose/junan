@@ -7,7 +7,7 @@ Route::post('/user/check', ['as'=>'user.check', 'uses'=>'UserController@check'])
 Route::get('/locked', 'UserController@lockInfo');
 
 // 错误修复
-Route::get('/finance/fix', 'FinanceController@fix');
+Route::get('/finance/fix', 'FixController@index');
 
 // 日志
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');

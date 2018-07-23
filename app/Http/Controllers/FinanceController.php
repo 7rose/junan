@@ -398,42 +398,6 @@ class FinanceController extends Controller
         })->export('xlsx');
     }
 
-    // 财务记录
-    public function fix()
-    {
-        /*
-         *
-         * 2018-7-20 星期5 - 22记录中若修改必然造成错误
-         *
-        */
-        $all = $records = $this->prepare()->get();
-
-        $cellData = [
-            ['日期', '驾校', '推荐人', '收费类型','应收','实收', '业务号'],
-        ];
-
-        foreach ($all as $a) {
-                // if($a->biz_id){
-            if($a->customer_id != $a->biz_customer_id && $a->customer_id && $a->biz_id){
-                    array_push($cellData,[date('Y-m-d', $a->date), $a->branch_text, $a->user_id_text, $a->item_text, $a->price, $a->real_price, $a->biz_id, $a->biz_customer_id, $a->customer_id, $a->id]);
-                    // Finance::find($a->id)->update(['customer_id'=> $a->biz_customer_id]);
-                    
-            }
-                // }
-        }
-
-        $file_name = '财务-错误修正'.date('Y-m-d', time());
-
-        Excel::create($file_name,function($excel) use ($cellData){
-            $excel->sheet('列表', function($sheet) use ($cellData){
-                // $sheet->getStyle('D')->getNumberFormat()->setFormatCode('FORMAT_TEXT');
-                $sheet->rows($cellData);
-                $sheet->setAutoSize(true);
-                $sheet->freezeFirstRow();
-            });
-        })->export('xlsx');
-    }
-
     // end
 }
 
