@@ -9,7 +9,7 @@
         <table class="table table-striped table-hover">
           <caption><h4>车辆: 加班车 <span class="glyphicon glyphicon-tag"></h4>
             <div class="btn-group">
-                <a href="/cars/income/create" class="btn btn-info btn-sm"> + 新业务</a>
+                <a href="/cars/income/create" class="btn btn-success btn-sm"> + 新业务</a>
             </div>
             @if($auth->admin())
             <div class="btn-group">
