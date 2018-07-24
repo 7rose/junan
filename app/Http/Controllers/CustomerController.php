@@ -92,10 +92,12 @@ class CustomerController extends Controller
                         ->orderBy('customers.created_at', 'desc')
                         ->paginate(50);
         // Session::put('customer_list', $records);
-        $all = $this->prepare()
-                        ->groupBy('customers.id')
-                        ->get()
-                        ->count();
+        // $all = $this->prepare()
+        //                 ->groupBy('customers.id')
+        //                 ->get()
+        //                 ->count();
+                        
+        $all = DB::table('customers')->count();
 
         return view('customers.main', compact('records', 'all'));
     }

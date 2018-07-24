@@ -8,7 +8,7 @@
     @if(isset($records))
         
         <table class="table table-striped table-hover">
-          <caption><h4>成员 <span class="glyphicon glyphicon-user"></h4>
+          <caption><h4>成员 <span class="glyphicon glyphicon-user"></span> - {{ isset($all) ? $all : 0 }}</h4>
             <a href="/user/create" class="btn btn-sm btn-success">+ 新成员</a>&nbsp&nbsp
             @if($auth->admin())
             <div class="btn-group">

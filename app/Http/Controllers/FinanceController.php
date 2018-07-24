@@ -93,7 +93,9 @@ class FinanceController extends Controller
             ->latest('finance.created_at')
             ->paginate(50);
 
-        return view('finance.main', compact('records'));
+        $all = Finance::count();
+
+        return view('finance.main', compact('records', 'all'));
     }
 
         // 查询条件

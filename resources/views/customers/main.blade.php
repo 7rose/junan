@@ -10,7 +10,7 @@
     @if(isset($records))
         
         <table class="table table-striped table-hover">
-          <caption><h4>学员 <span class="glyphicon glyphicon-leaf"></h4>
+          <caption><h4>学员 <span class="glyphicon glyphicon-leaf"></span> - {{ isset($all) ? $all : 0 }}</h4>
             @if(!$auth->admin())
               <a href="/customer/create" class="btn btn-sm btn-success">+ 新学员</a>&nbsp&nbsp
             @endif

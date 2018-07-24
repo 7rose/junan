@@ -7,7 +7,7 @@
     @if(isset($records))
         
         <table class="table table-striped table-hover">
-          <caption><h4>车辆: 加班车 <span class="glyphicon glyphicon-tag"></h4>
+          <caption><h4>车辆: 加班车 <span class="glyphicon glyphicon-tag"></span> - {{ isset($all) ? $all : 0 }}</h4>
             @if($auth->branchLimit())
             <div class="btn-group">
                 <a href="/cars/income/create" class="btn btn-success btn-sm"> + 新业务</a>

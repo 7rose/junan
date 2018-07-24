@@ -167,15 +167,17 @@ class CarController extends Controller
                         ->paginate(50);
 
         // print_r($records);
+        $all = CarIncome::count();
 
-        return view('cars.main', compact('records'));
+        return view('cars.main', compact('records', 'all'));
     }
 
     // 加油修理列表
     public function costIndex()
     {
         $records = $this->pre2()->latest('car_costs.created_at')->paginate(50);
-        return view('cars.main_costs', compact('records'));
+        $all = CarCost::count();
+        return view('cars.main_costs', compact('records', 'all'));
     }
 
     // 列表

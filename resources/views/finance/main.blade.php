@@ -8,7 +8,7 @@
     @if(isset($records))
         
         <table class="table table-striped table-hover">
-          <caption><h4>财务 <span class="glyphicon glyphicon-usd"></h4>
+          <caption><h4>财务 <span class="glyphicon glyphicon-usd"></span> - {{ isset($all) ? $all : 0 }}</h4>
             @if($auth->admin())
             <div class="btn-group">
                 <a href="/finance/download/excel" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-th-list"></span> 下载Excel </a>
