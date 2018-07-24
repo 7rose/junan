@@ -352,6 +352,10 @@ class FinanceController extends Controller
         $target = Finance::find($id);
         $target = Finance::find($id)->update(['abandon' => true]);
 
+        // 更新预处理财务结果数据
+        $pre = new Pre;
+        $pre->updateFinance();
+
         // 日志
         $log_content = "财务: 废弃单据, 序号:".$id;
         $log_level = "danger";
