@@ -32,6 +32,7 @@ class Pre
     {
         $records = DB::table('customers')
                         ->leftJoin('finance', 'customers.id', '=', 'finance.customer_id')
+                        ->where('finance.abandon',false)
                         ->select(
                             'customers.id', 
                             DB::raw('
