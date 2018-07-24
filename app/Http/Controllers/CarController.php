@@ -62,6 +62,8 @@ class CarController extends Controller
                                 if(Session::has('cars_key')){
                                     $query->where('cars.car_no', 'LIKE', '%'.Session::get('cars_key').'%');
                                     $query->orWhere('users.name', 'LIKE', '%'.Session::get('cars_key').'%');
+                                    $query->orWhere('config.text', 'LIKE', '%'.Session::get('cars_key').'%');
+                                    $query->orWhere('branches.text', 'LIKE', '%'.Session::get('cars_key').'%');
                                     $query->orWhere('car_incomes.content', 'LIKE', '%'.Session::get('cars_key').'%');
                                 }
 
@@ -111,6 +113,9 @@ class CarController extends Controller
                                 if(Session::has('cars_key')){
                                     $query->where('cars.car_no', 'LIKE', '%'.Session::get('cars_key').'%');
                                     $query->orWhere('users.name', 'LIKE', '%'.Session::get('cars_key').'%');
+                                    $query->orWhere('config.text', 'LIKE', '%'.Session::get('cars_key').'%');
+                                    $query->orWhere('branches.text', 'LIKE', '%'.Session::get('cars_key').'%');
+                                    $query->orWhere('i.text', 'LIKE', '%'.Session::get('cars_key').'%');
                                     $query->orWhere('car_costs.content', 'LIKE', '%'.Session::get('cars_key').'%');
                                 }
 
@@ -167,7 +172,8 @@ class CarController extends Controller
                         ->paginate(50);
 
         // print_r($records);
-        $all = CarIncome::count();
+        // $all = CarIncome::count();
+        $all = $this->pre()->get()->count();
 
         return view('cars.main', compact('records', 'all'));
     }
@@ -176,7 +182,8 @@ class CarController extends Controller
     public function costIndex()
     {
         $records = $this->pre2()->latest('car_costs.created_at')->paginate(50);
-        $all = CarCost::count();
+        // $all = CarCost::count();
+        $all = $this->pre2()->get()->count();
         return view('cars.main_costs', compact('records', 'all'));
     }
 

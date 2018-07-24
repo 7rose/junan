@@ -85,11 +85,11 @@ class UserController extends Controller
                     // ->orderBy('users.created_at', 'desc')
                     ->paginate(50);
 
-        // $all = $this->prepare()
-        //                 ->get()
-        //                 ->count();
+        $all = $this->prepare()
+                        ->get()
+                        ->count();
 
-        $all = DB::table('users')->count();
+        // $all = DB::table('users')->count();
         
         return view('users.main', compact('records', 'all'));
 

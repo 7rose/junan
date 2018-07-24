@@ -93,7 +93,7 @@ class FinanceController extends Controller
             ->latest('finance.created_at')
             ->paginate(50);
 
-        $all = Finance::count();
+        $all = $this->prepare()->get()->count();
 
         return view('finance.main', compact('records', 'all'));
     }

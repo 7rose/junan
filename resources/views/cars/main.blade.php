@@ -1,5 +1,6 @@
 <?php
     $auth = new App\Helpers\Auth;
+    $show = new App\Helpers\Show;
 ?>
 @extends('../nav')
 
@@ -63,17 +64,17 @@
             @foreach($records as $record)
             <tr class="{{ $record->abandon ? 'danger' : 'default' }}">
               <td>{{ $record->id }}</td>
-              <td>{{ $record->car_no }}</td>
-              <td>{{ $record->type_text }}</td>
-              <td>{{ $record->branch_text }}</td>
-              <td>{{ $record->user_name }}</td>
+              <td>{!! $show->seekString('cars_key', $record->car_no) !!}</td>
+              <td>{!! $show->seekString('cars_key', $record->type_text) !!}</td>
+              <td>{!! $show->seekString('cars_key', $record->branch_text) !!}</td>
+              <td>{!! $show->seekString('cars_key', $record->user_name) !!}</td>
               <td>{{ date('Y-m-d H:i:s', $record->start) }}</td>
               <td>{{ $record->hours }}</td>
               <td>{{ $record->real_price }}</td>
               <td>{{ $record->ticket_no }}</td>
               <td>{{ $record->created_by_name }}</td>
               <td>{{ $record->created_at }}</td>
-              <td>{{ $record->content }}</td>
+              <td>{!! $show->seekString('cars_key', $record->content) !!}</td>
             </tr>
             @endforeach
           </tbody>
