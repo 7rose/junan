@@ -16,13 +16,13 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
 @section('container')
 
 <div class="row">
-    {{-- 主表 --}}
+    {{-- 主表  --}}
     <div class="col-sm-10">
         {{-- 查询 --}}
         <div class="alert alert-info">
             <div class="col-sm-3">
                 @if($part->actionFromUrl())
-                    <strong>{{ $part->actionText() ? $part->actionText() : $lesson_info }}</strong>
+                    <strong>{{ $part->actionText() ? $part->actionText() : $lesson_info }} -{{ $all }}人</strong>
                 @endif
             </div>
 

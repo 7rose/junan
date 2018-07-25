@@ -344,10 +344,11 @@ class FilterController extends Controller
                         ->groupBy('biz.id')
                         ->orderBy('biz.branch')
                         ->orderBy('biz.user_id')
-                        ->paginate(20);
+                        ->paginate(30);
 
         return view('filters.main')
                 ->with('records', $this->picker($pages))
+                ->with('all', count($records))
                 ->with('selected_records', $this->selected($pages));
     }
 

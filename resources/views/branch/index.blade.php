@@ -77,7 +77,7 @@
         function send() {
             var text_val = $("#text").val();
 
-            var text_input = text_val.replace(/^\s+|\s+$/g,"");
+            var text_input = text_val.replace(/^\s+|\s+$/g,"").replace(/（/, "(").replace(/）/, ")");
 
             if(text_input=='') {
                 alert("输入内容不能为空!");

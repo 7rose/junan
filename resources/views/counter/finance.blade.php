@@ -107,8 +107,8 @@
                 <h4 class="modal-title" id="myModalLabel">自定时统计时间段</h4>
             </div>
             <div class="modal-body">
-                <input type="date" id="date_start" required="required"> 起(包含当日), 至
-                <input type="date" id="date_end" required="required">之前(不包含当日)
+                <input type="date" id="date_start" required="required"> 至
+                <input type="date" id="date_end" required="required">
             </div>
             <div class="modal-footer">
                 <a class="btn btn-default btn-sm" data-dismiss="modal">关闭</a>

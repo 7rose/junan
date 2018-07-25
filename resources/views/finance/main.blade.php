@@ -89,7 +89,7 @@
                 @endif
 
               @else
-                已废弃
+                已废弃:{{ $record->content }}
               @endif
               </td>
             </tr>
@@ -223,7 +223,9 @@
     // 废弃
     function abandon(id)
     {
-        var msg = "您即将废弃序号为"+id+"的单据, 废弃后的记录仍会显示在列表中, 以红色背景标注, 废弃后的数据不计入统计; 此操作本身无法撤销, 请谨慎操作!!"
+      
+        var reason = '<input type=\"text\" class=\"form-control input-sm\" id=\"reason\" placeholder=\"废弃原因\" required=\"required\">';
+        var msg = "您即将废弃序号为"+id+"的单据, 废弃后的记录仍会显示在列表中, 以红色背景标注, 废弃后的数据不计入统计; 此操作本身无法撤销, 请谨慎操作!!"+reason;
         $("#modal-msg").html(msg);
 
         var close_btn = '<button type=\"button\" class=\"btn btn-sm btn-default\" data-dismiss=\"modal\">关闭</button>';
@@ -235,8 +237,17 @@
 
     function abandon_ex(id)
     {
+        var reason = $("#reason").val().replace(/(^\s*)|(\s*$)/g,"");
+
+        if(reason == ''){
+            alert('原因不得为空!');
+            return false;
+        }
+
         var post_url = "/finance/abandon";
-        var post_data = {id:id};
+        var post_data = {id:id, reason:reason};
+
+        console.log(post_data);
 
         $.post(
             post_url,

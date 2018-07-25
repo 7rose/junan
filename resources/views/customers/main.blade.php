@@ -24,6 +24,14 @@
           <caption>
               <form role="form" class="form-inline" method="post" action="/customer/seek">
                 {{ csrf_field() }}
+                <div class="form-group form-sm">
+                    <input type="date" class="form-control input-sm" name="date_start" value="{{ Session::has('customer_date_start') ? Session::get('customer_date_start') : '' }}">
+                  </div>
+                  <div class="form-group">
+                    <label for="name">起, 至</label>
+                    <input type="date" class="form-control input-sm" name="date_end" value="{{ Session::has('customer_date_end') ? Session::get('customer_date_end') : '' }}">
+                  </div>
+
                   <div class="form-group">
                     <input type="text" class="form-control input-sm" name="key" placeholder="关键词" value="{{ Session::has('customer_key') ? Session::get('customer_key') : '' }}">
                   </div>

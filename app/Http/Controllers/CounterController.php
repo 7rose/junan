@@ -176,7 +176,9 @@ class CounterController extends Controller
     // 自定义统计时间
     public function postSet(Request $request)
     {
-        $date = $request->input('date_start').','.$request->input('date_end');
+        $end_of_day = Carbon::parse(session('date_end'))->endOfDay();
+
+        $date = $request->input('date_start').','.$end_of_day;
         $d = new Date;
         // $date = '2018-7-1,2018-7-11';
         $range = $d->dateRange($date);

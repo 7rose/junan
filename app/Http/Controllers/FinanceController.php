@@ -14,6 +14,7 @@ use App\Forms\FinanceEditForm;
 use App\Finance;
 use App\Customer;
 use App\User;
+use Carbon\Carbon;
 
 use App\Helpers\Error;
 use App\Helpers\ConfigList;
@@ -60,7 +61,8 @@ class FinanceController extends Controller
                                 }
 
                                 if(Session::has('finance_date_end')){
-                                    $query->where('finance.date', '<', strtotime(session('finance_date_end')));
+                                    $end_of_day = Carbon::parse(session('finance_date_end'))->endOfDay();
+                                    $query->where('finance.date', '<=', strtotime($end_of_day));
                                 }
 
                                 if(Session::has('finance_key')){
@@ -349,10 +351,11 @@ class FinanceController extends Controller
         if(!$auth->root())  return "无权操作";
 
         $id = $request->input('id');
+        $reason = $request->input('reason');
         // if(!$target->checked || !$target->checked_by || !$target->ticket_no) return "记录单据登记异常!";
 
-        $target = Finance::find($id);
-        $target = Finance::find($id)->update(['abandon' => true]);
+        // $target = Finance::find($id);
+        $target = Finance::find($id)->update(['abandon' => true, 'content'=>$reason]);
 
         // 更新预处理财务结果数据
         $pre = new Pre;

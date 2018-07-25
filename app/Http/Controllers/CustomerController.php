@@ -9,6 +9,7 @@ use App\Biz;
 use App\Finance;
 use DB;
 use Excel;
+use Carbon\Carbon;
 
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\CustomerForm;
@@ -33,6 +34,8 @@ class CustomerController extends Controller
         // $pre = new Pre;
         // $pre->updateFinance();
 
+        // Carbon::parse('first day of December 2008')->addWeeks(2); 
+
         $this->auth = new Auth;
 
         $records = DB::table('customers')
@@ -53,13 +56,14 @@ class CustomerController extends Controller
                         group_concat(branches.text) as biz_branch_text
                         '))
             ->where(function ($query) { 
-                // if(Session::has('finance_date_start')){
-                //     $query->where('finance.date', '>=', strtotime(session('finance_date_start')));
-                // }
+                if(Session::has('customer_date_start')){
+                    $query->where('customers.created_at', '>=', session('customer_date_start'));
+                }
 
-                // if(Session::has('finance_date_end')){
-                //     $query->where('finance.date', '<', strtotime(session('finance_date_end')));
-                // }
+                if(Session::has('customer_date_end')){
+                    $end_of_day = Carbon::parse(session('customer_date_end'))->endOfDay();
+                    $query->where('customers.created_at', '<=', $end_of_day);
+                }
 
                 if(Session::has('customer_key')){
                     $query->where('customers.name', 'LIKE', '%'.session('customer_key').'%');
@@ -91,7 +95,7 @@ class CustomerController extends Controller
                         // ->orderBy('customers.finance_info', 'desc')
                         ->orderBy('customers.created_at', 'desc')
                         ->paginate(50);
-        // Session::put('customer_list', $records);
+        //  Session::put('customer_list', $records);
         $all = $this->prepare()
                         ->groupBy('customers.id')
                         ->get()
@@ -107,6 +111,18 @@ class CustomerController extends Controller
     {
          $all = $request->all();
 
+         if($request->date_start != '') {
+            Session::put('customer_date_start', $request->date_start);
+        }else{
+            if(Session::has('customer_date_start')) Session::forget('customer_date_start');
+        }
+
+        if($request->date_end != '') {
+            Session::put('customer_date_end', $request->date_end);
+        }else{
+            if(Session::has('customer_date_end')) Session::forget('customer_date_end');
+        }
+
         if($request->key != '') {
             Session::put('customer_key', $request->key);
         }else{
@@ -118,6 +134,8 @@ class CustomerController extends Controller
     // 查询重置
     public function seekReset()
     {
+        if(Session::has('customer_date_start')) Session::forget('customer_date_start');
+        if(Session::has('customer_date_end')) Session::forget('customer_date_end');
         if(Session::has('customer_key')) Session::forget('customer_key');
         return redirect('/customer');
     }

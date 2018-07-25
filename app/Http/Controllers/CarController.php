@@ -7,6 +7,7 @@ use DB;
 use Session;
 use Excel;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
+use Carbon\Carbon;
 
 use App\Helpers\Auth;
 use App\Helpers\Error;
@@ -56,7 +57,8 @@ class CarController extends Controller
                                 }
 
                                 if(Session::has('cars_date_end')){
-                                    $query->where('car_incomes.start', '<', strtotime(Session::get('cars_date_end')));
+                                    $end_of_day = Carbon::parse(session('cars_date_end'))->endOfDay();
+                                    $query->where('car_incomes.start', '<=', strtotime($end_of_day));
                                 }
 
                                 if(Session::has('cars_key')){
@@ -107,7 +109,8 @@ class CarController extends Controller
                                 }
 
                                 if(Session::has('cars_date_end')){
-                                    $query->where('finance.date', '<', strtotime(Session::get('cars_date_end')));
+                                    $end_of_day = Carbon::parse(session('cars_date_end'))->endOfDay();
+                                    $query->where('finance.date', '<=', strtotime($end_of_day));
                                 }
 
                                 if(Session::has('cars_key')){
