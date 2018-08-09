@@ -335,7 +335,7 @@ class FilterController extends Controller
     {
         $records = $this->router($key)
                         ->groupBy('biz.id')
-                        // ->orderBy('biz.id')
+                        ->orderBy('biz.id')
                         ->orderBy('biz.branch')
                         ->orderBy('biz.file_id')
                         ->orderBy('biz.user_id')

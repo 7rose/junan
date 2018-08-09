@@ -477,27 +477,34 @@ class ImportController extends Controller
 
             }else{
                 // 科目1通过后必须检测时间段
-                // 检验日期: 起点
-                if(strtotime($item['start_date']) == false) {
-                    $error = '第'.($i+2).'行: 考试有效期起点格式错误!';
-                    return redirect()->back()->withErrors(['file'=>$error])->withInput();
-                }
+                // 检验日期: 如果日期不为空则检验,为空则不校验
+                if($item['start_date'] != '' && $item['out_date'] != ''){
+                    if(strtotime($item['start_date']) == false) {
+                        $error = '第'.($i+2).'行: 考试有效期起点格式错误!';
+                        return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                    }
 
-                if(strtotime($item['out_date']) == false) {
-                    $error = '第'.($i+2).'行: 考试有效期结束点格式错误!';
-                    return redirect()->back()->withErrors(['file'=>$error])->withInput();
-                }
+                    if(strtotime($item['out_date']) == false) {
+                        $error = '第'.($i+2).'行: 考试有效期结束点格式错误!';
+                        return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                    }
 
-                if(Carbon::parse($item['start_date'])->addYears(3) < Carbon::today() || Carbon::parse($item['start_date']) > Carbon::today()) {
-                    $error = '第'.($i+2).'行: 考试有效期起点非法!';
-                    return redirect()->back()->withErrors(['file'=>$error])->withInput();
-                }
+                    if(Carbon::parse($item['start_date'])->addYears(3) < Carbon::today() || Carbon::parse($item['start_date']) > Carbon::today()) {
+                        $error = '第'.($i+2).'行: 考试有效期起点非法!';
+                        return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                    }
 
-                // 检验日期: 结束点
-                if(Carbon::parse($item['out_date']) > Carbon::today()->addYears(3) || Carbon::parse($item['out_date']) < Carbon::today()) {
-                    $error = '第'.($i+2).'行: 考试有效期结束点非法!';
-                    return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                    // 检验日期: 结束点
+                    if(Carbon::parse($item['out_date']) > Carbon::today()->addYears(3) || Carbon::parse($item['out_date']) < Carbon::today()) {
+                        $error = '第'.($i+2).'行: 考试有效期结束点非法!';
+                        return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                    }
                 }
+            }
+
+            // 检验准考证号
+            if(intval($request->lesson) == 3) {
+                // 
             }
 
             // 检验驾照类型字段
