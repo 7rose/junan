@@ -106,8 +106,17 @@
                     <h3 class="panel-title">{!! $pre->customerBiz($b) !!}</h3>
                 </div>
                 <div class="panel-body">
+                @if($b->start_date && $b->out_date)
+                        <div class="alert alert-info">{{ '有效期: '.date('Y-m-d', strtotime($b->start_date)).' 至 '.date('Y-m-d', strtotime($b->out_date)) }}</div>
+                @endif
+                
+                @if($b->content)
+                    <div class="alert alert-warning">{{ $b->content }}</div>
+                @endif
+
                 @if($b->class_id)
                     @if($pre->lessonList($b))
+
                     <table class="table table-hover">
                         <thead>
                             <tr>

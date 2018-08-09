@@ -6,10 +6,13 @@ use Illuminate\Http\Request;
 use Session;
 use Excel;
 use DB;
+use Carbon\Carbon;
 
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\UserImportForm;
 use App\Forms\ClassImportForm;
+use App\Forms\StepForm;
+
 use App\Helpers\Validator;
 use App\Helpers\Unique;
 use App\Helpers\Error;
@@ -391,6 +394,267 @@ class ImportController extends Controller
 
         return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'Excel导入已成功!']);
     }
+
+    // 学员进度
+    public function step()
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        $form = $this->form(StepForm::class, [
+            'method' => 'POST',
+            'url' => '/import/step/store'
+        ]);
+        $title = 'Excel导入: 考试进度';
+        $icon = 'import';
+        return view('form', compact('form'))->with('custom',['title'=>$title, 'icon'=>$icon]);
+    }
+
+       // 校验
+    public function stepStore(Request $request)
+    {
+        // 授权
+        $auth = new Auth;
+        $auth_error = new Error;
+        if(!$auth->admin())  return $auth_error->forbidden();
+
+        $resaults = Excel::load($request->file, function($reader) {
+            // 
+        })->get();
+
+        $form = $this->form(StepForm::class);
+        $validate = new Validator;
+        // $unique = new Unique;
+
+        // // print_r($array);
+        // $all_id_number_list = [];
+        // $new_customer_list = [];
+        // $update_customer_list = [];
+
+        // // 驾校列表
+        // $branches_list = DB::table('branches')
+        //                     ->where('id', '>', 1)
+        //                     ->where('show', true)
+        //                     ->select(['id', 'text'])
+        //                     ->get()
+        //                     ->toArray();
+                            
+        // if(!count($branches_list)) return $auth_error->paramLost();
+
+        for ($i=0; $i < count($resaults); $i++) { 
+
+            $item = $resaults[$i];
+            
+            // 检测字段存在
+            if(!isset($item['name']) || !isset($item['id_number']) || !isset($item['licence_type']) || !isset($item['step']) || !isset($item['start_date']) ||!isset($item['out_date'])){
+                $error = '文件格式错误';
+                return redirect()->back()->withErrors(['file'=>$error])->withInput();
+            }
+
+            // 空记录中止
+            if($item['id_number'] == '') break;
+
+            // 身份证
+            if(!$validate->checkIdNumber($item['id_number'])) {
+                $error = '第'.($i+2).'行: '.$resaults[$i]['name'].'-'.$item['id_number']."身份证号错误!";
+                return redirect()->back()->withErrors(['file'=>$error])->withInput();
+            }
+
+            // 次数
+            if(!intval($item['step']) && $item['step'] != 0 && $item['step'] != '0' ) {
+                $error = '第'.($i+2).'行: 历史考务必须为整数!';
+                return redirect()->back()->withErrors(['file'=>$error])->withInput();
+            }
+
+            if(intval($request->lesson) == 1) {
+                // 科目1不得有日期区间
+                if(strtotime($item['start_date']) == true || strtotime($item['start_date']) == true) {
+                    $error = '第'.($i+2).'行: 科目1导入不应有考试有效期!';
+                    return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                }
+
+            }else{
+                // 科目1通过后必须检测时间段
+                // 检验日期: 起点
+                if(strtotime($item['start_date']) == false) {
+                    $error = '第'.($i+2).'行: 考试有效期起点格式错误!';
+                    return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                }
+
+                if(strtotime($item['out_date']) == false) {
+                    $error = '第'.($i+2).'行: 考试有效期结束点格式错误!';
+                    return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                }
+
+                if(Carbon::parse($item['start_date'])->addYears(3) < Carbon::today() || Carbon::parse($item['start_date']) > Carbon::today()) {
+                    $error = '第'.($i+2).'行: 考试有效期起点非法!';
+                    return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                }
+
+                // 检验日期: 结束点
+                if(Carbon::parse($item['out_date']) > Carbon::today()->addYears(3) || Carbon::parse($item['out_date']) < Carbon::today()) {
+                    $error = '第'.($i+2).'行: 考试有效期结束点非法!';
+                    return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                }
+            }
+
+            // 检验驾照类型字段
+            $licence = DB::table('config')
+                            ->where('type', 'licence_type')
+                            ->where('text', 'LIKE', $item['licence_type'].':%');
+
+            $licence_num = count($licence->get());
+
+            if($licence_num == 0 || $licence_num > 1) {
+                $error = '第'.($i+2).'行: 驾照类型错误!';
+                return redirect()->back()->withErrors(['file'=>$error])->withInput();
+            }
+
+            // 校验用户
+            $target = DB::table('biz')
+                            ->leftJoin('customers', 'biz.customer_id', '=', 'customers.id')
+                            ->select('biz.branch', 'biz.id', 'biz.next', 'biz.next2', 'biz.next3')
+                            ->where('biz.finished', false)
+                            ->whereNotNull('biz.class_id')
+                            ->where('customers.id_number', $item['id_number'])
+                            ->where('biz.licence_type', $licence->first()->id);
+
+            $target_num = count($target->get());
+
+            if($target_num == 0 || $target_num > 1) {
+                $error = '第'.($i+2).'行: 学员未登记，或者虽然登记但尚未开班!';
+                return redirect()->back()->withErrors(['file'=>$error])->withInput();
+            }
+
+            // 检验驾校归属
+            if($target->first()->branch != $request->branch && $target->first()->branch != 1) {
+                $error = '第'.($i+2).'行: 该学员不属于以上选择的驾校!';
+                return redirect()->back()->withErrors(['file'=>$error])->withInput();
+            }
+
+            // 检验考试进度
+            switch (intval($request->lesson)) {
+                case 1:
+                    if($target->first()->next2 != '2.0' || $target->first()->next3 != '3.0' || $target->first()->next == '4.0' || $target->first()->next == '4.1' || $target->first()->next == '4.2' || $target->first()->next == '4.3') {
+                        $error = '第'.($i+2).'行: 该学员已有科目2/3/4考务记录,科目1记录已过期!';
+                        return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                    }
+
+                    break;
+
+                case 2:
+                    if($target->first()->next == '4.0' || $target->first()->next == '4.1' || $target->first()->next == '4.2' || $target->first()->next == '4.3') {
+                        $error = '第'.($i+2).'行: 该学员已有科目4考务记录,科目2记录已过期!';
+                        return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                    }
+
+                    break;
+
+                case 3:
+                    if($target->first()->next == '4.0' || $target->first()->next == '4.1' || $target->first()->next == '4.2' || $target->first()->next == '4.3') {
+                        $error = '第'.($i+2).'行: 该学员已有科目4考务记录,科目3记录已过期!';
+                        return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                    }
+
+                    break;
+
+                case 4:
+                    if($target->first()->next == '4.3') {
+                        $error = '第'.($i+2).'行: 该学员科目4已通过,数据已已过期!';
+                        return redirect()->back()->withErrors(['file'=>$error])->withInput();
+                    }
+
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
+
+        }
+        // 缓存结果
+        session(['step_imports' => $resaults]);
+        session(['step_imports_requests' => ['lesson' => $request->lesson, 'branch' => $request->branch]]);
+
+        $all = count($resaults);
+        return view('import.step_info', compact('all'));
+ 
+    }
+
+    // 写入
+    public function stepSave()
+    {
+        // 授权
+        $auth = new Auth;
+        $error = new Error;
+        if(!$auth->admin())  return $error->forbidden();
+
+        if(!Session::has('step_imports') || count(session('step_imports')) == 0 || !Session::has('step_imports_requests')) return $error->paramLost();
+
+        
+        $resaults = session('step_imports');
+        $requests = session('step_imports_requests');
+
+        for ($i=0; $i < count($resaults); $i++) { 
+
+            $item = $resaults[$i];
+
+            $licence = DB::table('config')
+                            ->where('type', 'licence_type')
+                            ->where('text', 'LIKE', $item['licence_type'].':%')
+                            ->first()->id;
+
+            $target = DB::table('biz')
+                            ->leftJoin('customers', 'biz.customer_id', '=', 'customers.id')
+                            ->select('biz.branch', 'biz.id', 'biz.next', 'biz.next2', 'biz.next3', 'biz.content')
+                            ->where('biz.finished', false)
+                            ->whereNotNull('biz.class_id')
+                            ->where('customers.id_number', $item['id_number'])
+                            ->where('biz.licence_type', $licence)
+                            ->first();
+
+            // 分类
+            $branch = $requests['branch'];
+
+            $new_content = intval($item['step']) == 0 ? null : $item['step'];
+            $content = $new_content ? '科目'.$requests['lesson'].'补考'.$new_content.'次; '.$target->content : $target->content;
+
+            $start_date = Carbon::parse($item['start_date']);
+            $out_date = Carbon::parse($item['out_date']);
+
+            switch ($requests['lesson']) {
+                case 1:
+                    Biz::find($target->id)->update(['branch' => $branch, 'next' => '1.0', 'next2' => '2.0', 'next3' => '3.0', 'content' => $content]);
+                    // $target->update(['branch' => $branch, 'next' => '1.0', 'next2' => '2.0', 'next3' => '3.0', 'content' => $content]);
+                    break;
+
+                case 2:
+                    Biz::find($target->id)->update(['branch' => $branch, 'next' => '1.3', 'next2' => '2.0', 'start_date'=>$start_date, 'out_date'=>$out_date, 'content' => $content]);
+                    break;
+
+                case 3:
+                    Biz::find($target->id)->update(['branch' => $branch, 'next' => '1.3', 'next3' => '3.0', 'start_date'=>$start_date, 'out_date'=>$out_date, 'content' => $content]);
+                    break;
+
+                case 4:
+                    Biz::find($target->id)->update(['branch' => $branch, 'next' => '4.0', 'next2' => '2.3', 'next3' => '3.3', 'start_date'=>$start_date, 'out_date'=>$out_date, 'content' => $content]);
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
+
+            // 清理session
+            if(Session::has('step_imports')) Session::forget('step_imports');
+            if(Session::has('step_imports_requests')) Session::forget('step_imports_requests');
+        }
+
+        return view('note')->with('custom', ['color'=>'success', 'icon'=>'ok', 'content'=>'Excel导入已成功!']);
+    }
+
 
     // end
 }

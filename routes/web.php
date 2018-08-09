@@ -58,6 +58,9 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
     Route::get('/import/class', 'ImportController@classImport');
     Route::post('/import/class/store', ['as'=>'import.class_store', 'uses'=>'ImportController@classStore']);
     Route::get('/import/class/save', 'ImportController@classSave');
+    Route::get('/import/step', 'ImportController@step');
+    Route::post('/import/step/store', 'ImportController@stepStore');
+    Route::get('/import/step/save', 'ImportController@stepSave');
 
     // 学员
     Route::get('/customer', 'CustomerController@index');
@@ -149,8 +152,21 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 
 Route::get('/test', function() {
-        return config('app.env');
-    });
+    // $c = new Carbon\Carbon;
+    // $a = 'fukc';
+    // $a=(int)$a; 
+    // $b = floatval($a);
+    // $string = '';
+    $a = 'fuck';
+
+// $content = optional(intval($a) == 0) ? $a : 'null';
+    $content = intval($a) == 0 ? null : $a;
+echo $content;
+
+    // echo $b;
+        // if(strtotime($string) === false) echo "fuck";
+
+});
 
 
 

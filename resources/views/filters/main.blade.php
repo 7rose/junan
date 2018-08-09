@@ -145,6 +145,7 @@ $lesson_info .= Session::has('score_lesson') ? ',  科目: '.Session::get('score
                     @else
                     <tr>
                     @endif
+                    
                         <td>{!! $seek->seekKey($record->customer_name, $key) !!}</td>
                         <td>{!! $seek->seekKey($record->customer_mobile, $key) !!}</td>
                         <td>{!! $seek->seekKey($record->customer_id_number, $key) !!}</td>

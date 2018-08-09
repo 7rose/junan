@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 use App\Forms\ScoreForm;
+use Carbon\Carbon;
 
 use DB;
 use URL;
@@ -270,6 +271,9 @@ class FilterController extends Controller
     // 默认跳转
     public function index()
     {
+        // 清除选择
+        $this->clearSelect();
+
         return redirect('/filter/file_id_fail');
     }
 
@@ -331,6 +335,7 @@ class FilterController extends Controller
     {
         $records = $this->router($key)
                         ->groupBy('biz.id')
+                        // ->orderBy('biz.id')
                         ->orderBy('biz.branch')
                         ->orderBy('biz.file_id')
                         ->orderBy('biz.user_id')
@@ -770,7 +775,12 @@ class FilterController extends Controller
             ->update(['end'=>true]);
 
         if($lesson==1) {
-            DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>$lesson.'.3']);
+            // 写入考试有效期
+            $start_date = Carbon::createFromTimestamp($order_date);
+            $out_date = $start_date->copy()->addYears(3);
+
+            // 写入进度
+            DB::table('biz')->whereIn('id', $array_resault)->update(['next'=>$lesson.'.3', 'start_date'=>$start_date, 'out_date'=>$out_date]);
         }elseif ($lesson==2 || $lesson==3) {
             DB::table('biz')->whereIn('id', $array_resault)->update(['next'.$lesson=>$lesson.'.3']);
             
