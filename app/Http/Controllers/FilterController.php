@@ -347,11 +347,13 @@ class FilterController extends Controller
 
         $pages = $this->router($key)
                         ->groupBy('biz.id')
+                        ->orderBy('biz.id')
                         ->orderBy('biz.branch')
                         ->orderBy('biz.user_id')
                         ->paginate(30);
 
         return view('filters.main')
+                // ->with('records', $records)
                 ->with('records', $this->picker($pages))
                 ->with('all', count($records))
                 ->with('selected_records', $this->selected($pages));

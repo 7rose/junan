@@ -74,7 +74,9 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="/import/user"><span class="glyphicon glyphicon-user"></span> 成员</a></li>
+                            <li class="divider"></li>
                             <li><a href="/import/class"><span class="glyphicon glyphicon-list-alt"></span> 开班花名册</a></li>
+                            <li class="divider"></li>
                             <li><a href="/import/step"><span class="glyphicon glyphicon-align-left"></span> 考试进度</a></li>
                         </ul>
                     </li>
