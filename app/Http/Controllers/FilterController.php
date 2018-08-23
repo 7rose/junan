@@ -685,6 +685,7 @@ class FilterController extends Controller
         // $auth = new Auth;
         // $auth_error = new Error;
         // if(!$auth->info())  return $auth_error->forbidden();
+
         Session::put('score_date', strtotime($request->order_date));
         Session::put('score_lesson', $request->lesson);
 
@@ -712,11 +713,13 @@ class FilterController extends Controller
         Session::put('biz_records', $pre->get());
         // return $records->toJson();
 
+        $all = $pre->get()->count();
         $pages = $pre->paginate(20);
         // // 清除选择
         // $this->clearSelect();
 
         return view('filters.main')
+                ->with('all', $all)
                 ->with('records', $this->picker($pages))
                 ->with('selected_records', $this->selected($pages));
     }
