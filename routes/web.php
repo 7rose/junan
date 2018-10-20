@@ -153,19 +153,6 @@ Route::group(['middleware' => ['login', 'state_check']], function () {
 
 Route::get('/test', function() {
     // $c = new Carbon\Carbon;
-    // $a = 'fukc';
-    // $a=(int)$a; 
-    // $b = floatval($a);
-    // $string = '';
-    $a = 'fuck';
-
-// $content = optional(intval($a) == 0) ? $a : 'null';
-    $content = intval($a) == 0 ? null : $a;
-echo $content;
-
-    // echo $b;
-        // if(strtotime($string) === false) echo "fuck";
-
 });
 
 
